@@ -142,7 +142,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Envelope<Void>> handleBusinessException(BusinessException e) {
         log.error("handleBusinessException", e);
 
-        Envelope<Void> response = Envelope.error(e.getCode(), e.getArgs());
+        Envelope<Void> response = Envelope.error(e.getCode());
 
         return ResponseEntity.ok(response);
     }

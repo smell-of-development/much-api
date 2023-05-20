@@ -47,14 +47,6 @@ public class Envelope<D> {
 
 
     private Envelope(final Code code,
-                     final Object... args) {
-
-        this.code = code.getCode();
-        this.message = String.format(code.getMessage(), args);
-    }
-
-
-    private Envelope(final Code code,
                      final D data) {
 
         this.code = code.getCode();
@@ -97,9 +89,9 @@ public class Envelope<D> {
     }
 
 
-    public static Envelope<Void> error(final Code code, Object... args) {
+    public static Envelope<Void> error(final Code code) {
 
-        return new Envelope<>(code, args);
+        return new Envelope<>(code);
     }
 
 
@@ -123,7 +115,7 @@ public class Envelope<D> {
 
 
         private static List<Error> of(final BindingResult bindingResult,
-                                final MessageSource messageSource) {
+                                      final MessageSource messageSource) {
 
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
             if (!fieldErrors.isEmpty()) {
