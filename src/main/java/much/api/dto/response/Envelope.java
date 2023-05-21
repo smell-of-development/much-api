@@ -5,20 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import much.api.common.enums.Code;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Envelope<D> {
+public class Envelope<R> {
 
     @Schema(defaultValue = "200", example = "200")
     private Integer code;
@@ -26,17 +17,17 @@ public class Envelope<D> {
     @Schema(description = "참고용 메세지")
     private String message;
 
-    private List<Error> errors;
+//    private List<Error> errors;
 
 //    private Error error;
 
-    private D data;
+    private R result;
 
 
-    private Envelope(final Integer code, final D data) {
+    private Envelope(final Integer code, final R result) {
 
         this.code = code;
-        this.data = data;
+        this.result = result;
     }
 
     private Envelope(final Code code) {
@@ -47,11 +38,11 @@ public class Envelope<D> {
 
 
     private Envelope(final Code code,
-                     final D data) {
+                     final R result) {
 
         this.code = code.getCode();
         this.message = code.getMessage();
-        this.data = data;
+        this.result = result;
     }
 
 
@@ -63,30 +54,30 @@ public class Envelope<D> {
 //    }
 
 
-    private Envelope(final Code code,
-                     final List<Error> error) {
+//    private Envelope(final Code code,
+//                     final List<Error> error) {
+//
+//        this(code);
+//        this.errors = error;
+//    }
 
-        this(code);
-        this.errors = error;
-    }
-
-    public static <D> Envelope<D> ok(final D data) {
+    public static <R> Envelope<R> ok(final R data) {
 
         return new Envelope<>(HttpStatus.OK.value(), data);
     }
 
-    public static <D> Envelope<D> okWithCode(final Code code,
-                                             final D data) {
+    public static <R> Envelope<R> okWithCode(final Code code,
+                                             final R data) {
 
         return new Envelope<>(code, data);
     }
 
-    public static Envelope<Void> error(final Code code,
-                                       final BindingResult bindingResult,
-                                       final MessageSource messageSource) {
-
-        return new Envelope<>(code, Error.of(bindingResult, messageSource));
-    }
+//    public static Envelope<Void> error(final Code code,
+//                                       final BindingResult bindingResult,
+//                                       final MessageSource messageSource) {
+//
+//        return new Envelope<>(code, Error.of(bindingResult, messageSource));
+//    }
 
 
     public static Envelope<Void> error(final Code code) {
@@ -101,55 +92,55 @@ public class Envelope<D> {
 //        return new Envelope<>(code, errors);
 //    }
 
-    private record Error(String target, String value, String reason) {
-
-        public static List<Error> of(final String target,
-                                     final String value,
-                                     final String reason) {
-
-
-            List<Error> errors = new ArrayList<>();
-            errors.add(new Error(target, value, reason));
-            return errors;
-        }
-
-
-        private static List<Error> of(final BindingResult bindingResult,
-                                      final MessageSource messageSource) {
-
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            if (!fieldErrors.isEmpty()) {
-                return fieldErrors.stream()
-                        .map(fieldError -> new Error(
-                                fieldError.getField(),
-                                fieldError.getRejectedValue() == null ? "" : fieldError.getRejectedValue().toString(),
-                                messageSource.getMessage(fieldError, Locale.KOREA)))
-                        .collect(Collectors.toList());
-            }
-//            FieldError fieldError = bindingResult.getFieldErrors().get(0);
-//            if (fieldError != null) {
-//                return new Error(
-//                        fieldError.getField(),
-//                        messageSource.getMessage(fieldError, Locale.KOREA));
+//    private record Error(String target, String value, String reason) {
+//
+//        public static List<Error> of(final String target,
+//                                     final String value,
+//                                     final String reason) {
+//
+//
+//            List<Error> errors = new ArrayList<>();
+//            errors.add(new Error(target, value, reason));
+//            return errors;
+//        }
+//
+//
+//        private static List<Error> of(final BindingResult bindingResult,
+//                                      final MessageSource messageSource) {
+//
+//            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+//            if (!fieldErrors.isEmpty()) {
+//                return fieldErrors.stream()
+//                        .map(fieldError -> new Error(
+//                                fieldError.getField(),
+//                                fieldError.getRejectedValue() == null ? "" : fieldError.getRejectedValue().toString(),
+//                                messageSource.getMessage(fieldError, Locale.KOREA)))
+//                        .collect(Collectors.toList());
 //            }
-
-            List<ObjectError> allErrors = bindingResult.getAllErrors();
-            return allErrors.stream()
-                    .map(objectError -> new Error(
-                            objectError.getObjectName(),
-                            "",
-                            objectError.getDefaultMessage()))
-                    .collect(Collectors.toList());
-//            ObjectError globalError = bindingResult.getGlobalErrors().get(0);
-//            if (globalError != null) {
-//                return new Error(
-//                        globalError.getObjectName(),
-//                        globalError.getDefaultMessage()
-//                );
-//            }
-
-//            return new Error(null, null);
-        }
-    }
+////            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+////            if (fieldError != null) {
+////                return new Error(
+////                        fieldError.getField(),
+////                        messageSource.getMessage(fieldError, Locale.KOREA));
+////            }
+//
+//            List<ObjectError> allErrors = bindingResult.getAllErrors();
+//            return allErrors.stream()
+//                    .map(objectError -> new Error(
+//                            objectError.getObjectName(),
+//                            "",
+//                            objectError.getDefaultMessage()))
+//                    .collect(Collectors.toList());
+////            ObjectError globalError = bindingResult.getGlobalErrors().get(0);
+////            if (globalError != null) {
+////                return new Error(
+////                        globalError.getObjectName(),
+////                        globalError.getDefaultMessage()
+////                );
+////            }
+//
+////            return new Error(null, null);
+//        }
+//    }
 
 }

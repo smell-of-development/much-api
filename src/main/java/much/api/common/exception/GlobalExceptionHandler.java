@@ -3,7 +3,6 @@ package much.api.common.exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.dto.response.Envelope;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +23,7 @@ import static much.api.common.enums.Code.*;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private final MessageSource messageSource;
+//    private final MessageSource messageSource;
 
     /**
      * validation.Valid or @Validated binding error 발생시
@@ -33,11 +32,12 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Envelope<Void>> handleBindException(BindException e) {
         log.error("handleBindException", e);
 
-        Envelope<Void> response = Envelope.error(
-                INVALID_INPUT_VALUE,
-                e.getBindingResult(),
-                messageSource
-        );
+//        Envelope<Void> response = Envelope.error(
+//                INVALID_INPUT_VALUE,
+//                e.getBindingResult(),
+//                messageSource
+//        );
+        Envelope<Void> response = Envelope.error(INVALID_INPUT_VALUE);
 
         return ResponseEntity.ok(response);
     }
