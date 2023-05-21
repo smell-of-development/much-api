@@ -1,10 +1,12 @@
 package much.api.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Code {
 
     INVALID_INPUT_VALUE(1000, "입력값이 잘못되었습니다."),
