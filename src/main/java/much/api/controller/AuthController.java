@@ -40,7 +40,7 @@ public class AuthController implements AuthApi {
     @Override
     @GetMapping("/oauth2/code/{provider}")
     public ResponseEntity<Envelope<OAuth2Response>> handleOAuth2(@PathVariable String provider,
-                                                                  @RequestParam String code) {
+                                                                 @RequestParam String code) {
 
         final String toLowerCase = provider.toLowerCase();
         OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(toLowerCase);
