@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(SWAGGER_URL_ARRAY).permitAll()
+                        .requestMatchers("/common/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
                         .anyRequest().authenticated())

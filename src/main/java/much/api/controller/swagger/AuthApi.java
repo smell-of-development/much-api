@@ -10,7 +10,7 @@ import much.api.dto.response.OAuth2Response;
 import much.api.dto.response.OAuth2UriResponse;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "인증API", description = "인증 관련 API")
+@Tag(name = "인증 API", description = "인증 관련 API")
 public interface AuthApi {
 
     @Operation(summary = "OAuth2 URI 조회",
