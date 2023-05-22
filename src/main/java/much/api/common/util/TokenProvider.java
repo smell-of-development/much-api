@@ -21,7 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TokenProvider {
 
-    private static final String CLAIM_ROLE = "role";
+    public static final String CLAIM_ROLE = "role";
 
     private final JwtProperties properties;
 

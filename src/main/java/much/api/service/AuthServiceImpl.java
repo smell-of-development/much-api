@@ -26,6 +26,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Objects;
 import java.util.Optional;
 
+import static much.api.common.enums.Code.*;
 import static much.api.common.properties.OAuth2Properties.*;
 import static much.api.common.util.PhoneNumberUtils.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
@@ -52,26 +53,20 @@ public class AuthServiceImpl implements AuthService {
      * @param refreshToken 정상 리프레시 토큰
      * @return 재발급 된 액세스 토큰 응답
      */
-    public Envelope<Jwt> refreshAccessToken(String accessToken, String refreshToken) {
+    public Envelope<Jwt> refreshAccessToken(final String accessToken,
+                                            final String refreshToken) {
 
         // 리프레시 토큰이 유효하지 않다면
         if (!tokenProvider.isValidRefreshToken(refreshToken)) {
             log.info("리프레시 토큰이 유효하지 않음");
-            throw new InsufficientAuthenticationException(Code.UNAUTHORIZED.getMessage());
+            throw new InsufficientAuthenticationException(UNAUTHORIZED.getMessage());
         }
 
         // 유효한 리프레시 토큰의 유저 id (검증됨)
         final String userIdAtRefreshToken = tokenProvider.extractSubject(refreshToken);
 
-        // 액세스 토큰의 유저 id, role (미검증됨)
-        final String userIdAtAccessToken = tokenProvider.extractSubject(accessToken);
-        final String userRoleAtAccessToken = tokenProvider.extractClaim(accessToken, "role");
-
-        // 유효기간만 만료된 정상 액세스토큰이거나 유효한 액세스 토큰 (액세스 토큰값은 이때 검증됨)
-        if (((tokenProvider.isExpiredToken(accessToken) && userIdAtAccessToken != null && userRoleAtAccessToken != null)
-                || tokenProvider.isValidAccessToken(accessToken))
-                // 그리고, 서로 같은 쌍일때만
-                && Objects.equals(userIdAtAccessToken, userIdAtRefreshToken)) {
+        // 리프레시 가능한 액세스 토큰인지
+        if (isRefreshableAccessToken(accessToken, userIdAtRefreshToken)) {
 
             log.info("토큰 검증 끝. 사용자 ID : {}", userIdAtRefreshToken);
             // 사용자 확인
@@ -90,10 +85,35 @@ public class AuthServiceImpl implements AuthService {
                 log.info("사용자를 찾지 못함. ID : {}", userIdAtRefreshToken);
                 throw new UserNotFound();
             }
+        } else {
+            log.info("리프레시 토큰 외 검증 실패");
+            throw new InsufficientAuthenticationException("리프레시 불가");
         }
 
-        log.info("리프레시 토큰 외 검증 실패");
-        throw new InsufficientAuthenticationException("리프레시 불가");
+    }
+
+
+    /**
+     * 리프레시 가능한 액세스 토큰인지 검사
+     *
+     * @param accessToken          액세스 토큰
+     * @param userIdAtRefreshToken 만료되었지만, 발급되었던 액세스 토큰이거나 아직 유효한
+     * @return 리프레시 가능여부
+     */
+    private boolean isRefreshableAccessToken(final String accessToken,
+                                             final String userIdAtRefreshToken) {
+
+        // 액세스 토큰의 유저 id, role (미검증됨)
+        final String userIdAtAccessToken = tokenProvider.extractSubject(accessToken);
+        final String userRoleAtAccessToken = tokenProvider.extractClaim(accessToken, TokenProvider.CLAIM_ROLE);
+
+        // 유효기간만 만료된 정상 발급되었던 액세스토큰이거나(액세스 토큰값은 이때 검증됨)
+        // 유효한 액세스 토큰이면서
+        // 같은 유저에 대한 토큰일 때
+        return
+                ((tokenProvider.isExpiredToken(accessToken) && userIdAtAccessToken != null && userRoleAtAccessToken != null)
+                        || tokenProvider.isValidAccessToken(accessToken)
+                ) && Objects.equals(userIdAtAccessToken, userIdAtRefreshToken);
     }
 
 
@@ -106,12 +126,13 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public Envelope<OAuth2Response> processOAuth2(OAuth2Properties.Provider providerInfo, String code) {
+    public Envelope<OAuth2Response> processOAuth2(final Provider providerInfo,
+                                                  final String code) {
 
-        OAuth2Token oAuth2Token = getOAuth2Token(providerInfo, code);
-        OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
+        final OAuth2Token oAuth2Token = getOAuth2Token(providerInfo, code);
+        final OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
 
-        String socialId = openId.getSub();
+        final String socialId = openId.getSub();
 
         /*
         1. 소셜 ID로 기존 등록자 확인
@@ -126,12 +147,13 @@ public class AuthServiceImpl implements AuthService {
 
             // 정보 업데이트
             joinedUser.setPicture(openId.getPicture());
-            openId.getPhoneNumber().ifPresent(joinedUser::setPhoneNumber);
+            openId.getPhoneNumber()
+                    .ifPresent(joinedUser::setPhoneNumber);
 
             // 1-1. 필수정보 미입력 사용자 응답
             if (joinedUser.isNewUser()) {
                 Code requiredCode = StringUtils.hasText(joinedUser.getPhoneNumber()) ?
-                        Code.ADDITIONAL_INFORMATION_REQUIRED_1 : Code.ADDITIONAL_INFORMATION_REQUIRED_2;
+                        ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
 
                 return makeNewUserResponse(providerInfo, joinedUser, requiredCode);
             }
@@ -173,7 +195,7 @@ public class AuthServiceImpl implements AuthService {
             // 2-2. 최초등록자. 필수정보 미입력 사용자 응답
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
-            return makeNewUserResponse(providerInfo, savedUser, Code.ADDITIONAL_INFORMATION_REQUIRED_1);
+            return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
         }
 
         /*
@@ -181,7 +203,7 @@ public class AuthServiceImpl implements AuthService {
          */
         User newUser = userBuilder.build();
         User savedUser = userRepository.save(newUser);
-        return makeNewUserResponse(providerInfo, savedUser, Code.ADDITIONAL_INFORMATION_REQUIRED_2);
+        return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_2);
     }
 
 
@@ -191,12 +213,14 @@ public class AuthServiceImpl implements AuthService {
      * @param user 유저 엔티티
      * @return 기존 유저의 id, 새로운 provider, 새로운 socialId, email, 마스킹 phoneNumber, loginUri 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeDuplicatedUserResponse(User user, Provider providerInfo, String socialId) {
+    private Envelope<OAuth2Response> makeDuplicatedUserResponse(final User user,
+                                                                final Provider providerInfo,
+                                                                final String socialId) {
 
         OAuth2Provider firstLinkedSocial = user.getFirstLinkedSocial();
         Provider anotherProviderInfo = oAuth2Properties.findProviderWithName(firstLinkedSocial.getName());
 
-        return Envelope.okWithCode(Code.DUPLICATED_PHONE_NUMBER, OAuth2Response.builder()
+        return Envelope.okWithCode(DUPLICATED_PHONE_NUMBER, OAuth2Response.builder()
                 .id(user.getId()) // 기존 유저 ID
                 .provider(providerInfo.getName()) // 현재 로그인 시도한 provider
                 .socialId(socialId) // 현재 로그인 시도한 provider 측 회원 id
@@ -213,7 +237,9 @@ public class AuthServiceImpl implements AuthService {
      * @param user 유저 엔티티
      * @return id, provider 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeNewUserResponse(Provider providerInfo, User user, Code code) {
+    private Envelope<OAuth2Response> makeNewUserResponse(final Provider providerInfo,
+                                                         final User user,
+                                                         final Code code) {
 
         return Envelope.okWithCode(code, OAuth2Response.builder()
                 .id(user.getId())
@@ -229,7 +255,8 @@ public class AuthServiceImpl implements AuthService {
      * @param oAuth2Token  받아온 토큰객체
      * @return 제공자로부터 얻어온 OpenId 객체
      */
-    private OpenId getUserFromProvider(Provider providerInfo, OAuth2Token oAuth2Token) {
+    private OpenId getUserFromProvider(final Provider providerInfo,
+                                       final OAuth2Token oAuth2Token) {
 
         return webClient.get()
                 .uri(providerInfo.getUserInfoUri())
@@ -248,7 +275,8 @@ public class AuthServiceImpl implements AuthService {
      * @param code         authorization code
      * @return 제공자로부터 얻어온 토큰정보 객체
      */
-    private OAuth2Token getOAuth2Token(Provider providerInfo, String code) {
+    private OAuth2Token getOAuth2Token(final Provider providerInfo,
+                                       final String code) {
 
         return webClient.post()
                 .uri(fromHttpUrl(providerInfo.getTokenUri())
