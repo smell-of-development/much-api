@@ -8,7 +8,7 @@ import much.api.common.enums.Code;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Envelope<R> {
 
     @Schema(defaultValue = "200", example = "200")
