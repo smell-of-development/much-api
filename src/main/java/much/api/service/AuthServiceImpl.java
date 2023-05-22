@@ -68,18 +68,15 @@ public class AuthServiceImpl implements AuthService {
         if (isRefreshableAccessToken(accessToken, userIdAtRefreshToken)) {
 
             // 사용자 확인
-            Optional<User> user = userRepository.findById(Long.parseLong(userIdAtRefreshToken));
-            if (user.isPresent()) {
-                User foundUser = user.get();
+            User foundUser = userRepository.findById(Long.parseLong(userIdAtRefreshToken))
+                    .orElseThrow(() -> new UserNotFound(userIdAtRefreshToken));
 
-                if (foundUser.getRefreshable()) {
-                    // 액세스토큰 재발급
-                    final String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
-                    return Envelope.ok(new Jwt(newAccessToken));
-                }
-                throw new tokenRefreshBlockedUserException(userIdAtRefreshToken);
+            // 리프레시 가능 여부
+            if (foundUser.getRefreshable()) {
+                final String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
+                return Envelope.ok(new Jwt(newAccessToken));
             }
-            throw new UserNotFound(userIdAtRefreshToken);
+            throw new tokenRefreshBlockedUserException(userIdAtRefreshToken);
         }
 
         throw new InsufficientAuthenticationException("리프레시 불가");
