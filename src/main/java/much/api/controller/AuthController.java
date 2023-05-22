@@ -2,6 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import much.api.common.exception.InvalidValueException;
 import much.api.common.properties.OAuth2Properties;
 import much.api.controller.swagger.AuthApi;
 import much.api.dto.Jwt;
@@ -13,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-
-import static much.api.common.enums.Code.*;
 
 @Slf4j
 @RestController
@@ -63,10 +62,10 @@ public class AuthController implements AuthApi {
         final String refreshToken = jwt.getRefreshToken();
 
         if (!StringUtils.hasText(accessToken)) {
-            return ResponseEntity.ok(Envelope.error(INVALID_VALUE_FOR, "accessToken"));
+            throw new InvalidValueException("accessToken");
         }
         if (!StringUtils.hasText(refreshToken)) {
-            return ResponseEntity.ok(Envelope.error(INVALID_VALUE_FOR, "refreshToken"));
+            throw new InvalidValueException("refreshToken");
         }
 
         return ResponseEntity.ok(authService.refreshAccessToken(accessToken, refreshToken));

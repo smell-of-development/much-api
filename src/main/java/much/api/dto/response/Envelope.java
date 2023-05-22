@@ -42,10 +42,10 @@ public class Envelope<R> {
     }
 
     private Envelope(final Code code,
-                     final String... args) {
+                     final Object... args) {
 
         this.code = code.getCode();
-        this.message = String.format(code.getMessage(), (Object[]) args);
+        this.message = String.format(code.getMessage(), args);
     }
 
     private Envelope(final Code code,
@@ -82,7 +82,7 @@ public class Envelope<R> {
     }
 
     public static Envelope<Void> error(final Code code,
-                                       final String... args) {
+                                       final Object... args) {
 
         return new Envelope<>(code, args);
     }

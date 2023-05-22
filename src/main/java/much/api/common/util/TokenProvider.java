@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
 import much.api.common.properties.JwtProperties;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -94,13 +95,21 @@ public class TokenProvider {
 
     public String extractSubject(String token) {
 
-        return JWT.decode(token).getSubject();
+        try {
+            return JWT.decode(token).getSubject();
+        } catch (JWTDecodeException e) {
+            throw new InsufficientAuthenticationException("토큰 디코딩 실패");
+        }
     }
 
 
     public String extractClaim(String token, String claim) {
 
-        return JWT.decode(token).getClaim(claim).asString();
+        try {
+            return JWT.decode(token).getClaim(claim).asString();
+        } catch (JWTDecodeException e) {
+            throw new InsufficientAuthenticationException("토큰 디코딩 실패");
+        }
     }
 
 

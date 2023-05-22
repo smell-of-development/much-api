@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
 import much.api.common.enums.OAuth2Provider;
-import much.api.common.exception.CanNotRefreshTokenException;
+import much.api.common.exception.tokenRefreshBlockedUserException;
 import much.api.common.exception.UserNotFound;
 import much.api.common.properties.OAuth2Properties;
 import much.api.common.util.TokenProvider;
@@ -58,8 +58,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 리프레시 토큰이 유효하지 않다면
         if (!tokenProvider.isValidRefreshToken(refreshToken)) {
-            log.info("리프레시 토큰이 유효하지 않음");
-            throw new InsufficientAuthenticationException(UNAUTHORIZED.getMessage());
+            throw new InsufficientAuthenticationException("리프레시 토큰이 유효하지 않음");
         }
 
         // 유효한 리프레시 토큰의 유저 id (검증됨)
@@ -68,7 +67,6 @@ public class AuthServiceImpl implements AuthService {
         // 리프레시 가능한 액세스 토큰인지
         if (isRefreshableAccessToken(accessToken, userIdAtRefreshToken)) {
 
-            log.info("토큰 검증 끝. 사용자 ID : {}", userIdAtRefreshToken);
             // 사용자 확인
             Optional<User> user = userRepository.findById(Long.parseLong(userIdAtRefreshToken));
             if (user.isPresent()) {
@@ -79,17 +77,12 @@ public class AuthServiceImpl implements AuthService {
                     final String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
                     return Envelope.ok(new Jwt(newAccessToken));
                 }
-                log.info("리프레시 차단상태");
-                throw new CanNotRefreshTokenException();
-            } else {
-                log.info("사용자를 찾지 못함. ID : {}", userIdAtRefreshToken);
-                throw new UserNotFound();
+                throw new tokenRefreshBlockedUserException(userIdAtRefreshToken);
             }
-        } else {
-            log.info("리프레시 토큰 외 검증 실패");
-            throw new InsufficientAuthenticationException("리프레시 불가");
+            throw new UserNotFound(userIdAtRefreshToken);
         }
 
+        throw new InsufficientAuthenticationException("리프레시 불가");
     }
 
 
@@ -177,7 +170,8 @@ public class AuthServiceImpl implements AuthService {
             case KAKAO -> User.builder().kakaoId(socialId);
             case GOOGLE -> User.builder().googleId(socialId);
         };
-        userBuilder.picture(openId.getPicture()) // 신규 등록자 공통
+        // 신규 등록자 공통 등록정보
+        userBuilder.picture(openId.getPicture())
                 .email(openId.getEmail())
                 .name(openId.getName());
 
@@ -192,14 +186,14 @@ public class AuthServiceImpl implements AuthService {
                 return makeDuplicatedUserResponse(duplicatedUser.get(), providerInfo, socialId);
             }
 
-            // 2-2. 최초등록자. 필수정보 미입력 사용자 응답
+            // 2-2. 휴대폰 번호 존재 최초등록자.
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
             return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
         }
 
         /*
-        3. 휴대폰 번호가 없는 최초등록자.
+        2-3. 휴대폰 번호 미존재 최초등록자.
          */
         User newUser = userBuilder.build();
         User savedUser = userRepository.save(newUser);

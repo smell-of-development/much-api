@@ -43,7 +43,7 @@ public class CommonController implements CommonApi {
     public ResponseEntity<Envelope<Void>> retrieveDuplicatedNickname(@RequestParam String nickname) {
 
         if (!StringUtils.hasLength(nickname)) {
-            throw new RequiredException();
+            throw new RequiredException("nickname");
         }
         if (!ValidationChecker.isValidNickname(nickname)) {
             throw new InvalidNicknameException();

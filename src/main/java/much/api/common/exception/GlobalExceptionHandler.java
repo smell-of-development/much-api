@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 //                e.getBindingResult(),
 //                messageSource
 //        );
-        Envelope<Void> response = Envelope.error(INVALID_VALUE);
+        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getTarget());
 
         return ResponseEntity.ok(response);
     }
@@ -52,7 +52,20 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(Exception e) {
         log.error("bindingException", e);
 
-        Envelope<Void> response = Envelope.error(INVALID_VALUE);
+        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getMessage());
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
+     * 서비스 내 유효하지 않은 값
+     */
+    @ExceptionHandler(InvalidValueException.class)
+    protected ResponseEntity<Envelope<Void>> handleInvalidValueException(Exception e) {
+        log.error("InvalidValueException", e);
+
+        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getMessage());
 
         return ResponseEntity.ok(response);
     }

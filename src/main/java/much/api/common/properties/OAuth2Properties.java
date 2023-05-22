@@ -31,7 +31,7 @@ public class OAuth2Properties {
         return getProviders().stream()
                 .filter(p -> name.equals(p.getName()))
                 .findFirst()
-                .orElseThrow(NotSupportedOAuth2ProviderException::new);
+                .orElseThrow(() -> new NotSupportedOAuth2ProviderException(name));
     }
 
     @Getter

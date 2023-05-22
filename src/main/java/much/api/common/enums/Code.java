@@ -9,13 +9,12 @@ import lombok.RequiredArgsConstructor;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Code {
 
-    INVALID_VALUE(1000, "요청값이 잘못되었습니다."),
     INVALID_VALUE_FOR(1000, "요청값 [%s]을 확인해주세요."),
     REQUIRED_INFORMATION(1001, "필수 정보입니다."),
     INCORRECT_FORMAT(1100, "잘못된 메세지 형식입니다."),
 
     USER_NOT_FOUND(2000, "사용자를 찾을 수 없습니다."),
-    CAN_NOT_REFRESH_TOKEN(2001, "리프레시가 차단된 사용자입니다."),
+    TOKEN_REFRESH_BLOCKED_USER(2001, "토큰 리프레시가 차단된 사용자입니다."),
     INVALID_NICKNAME(2002, "닉네임은 2글자 이상 완성된 한글, 영어, 숫자만 사용할 수 있습니다."),
     DUPLICATED_NICKNAME(2003, "중복되는 닉네임이 있어 사용할 수 없습니다."),
 
