@@ -1,4 +1,4 @@
-package much.api.common.exception;
+package much.api.exception;
 
 import static much.api.common.enums.Code.*;
 

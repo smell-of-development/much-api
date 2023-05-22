@@ -8,14 +8,14 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import static much.api.common.enums.OAuth2Provider.*;
-
 @Getter
 @Entity
+@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_USER")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseTimeEntity {
 
     @Id
@@ -56,29 +56,6 @@ public class User extends BaseTimeEntity {
 
     @ColumnDefault("1")
     private Boolean refreshable;
-
-    @Builder
-    private User(String kakaoId,
-                 String googleId,
-                 String picture,
-                 String phoneNumber,
-                 String email,
-                 String name,
-                 String nickname,
-                 String positionIds,
-                 String positionClass) {
-
-        this.kakaoId = kakaoId;
-        this.googleId = googleId;
-        this.firstLinkedSocial = kakaoId != null ? KAKAO : GOOGLE;
-        this.picture = picture;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.name = name;
-        this.nickname = nickname;
-        this.positionIds = positionIds;
-        this.positionClass = positionClass;
-    }
 
 
     public boolean isNewUser() {

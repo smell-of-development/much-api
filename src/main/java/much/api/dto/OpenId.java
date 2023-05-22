@@ -3,9 +3,6 @@ package much.api.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.util.PhoneNumberUtils;
-
-import java.util.Optional;
 
 @Slf4j
 @Getter
@@ -25,11 +22,7 @@ public class OpenId {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    private Boolean phone_number_verified;
+    @JsonProperty("phone_number_verified")
+    private Boolean phoneNumberVerified;
 
-
-    public Optional<String> getPhoneNumber() {
-
-        return PhoneNumberUtils.toOnlyDigits(this.phoneNumber);
-    }
 }

@@ -1,7 +1,7 @@
 package much.api.service;
 
 import lombok.RequiredArgsConstructor;
-import much.api.common.exception.DuplicatedNicknameException;
+import much.api.exception.DuplicatedNicknameException;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.PositionResponse;
 import much.api.repository.PositionRepository;

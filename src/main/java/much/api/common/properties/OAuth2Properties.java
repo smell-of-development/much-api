@@ -3,7 +3,7 @@ package much.api.common.properties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.OAuth2Provider;
-import much.api.common.exception.NotSupportedOAuth2ProviderException;
+import much.api.exception.NotSupportedOAuth2ProviderException;
 import much.api.dto.response.OAuth2UriResponse;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

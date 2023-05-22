@@ -2,7 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.exception.InvalidValueException;
+import much.api.exception.InvalidValueException;
 import much.api.common.properties.OAuth2Properties;
 import much.api.controller.swagger.AuthApi;
 import much.api.dto.Jwt;

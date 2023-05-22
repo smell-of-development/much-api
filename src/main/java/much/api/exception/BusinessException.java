@@ -1,4 +1,4 @@
-package much.api.common.exception;
+package much.api.exception;
 
 import lombok.Getter;
 import much.api.common.enums.Code;

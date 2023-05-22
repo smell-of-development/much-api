@@ -1,4 +1,4 @@
-package much.api.common.exception;
+package much.api.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

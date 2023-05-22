@@ -1,4 +1,4 @@
-package much.api.common.filter;
+package much.api.filter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;

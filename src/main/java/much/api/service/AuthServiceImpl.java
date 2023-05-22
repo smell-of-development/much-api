@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
 import much.api.common.enums.OAuth2Provider;
-import much.api.common.exception.tokenRefreshBlockedUserException;
-import much.api.common.exception.UserNotFound;
+import much.api.exception.tokenRefreshBlockedUserException;
+import much.api.exception.UserNotFound;
 import much.api.common.properties.OAuth2Properties;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 정보 업데이트
             joinedUser.setPicture(openId.getPicture());
-            openId.getPhoneNumber()
+            toOnlyDigits(openId.getPhoneNumber())
                     .ifPresent(joinedUser::setPhoneNumber);
 
             // 1-1. 필수정보 미입력 사용자 응답
@@ -175,7 +175,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(openId.getEmail())
                 .name(openId.getName());
 
-        Optional<String> phoneNumber = openId.getPhoneNumber();
+        Optional<String> phoneNumber = toOnlyDigits(openId.getPhoneNumber());
         // 휴대폰번호 존재시
         if (phoneNumber.isPresent()) {
             // 휴대폰번호로 중복 사용자 조회

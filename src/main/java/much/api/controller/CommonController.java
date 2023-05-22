@@ -2,8 +2,8 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
-import much.api.common.exception.InvalidNicknameException;
-import much.api.common.exception.RequiredException;
+import much.api.exception.InvalidNicknameException;
+import much.api.exception.RequiredException;
 import much.api.common.util.ValidationChecker;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
