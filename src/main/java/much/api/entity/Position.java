@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "TB_POSITION")
 public class Position {
 
     @Id

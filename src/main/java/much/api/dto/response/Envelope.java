@@ -8,7 +8,7 @@ import much.api.common.enums.Code;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Envelope<R> {
 
     @Schema(defaultValue = "200", example = "200")
@@ -23,8 +23,8 @@ public class Envelope<R> {
 
     private R result;
 
-
-    private Envelope(final Integer code, final R result) {
+    private Envelope(final Integer code,
+                     final R result) {
 
         this.code = code;
         this.result = result;
@@ -36,6 +36,17 @@ public class Envelope<R> {
         this.message = code.getMessage();
     }
 
+    private Envelope(final int code) {
+
+        this.code = code;
+    }
+
+    private Envelope(final Code code,
+                     final String... args) {
+
+        this.code = code.getCode();
+        this.message = String.format(code.getMessage(), (Object[]) args);
+    }
 
     private Envelope(final Code code,
                      final R result) {
@@ -45,6 +56,36 @@ public class Envelope<R> {
         this.result = result;
     }
 
+
+    public static <R> Envelope<R> ok(final R data) {
+
+        return new Envelope<>(HttpStatus.OK.value(), data);
+    }
+
+
+    public static <R> Envelope<R> okWithCode(final Code code,
+                                             final R data) {
+
+        return new Envelope<>(code, data);
+    }
+
+
+    public static Envelope<Void> empty() {
+
+        return new Envelope<>(200);
+    }
+
+
+    public static Envelope<Void> error(final Code code) {
+
+        return new Envelope<>(code);
+    }
+
+    public static Envelope<Void> error(final Code code,
+                                       final String... args) {
+
+        return new Envelope<>(code, args);
+    }
 
 //    private Envelope(final Code code,
 //                     final Error error) {
@@ -61,29 +102,13 @@ public class Envelope<R> {
 //        this.errors = error;
 //    }
 
-    public static <R> Envelope<R> ok(final R data) {
 
-        return new Envelope<>(HttpStatus.OK.value(), data);
-    }
-
-    public static <R> Envelope<R> okWithCode(final Code code,
-                                             final R data) {
-
-        return new Envelope<>(code, data);
-    }
-
-//    public static Envelope<Void> error(final Code code,
+    //    public static Envelope<Void> error(final Code code,
 //                                       final BindingResult bindingResult,
 //                                       final MessageSource messageSource) {
 //
 //        return new Envelope<>(code, Error.of(bindingResult, messageSource));
 //    }
-
-
-    public static Envelope<Void> error(final Code code) {
-
-        return new Envelope<>(code);
-    }
 
 
 //    public static Envelope<Void> of(final ErrorCode code,

@@ -5,6 +5,7 @@ import much.api.common.exception.JwtAccessDeniedHandler;
 import much.api.common.exception.JwtAuthenticationEntryPoint;
 import much.api.common.filter.JwtFilter;
 import much.api.common.util.TokenProvider;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,8 +24,6 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/api-docs/**"
     };
-
-    private final TokenProvider tokenProvider;
 
     private final JwtFilter jwtFilter;
 
@@ -50,6 +49,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(SWAGGER_URL_ARRAY).permitAll()
                         .requestMatchers("/common/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()

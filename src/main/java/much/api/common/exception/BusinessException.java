@@ -8,13 +8,7 @@ public abstract class BusinessException extends RuntimeException {
 
     protected Code code;
 
-    protected Object[] args;
-
     public BusinessException() {
-    }
-
-    public BusinessException(Throwable cause) {
-        super(cause);
     }
 
 }

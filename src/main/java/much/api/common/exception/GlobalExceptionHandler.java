@@ -9,6 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -37,21 +38,21 @@ public class GlobalExceptionHandler {
 //                e.getBindingResult(),
 //                messageSource
 //        );
-        Envelope<Void> response = Envelope.error(INVALID_INPUT_VALUE);
+        Envelope<Void> response = Envelope.error(INVALID_VALUE);
 
         return ResponseEntity.ok(response);
     }
 
 
     /**
-     * enum type 일치하지 않아 binding 못할 경우
-     * 주로 @RequestParam enum 으로 binding 못했을 경우 발생
+     * binding 못할 경우
+     * 주로 @RequestParam binding 못했을 경우 발생
      */
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("handleMethodArgumentTypeMismatchException", e);
+    @ExceptionHandler({ServletRequestBindingException.class, MethodArgumentTypeMismatchException.class})
+    protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(Exception e) {
+        log.error("bindingException", e);
 
-        Envelope<Void> response = Envelope.error(METHOD_NOT_ALLOWED);
+        Envelope<Void> response = Envelope.error(INVALID_VALUE);
 
         return ResponseEntity.ok(response);
     }

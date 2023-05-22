@@ -1,6 +1,9 @@
 package much.api.common.util;
 
-import io.jsonwebtoken.*;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
@@ -11,56 +14,48 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
 
+    private static final String CLAIM_ROLE = "role";
+
     private final JwtProperties properties;
 
 
     public String createAccessToken(String id, Role role) {
 
-        return Jwts.builder()
-                .setSubject(id)
-                .claim("role", role)
-                .setExpiration(new Date(System.currentTimeMillis() + properties.getAccessTokenExpirationTime()))
-                .signWith(SignatureAlgorithm.HS512, properties.getSecret())
-                .compact();
+        return JWT.create()
+                .withSubject(id)
+                .withClaim(CLAIM_ROLE, role.name())
+                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getAccessTokenExpirationTime()))
+                .sign(Algorithm.HMAC512(properties.getSecret()));
     }
 
 
     public String createRefreshToken(String id) {
 
-        return Jwts.builder()
-                .setSubject(id)
-                .setExpiration(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()))
-                .signWith(SignatureAlgorithm.HS512, properties.getSecret())
-                .compact();
-    }
-
-
-    public boolean isAccessToken(String token) {
-
-        return Jwts.parser()
-                .setSigningKey(properties.getSecret())
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role") != null;
+        return JWT.create()
+                .withSubject(id)
+                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()))
+                .sign(Algorithm.HMAC512(properties.getSecret()));
     }
 
 
     public boolean isExpiredToken(String token) {
 
         try {
-            parseClaims(token);
+            parse(token);
             return false;
-        } catch (ExpiredJwtException e) {
+        } catch (TokenExpiredException e) {
+            log.info("토큰기한 만료[{}]", token);
             return true;
+        } catch (Exception e) {
+            log.info("토큰해독 불가[{}]", token);
+            return false;
         }
     }
 
@@ -68,40 +63,73 @@ public class TokenProvider {
     public boolean isValidToken(String token) {
 
         try {
-            parseClaims(token);
+            parse(token);
             return true;
-        } catch (SignatureException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰");
-        } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰값이 없습니다.");
+        } catch (Exception e) {
+            log.info("토큰해독 불가[{}]", token);
+            return false;
         }
-
-        return false;
-    }
-
-    private void parseClaims(String token) {
-        Jwts.parser().setSigningKey(properties.getSecret()).parseClaimsJws(token);
     }
 
 
-    public Authentication getAuthentication(String token) {
+    public boolean isValidAccessToken(String token) {
 
-        Claims claims = Jwts.parser()
-                .setSigningKey(properties.getSecret())
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            DecodedJWT decodedJWT = parse(token);
 
-        List<SimpleGrantedAuthority> authorities = Arrays.stream(claims.get("role").toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+            return !decodedJWT.getClaim(CLAIM_ROLE)
+                    .isMissing();
+        } catch (Exception e) {
+            log.info("토큰해독 불가[{}]", token);
+            return false;
+        }
+    }
 
-        User user = new User(claims.getSubject(), "", authorities);
 
-        return new UsernamePasswordAuthenticationToken(user, token, authorities);
+    public boolean isValidRefreshToken(String token) {
+
+        return isValidToken(token) && extractClaim(token, CLAIM_ROLE) == null;
+    }
+
+
+    public String extractSubject(String token) {
+
+        return JWT.decode(token).getSubject();
+    }
+
+
+    public String extractClaim(String token, String claim) {
+
+        return JWT.decode(token).getClaim(claim).asString();
+    }
+
+
+    /**
+     * 토큰을 해독합니다.
+     *
+     * @param token 토큰
+     * @return 해독 된 JWT
+     * @throws TokenExpiredException    토큰 만료
+     * @throws JWTVerificationException 해독 실패
+     */
+    public DecodedJWT parse(String token) throws TokenExpiredException, JWTVerificationException {
+
+        return JWT.require(Algorithm.HMAC512(properties.getSecret()))
+                .build()
+                .verify(token);
+    }
+
+
+    public Authentication getAuthentication(DecodedJWT decodedJWT) {
+
+        String accessToken = decodedJWT.getToken();
+
+        String role = decodedJWT.getClaim(CLAIM_ROLE).asString();
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(authority);
+
+        User user = new User(decodedJWT.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(user, accessToken, authorities);
     }
 
 }

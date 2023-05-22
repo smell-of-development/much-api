@@ -9,25 +9,29 @@ import lombok.RequiredArgsConstructor;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Code {
 
-    INVALID_INPUT_VALUE(1000, "입력값이 잘못되었습니다."),
-    INCORRECT_FORMAT(1100, "잘못된 형식입니다."),
+    INVALID_VALUE(1000, "요청값이 잘못되었습니다."),
+    INVALID_VALUE_FOR(1000, "요청값 [%s]을 확인해주세요."),
+    REQUIRED_INFORMATION(1001, "필수 정보입니다."),
+    INCORRECT_FORMAT(1100, "잘못된 메세지 형식입니다."),
 
+    USER_NOT_FOUND(2000, "사용자를 찾을 수 없습니다."),
+    CAN_NOT_REFRESH_TOKEN(2001, "리프레시가 차단된 사용자입니다."),
+    INVALID_NICKNAME(2002, "닉네임은 2글자 이상 완성된 한글, 영어, 숫자만 사용할 수 있습니다."),
+    DUPLICATED_NICKNAME(2003, "중복되는 닉네임이 있어 사용할 수 없습니다."),
 
-    TOKEN_EXPIRE(4000, "액세스토큰 만료"),
-    UNAUTHORIZED(4100, "정상적인 인증정보가 필요합니다."),
-    FORBIDDEN(4300, "권한이 없습니다."),
+    UNAUTHORIZED(4000, "정상적인 토큰이 필요합니다."),
+    FORBIDDEN(4100, "권한이 없습니다."),
 
-    HANDLER_NOT_FOUND(4900, "처리 가능한 핸들러를 찾을 수 없습니다."),
-    METHOD_NOT_ALLOWED(4910, "허용된 메서드가 아닙니다."),
-    FILE_UPLOAD_SIZE_EXCEEDED(4999, "최대 업로드 크기를 초과합니다."),
-
-
-    PHONE_NUMBER_DUPLICATED(8000, "휴대폰 번호 중복"),
+    DUPLICATED_PHONE_NUMBER(8000, "휴대폰 번호 중복"),
     ADDITIONAL_INFORMATION_REQUIRED_1(8100, "추가정보 입력이 필요합니다."),
     ADDITIONAL_INFORMATION_REQUIRED_2(8101, "추가정보 입력과 휴대폰번호 인증이 필요합니다."),
+    NOT_SUPPORTED_OAUTH2_PROVIDER(8999, "지원하지 않는 PROVIDER 입니다."),
 
-    NOT_SUPPORTED_OAUTH2_PROVIDER(9000, "지원하지 않는 PROVIDER 입니다."),
-    INTERNAL_SERVER_ERROR(9999, "Internal Server Error");
+    HANDLER_NOT_FOUND(9000, "처리 가능한 핸들러를 찾을 수 없습니다."),
+    METHOD_NOT_ALLOWED(9001, "허용된 메서드가 아닙니다."),
+    FILE_UPLOAD_SIZE_EXCEEDED(9002, "최대 업로드 크기를 초과합니다."),
+
+    INTERNAL_SERVER_ERROR(9999, "확인되지 않은 예외");
 
     private final Integer code;
 

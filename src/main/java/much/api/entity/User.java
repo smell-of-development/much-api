@@ -15,7 +15,7 @@ import static much.api.common.enums.OAuth2Provider.*;
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "USERS")
+@Table(name = "TB_USER")
 public class User extends BaseTimeEntity {
 
     @Id
@@ -49,12 +49,13 @@ public class User extends BaseTimeEntity {
 
     private String positionClass;
 
-
     @Column(length = 20)
     @ColumnDefault("'ROLE_USER'")
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ColumnDefault("1")
+    private Boolean refreshable;
 
     @Builder
     private User(String kakaoId,

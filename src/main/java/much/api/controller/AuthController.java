@@ -1,6 +1,5 @@
 package much.api.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.properties.OAuth2Properties;
@@ -11,7 +10,11 @@ import much.api.dto.response.OAuth2Response;
 import much.api.dto.response.OAuth2UriResponse;
 import much.api.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+
+import static much.api.common.enums.Code.*;
 
 @Slf4j
 @RestController
@@ -21,6 +24,7 @@ public class AuthController implements AuthApi {
     private final AuthService authService;
 
     private final OAuth2Properties oAuth2Properties;
+
 
 
     @Override
@@ -53,10 +57,19 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Envelope<Jwt>> refreshAccessToken(@RequestBody @Valid Jwt jwt) {
+    public ResponseEntity<Envelope<?>> refreshAccessToken(@RequestBody Jwt jwt) {
 
-        // TODO 구현하기
-        return ResponseEntity.ok(Envelope.ok(new Jwt(jwt.getAccessToken())));
+        final String accessToken = jwt.getAccessToken();
+        final String refreshToken = jwt.getRefreshToken();
+
+        if (!StringUtils.hasText(accessToken)) {
+            return ResponseEntity.ok(Envelope.error(INVALID_VALUE_FOR, "accessToken"));
+        }
+        if (!StringUtils.hasText(refreshToken)) {
+            return ResponseEntity.ok(Envelope.error(INVALID_VALUE_FOR, "refreshToken"));
+        }
+
+        return ResponseEntity.ok(authService.refreshAccessToken(accessToken, refreshToken));
     }
 
 

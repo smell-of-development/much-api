@@ -16,7 +16,7 @@ public class PhoneNumberUtils {
 
     private static final String PHONE_NUMBER_REGEX = "(\\d{3})-?(\\d{4})-?(\\d{4})$";
 
-    private static final Pattern PHONE_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
+    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
 
     private static final String MASK = "****";
 
@@ -60,7 +60,7 @@ public class PhoneNumberUtils {
 
     private static String masking(String phoneNumber) {
 
-        Matcher matcher = PHONE_PATTERN.matcher(phoneNumber);
+        Matcher matcher = PHONE_NUMBER_PATTERN.matcher(phoneNumber);
         if (matcher.find()) {
             String middle = matcher.group(2);
             return phoneNumber.replace(middle, MASK);

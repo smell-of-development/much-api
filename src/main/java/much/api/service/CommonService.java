@@ -7,4 +7,6 @@ public interface CommonService {
 
     Envelope<PositionResponse> retrievePositions();
 
+    void checkDuplicatedNickname(String nickname);
+
 }

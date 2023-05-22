@@ -17,8 +17,8 @@ public interface AuthApi {
             description = """
                     카카오 혹은 구글 로그인 URI를 조회하는 API
                     ### 응답값 상세
-                    - provider    : 요청 provider
-                    - loginUri    : 요청한 provider 로그인 주소
+                    - provider : 요청 provider
+                    - loginUri : 요청한 provider 로그인 주소
                     """,
             parameters = {@Parameter(name = "provider", description = "kakao 또는 google")
             })
@@ -47,14 +47,14 @@ public interface AuthApi {
             description = """
                     액세스 토큰을 갱신합니다.
                     ### 요청값
-                    - accessToken  : 만료되었거나 정상 액세스토큰
+                    - accessToken  : 만료되었거나 정상인 액세스토큰
                     - refreshToken : 액세스 토큰에 해당하는 정상 리프레시토큰
                     ### 응답값
-                    - 200  : accessToken - 리프레시 된 액세스 토큰
-                    - 1000 : 요청값 이상
-                    - 4100 : 비정상 토큰. 갱신불가
+                    - code 200  : accessToken - 리프레시 된 액세스 토큰
+                    - code 1000 : 요청값 이상 (accessToken, refreshToken 모두 필수)
+                    - code 4000 : 갱신불가
                     """,
             requestBody = @RequestBody(required = true))
-    ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt jwt);
+    ResponseEntity<Envelope<?>> refreshAccessToken(Jwt jwt);
 
 }
