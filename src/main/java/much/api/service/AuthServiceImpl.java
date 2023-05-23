@@ -3,7 +3,6 @@ package much.api.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
-import much.api.common.enums.OAuth2Provider;
 import much.api.exception.tokenRefreshBlockedUserException;
 import much.api.exception.UserNotFound;
 import much.api.common.properties.OAuth2Properties;
@@ -40,8 +39,6 @@ public class AuthServiceImpl implements AuthService {
     private final WebClient webClient;
 
     private final UserRepository userRepository;
-
-    private final OAuth2Properties oAuth2Properties;
 
     private final TokenProvider tokenProvider;
 
@@ -123,19 +120,17 @@ public class AuthServiceImpl implements AuthService {
         final OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
 
         final String socialId = openId.getSub();
+        final String serviceSocialId = providerInfo.makeUserSocialId(socialId);
 
         /*
         1. 소셜 ID로 기존 등록자 확인
          */
-        Optional<User> user = switch (providerInfo.getEnum()) {
-            case KAKAO -> userRepository.findByKakaoId(socialId);
-            case GOOGLE -> userRepository.findByGoogleId(socialId);
-        };
+        Optional<User> optionalUser = userRepository.findBySocialId(serviceSocialId);
 
-        if (user.isPresent()) {
-            User joinedUser = user.get();
+        if (optionalUser.isPresent()) {
+            User joinedUser = optionalUser.get();
 
-            // 정보 업데이트
+            // 정보 업데이트 (휴대폰 번호)
             toOnlyDigits(openId.getPhoneNumber())
                     .ifPresent(joinedUser::setPhoneNumber);
 
@@ -144,30 +139,20 @@ public class AuthServiceImpl implements AuthService {
                 Code requiredCode = StringUtils.hasText(joinedUser.getPhoneNumber()) ?
                         ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
 
-                return makeNewUserResponse(providerInfo, joinedUser, requiredCode);
+                return makeNewUserResponse(joinedUser, requiredCode);
             }
 
-            // 1-2. 토큰 생성하여 응답
-            String id = joinedUser.getId().toString();
-
-            String accessToken = tokenProvider.createAccessToken(id, joinedUser.getRole());
-            String refreshToken = tokenProvider.createRefreshToken(id);
-
-            return Envelope.ok(OAuth2Response.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build());
+            // 1-2. 로그인 처리. 토큰 생성하여 응답
+            return makeLoginSuccessResponse(joinedUser);
         }
 
         /*
         2. 신규 등록자
          */
-        User.UserBuilder userBuilder = switch (providerInfo.getEnum()) {
-            case KAKAO -> User.builder().kakaoId(socialId);
-            case GOOGLE -> User.builder().googleId(socialId);
-        };
         // 신규 등록자 공통 등록정보
-        userBuilder.picture(openId.getPicture())
+        User.UserBuilder userBuilder = User.builder()
+                .socialId(serviceSocialId)
+                .picture(openId.getPicture())
                 .email(openId.getEmail())
                 .name(openId.getName());
 
@@ -175,17 +160,26 @@ public class AuthServiceImpl implements AuthService {
         // 휴대폰번호 존재시
         if (phoneNumber.isPresent()) {
             // 휴대폰번호로 중복 사용자 조회
-            Optional<User> duplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
+            Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
 
-            // 2-1. 휴대폰번호 중복
-            if (duplicatedUser.isPresent()) {
-                return makeDuplicatedUserResponse(duplicatedUser.get(), providerInfo, socialId);
+            // 2-1. 휴대폰번호 중복 => 기존 사용자 정보로 진행
+            if (optionalDuplicatedUser.isPresent()) {
+                User duplicatedUser = optionalDuplicatedUser.get();
+
+                // 아직 필수정보 입력을 하지 않았다면
+                if (duplicatedUser.isNewUser()) {
+                    // 필수정보 미입력 사용자 응답
+                    return makeNewUserResponse(duplicatedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
+                }
+
+                // 로그인 처리. 토큰 생성하여 응답
+                return makeLoginSuccessResponse(duplicatedUser);
             }
 
             // 2-2. 휴대폰번호 최초등록자
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
-            return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
+            return makeNewUserResponse(savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
         }
 
         /*
@@ -193,30 +187,27 @@ public class AuthServiceImpl implements AuthService {
          */
         User newUser = userBuilder.build();
         User savedUser = userRepository.save(newUser);
-        return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_2);
+        return makeNewUserResponse(savedUser, ADDITIONAL_INFORMATION_REQUIRED_2);
     }
 
 
     /**
-     * 중복된 휴대폰번호로 로그인을 시도한 유저의 응답을 생성 code 8000
+     * 유저 정보로 액세스 토큰을 만들어 응답 code 200
      *
-     * @param user 유저 엔티티
-     * @return 기존 유저의 id, 새로운 provider, 새로운 socialId, email, 마스킹 phoneNumber, loginUri 가 설정된 응답객체
+     * @param user 저장된 유저 엔티티
+     * @return id, provider, email, accessToken, refreshToken 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeDuplicatedUserResponse(final User user,
-                                                                final Provider providerInfo,
-                                                                final String socialId) {
+    private Envelope<OAuth2Response> makeLoginSuccessResponse(final User user) {
 
-        OAuth2Provider firstLinkedSocial = user.getFirstLinkedSocial();
-        Provider anotherProviderInfo = oAuth2Properties.findProviderWithName(firstLinkedSocial.getName());
+        String id = user.getId().toString();
 
-        return Envelope.okWithCode(DUPLICATED_PHONE_NUMBER, OAuth2Response.builder()
-                .id(user.getId()) // 기존 유저 ID
-                .provider(providerInfo.getName()) // 현재 로그인 시도한 provider
-                .socialId(socialId) // 현재 로그인 시도한 provider 측 회원 id
-                .email(user.getEmail())
-                .phoneNumber(toMaskedHyphenFormat(user.getPhoneNumber()).orElseGet(user::getPhoneNumber))
-                .loginUri(anotherProviderInfo.getLoginUri())
+        String accessToken = tokenProvider.createAccessToken(id, user.getRole());
+        String refreshToken = tokenProvider.createRefreshToken(id);
+
+        return Envelope.ok(OAuth2Response.builder()
+                .id(user.getId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build());
     }
 
@@ -225,15 +216,13 @@ public class AuthServiceImpl implements AuthService {
      * 필수정보를 받아야 하는 유저의 응답을 생성 code 8100 또는 8101
      *
      * @param user 유저 엔티티
-     * @return id, provider 가 설정된 응답객체
+     * @return id 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeNewUserResponse(final Provider providerInfo,
-                                                         final User user,
+    private Envelope<OAuth2Response> makeNewUserResponse(final User user,
                                                          final Code code) {
 
         return Envelope.okWithCode(code, OAuth2Response.builder()
                 .id(user.getId())
-                .provider(providerInfo.getName())
                 .build());
     }
 

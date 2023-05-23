@@ -30,11 +30,10 @@ public interface AuthApi {
                     로그인 시도시 자동으로 리다이렉트되어 요청됩니다.
                     ### 케이스별 결과값
                     1. 최초 사용자
-                    - 휴대폰번호 중복(code: 8000)   : id(기존), provider(현재), socialId(현재), email(기존), phoneNumber(기존), loginUri => 통합 또는 기존로그인 유도
-                    - 휴대폰번호 존재(code: 8100)   : id, provider(현재)  => 추가정보 등록 필요
-                    - 휴대폰번호 미존재(code: 8101) : id, provider(현재)  => 추가정보 + 문자인증 필요
-                    2. 기존 사용자
-                    - 토큰발급(code: 200) : id, provider, email, accessToken, refreshToken
+                    - 휴대폰번호 존재(code: 8100)   : id => 추가정보 등록 필요
+                    - 휴대폰번호 미존재(code: 8101) : id => 추가정보 + 문자인증 필요
+                    2. 기존 사용자 / 기존 사용자와 휴대폰번호가 같은 최초 사용자
+                    - 토큰발급(code: 200) : id, accessToken, refreshToken
                     """,
             parameters = {
                     @Parameter(name = "provider", description = "kakao 또는 google"),

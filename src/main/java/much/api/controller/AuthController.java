@@ -30,11 +30,9 @@ public class AuthController implements AuthApi {
     @GetMapping("/oauth2/authorization/{provider}")
     public ResponseEntity<Envelope<OAuth2UriResponse>> retrieveOAuth2Uri(@PathVariable String provider) {
 
-        final String toLowerCase = provider.toLowerCase();
-
         return ResponseEntity.ok(
                 Envelope.ok(oAuth2Properties
-                        .findProviderWithName(toLowerCase)
+                        .findProviderWithName(provider)
                         .makeOAuth2UriResponse()
                 ));
     }
@@ -45,8 +43,7 @@ public class AuthController implements AuthApi {
     public ResponseEntity<Envelope<OAuth2Response>> handleOAuth2(@PathVariable String provider,
                                                                  @RequestParam String code) {
 
-        final String toLowerCase = provider.toLowerCase();
-        OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(toLowerCase);
+        OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
 
         Envelope<OAuth2Response> oAuth2Response = authService.processOAuth2(providerInfo, code);
 

@@ -2,7 +2,6 @@ package much.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import much.api.common.enums.OAuth2Provider;
 import much.api.common.enums.Role;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -22,12 +21,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String kakaoId;
-
-    private String googleId;
-
-    @Enumerated(EnumType.STRING)
-    private OAuth2Provider firstLinkedSocial;
+    private String socialId;
 
     @Setter
     private String picture;

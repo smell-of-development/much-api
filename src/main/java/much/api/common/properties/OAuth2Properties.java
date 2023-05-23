@@ -29,7 +29,7 @@ public class OAuth2Properties {
     public Provider findProviderWithName(String name) {
 
         return getProviders().stream()
-                .filter(p -> name.equals(p.getName()))
+                .filter(p -> name.equalsIgnoreCase(p.getName()))
                 .findFirst()
                 .orElseThrow(() -> new NotSupportedOAuth2ProviderException(name));
     }
@@ -58,7 +58,13 @@ public class OAuth2Properties {
 
         private final String scope;
 
+        public String makeUserSocialId(String socialId) {
+
+            return getEnum().name() + "_" + socialId;
+        }
+
         public OAuth2Provider getEnum() {
+
             return OAuth2Provider.valueOf(getName().toUpperCase());
         }
 

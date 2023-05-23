@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @RequiredArgsConstructor
 public enum OAuth2Provider {
-    KAKAO("kakao"), GOOGLE("google");
-
-    private final String name;
+    KAKAO, GOOGLE
 
 }
