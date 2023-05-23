@@ -146,22 +146,23 @@ public class AuthServiceImpl implements AuthService {
                 .email(openId.getEmail())
                 .name(openId.getName());
 
-        Optional<String> phoneNumber = toOnlyDigits(openId.getPhoneNumber());
+        Optional<String> phoneNumberOptional = toOnlyDigits(openId.getPhoneNumber());
 
         // 2-1. 휴대폰번호 미존재 최초등록자.
-        if (phoneNumber.isEmpty()) {
+        if (phoneNumberOptional.isEmpty()) {
             User newUser = userBuilder.build();
             User savedUser = userRepository.save(newUser);
             return makeNewUserResponse(savedUser);
         }
 
         // 휴대폰번호로 중복 사용자 조회
-        Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
+        final String phoneNumber = phoneNumberOptional.get();
+        Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber);
 
         // 중복이 없다면
         if (optionalDuplicatedUser.isEmpty()) {
             // 2-2. 휴대폰번호 최초등록자
-            User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
+            User newUser = userBuilder.phoneNumber(phoneNumber).build();
             User savedUser = userRepository.save(newUser);
             return makeNewUserResponse(savedUser);
         }
