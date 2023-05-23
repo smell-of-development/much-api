@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
     public Envelope<Jwt> refreshAccessToken(final String accessToken,
                                             final String refreshToken) {
 
-        // 리프레시 토큰이 유효하지 않다면
+        // 유효한 리프레시 토큰이 아니라면 종료
         if (!tokenProvider.isValidRefreshToken(refreshToken)) {
             throw new InsufficientAuthenticationException("리프레시 토큰이 유효하지 않음");
         }
@@ -67,13 +67,13 @@ public class AuthServiceImpl implements AuthService {
         // 리프레시 가능한 액세스 토큰인지
         if (isRefreshableAccessToken(accessToken, userIdAtRefreshToken)) {
 
-            // 사용자 확인
+            // 사용자 조회
             User foundUser = userRepository.findById(Long.parseLong(userIdAtRefreshToken))
                     .orElseThrow(() -> new UserNotFound(userIdAtRefreshToken));
 
             // 리프레시 가능 여부
             if (foundUser.getRefreshable()) {
-                final String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
+                String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
                 return Envelope.ok(new Jwt(newAccessToken));
             }
             throw new tokenRefreshBlockedUserException(userIdAtRefreshToken);
