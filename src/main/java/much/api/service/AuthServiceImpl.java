@@ -133,13 +133,7 @@ public class AuthServiceImpl implements AuthService {
             toOnlyDigits(openId.getPhoneNumber())
                     .ifPresent(joinedUser::setPhoneNumber);
 
-            // 1-1. 필수정보 미입력 사용자 응답
-            if (joinedUser.isNewUser()) {
-                return makeNewUserResponse(joinedUser);
-            }
-
-            // 1-2. 로그인 처리. 토큰 생성하여 응답
-            return makeLoginSuccessResponse(joinedUser);
+            return makeNewUserOrLoginSuccessResponse(joinedUser);
         }
 
         /*
@@ -153,37 +147,45 @@ public class AuthServiceImpl implements AuthService {
                 .name(openId.getName());
 
         Optional<String> phoneNumber = toOnlyDigits(openId.getPhoneNumber());
-        // 휴대폰번호 존재시
-        if (phoneNumber.isPresent()) {
-            // 휴대폰번호로 중복 사용자 조회
-            Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
 
-            // 2-1. 휴대폰번호 중복 => 기존 사용자 정보로 진행
-            if (optionalDuplicatedUser.isPresent()) {
-                User duplicatedUser = optionalDuplicatedUser.get();
+        // 2-1. 휴대폰번호 미존재 최초등록자.
+        if (phoneNumber.isEmpty()) {
+            User newUser = userBuilder.build();
+            User savedUser = userRepository.save(newUser);
+            return makeNewUserResponse(savedUser);
+        }
 
-                // 아직 필수정보 입력을 하지 않았다면
-                if (duplicatedUser.isNewUser()) {
-                    // 필수정보 미입력 사용자 응답
-                    return makeNewUserResponse(duplicatedUser);
-                }
+        // 휴대폰번호로 중복 사용자 조회
+        Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
 
-                // 로그인 처리. 토큰 생성하여 응답
-                return makeLoginSuccessResponse(duplicatedUser);
-            }
-
+        // 중복이 없다면
+        if (optionalDuplicatedUser.isEmpty()) {
             // 2-2. 휴대폰번호 최초등록자
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
             return makeNewUserResponse(savedUser);
         }
 
-        /*
-        2-3. 휴대폰번호 미존재 최초등록자.
-         */
-        User newUser = userBuilder.build();
-        User savedUser = userRepository.save(newUser);
-        return makeNewUserResponse(savedUser);
+        // 2-2. 휴대폰번호 중복 => 기존 사용자 정보로 진행
+        User duplicatedUser = optionalDuplicatedUser.get();
+        return makeNewUserOrLoginSuccessResponse(duplicatedUser);
+    }
+
+
+    /**
+     * 신규사용자 혹은 로그인 완료 응답
+     *
+     * @param user 유저 엔티티
+     * @return 케이스별 응답객체
+     */
+    private Envelope<OAuth2Response> makeNewUserOrLoginSuccessResponse(User user) {
+        // 필수정보 미입력 사용자 응답
+        if (user.isNewUser()) {
+            return makeNewUserResponse(user);
+        }
+
+        // 로그인 처리. 토큰 생성하여 응답
+        return makeLoginSuccessResponse(user);
     }
 
 
