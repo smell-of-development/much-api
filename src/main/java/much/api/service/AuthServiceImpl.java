@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
      * 리프레시 가능한 액세스 토큰인지 검사
      *
      * @param accessToken          액세스 토큰
-     * @param userIdAtRefreshToken 만료되었지만, 발급되었던 액세스 토큰이거나 아직 유효한
+     * @param userIdAtRefreshToken 리프레시 토큰의 user id
      * @return 리프레시 가능여부
      */
     private boolean isRefreshableAccessToken(final String accessToken,
@@ -161,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         /*
-        2. 신규 등록자.
+        2. 신규 등록자
          */
         User.UserBuilder userBuilder = switch (providerInfo.getEnum()) {
             case KAKAO -> User.builder().kakaoId(socialId);
@@ -178,19 +178,19 @@ public class AuthServiceImpl implements AuthService {
             // 휴대폰번호로 중복 사용자 조회
             Optional<User> duplicatedUser = userRepository.findByPhoneNumber(phoneNumber.get());
 
-            // 2-1. 휴대폰번호 중복시 중복응답(기존정보 반환)
+            // 2-1. 휴대폰번호 중복
             if (duplicatedUser.isPresent()) {
                 return makeDuplicatedUserResponse(duplicatedUser.get(), providerInfo, socialId);
             }
 
-            // 2-2. 휴대폰 번호 존재 최초등록자.
+            // 2-2. 휴대폰번호 최초등록자
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
             return makeNewUserResponse(providerInfo, savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
         }
 
         /*
-        2-3. 휴대폰 번호 미존재 최초등록자.
+        2-3. 휴대폰번호 미존재 최초등록자.
          */
         User newUser = userBuilder.build();
         User savedUser = userRepository.save(newUser);
