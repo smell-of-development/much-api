@@ -136,7 +136,6 @@ public class AuthServiceImpl implements AuthService {
             User joinedUser = user.get();
 
             // 정보 업데이트
-            joinedUser.setPicture(openId.getPicture());
             toOnlyDigits(openId.getPhoneNumber())
                     .ifPresent(joinedUser::setPhoneNumber);
 
