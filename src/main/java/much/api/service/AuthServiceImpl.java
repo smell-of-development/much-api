@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
 import much.api.exception.tokenRefreshBlockedUserException;
 import much.api.exception.UserNotFound;
-import much.api.common.properties.OAuth2Properties;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
@@ -136,10 +135,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 1-1. 필수정보 미입력 사용자 응답
             if (joinedUser.isNewUser()) {
-                Code requiredCode = StringUtils.hasText(joinedUser.getPhoneNumber()) ?
-                        ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
-
-                return makeNewUserResponse(joinedUser, requiredCode);
+                return makeNewUserResponse(joinedUser);
             }
 
             // 1-2. 로그인 처리. 토큰 생성하여 응답
@@ -169,7 +165,7 @@ public class AuthServiceImpl implements AuthService {
                 // 아직 필수정보 입력을 하지 않았다면
                 if (duplicatedUser.isNewUser()) {
                     // 필수정보 미입력 사용자 응답
-                    return makeNewUserResponse(duplicatedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
+                    return makeNewUserResponse(duplicatedUser);
                 }
 
                 // 로그인 처리. 토큰 생성하여 응답
@@ -179,7 +175,7 @@ public class AuthServiceImpl implements AuthService {
             // 2-2. 휴대폰번호 최초등록자
             User newUser = userBuilder.phoneNumber(phoneNumber.get()).build();
             User savedUser = userRepository.save(newUser);
-            return makeNewUserResponse(savedUser, ADDITIONAL_INFORMATION_REQUIRED_1);
+            return makeNewUserResponse(savedUser);
         }
 
         /*
@@ -187,7 +183,7 @@ public class AuthServiceImpl implements AuthService {
          */
         User newUser = userBuilder.build();
         User savedUser = userRepository.save(newUser);
-        return makeNewUserResponse(savedUser, ADDITIONAL_INFORMATION_REQUIRED_2);
+        return makeNewUserResponse(savedUser);
     }
 
 
@@ -195,7 +191,7 @@ public class AuthServiceImpl implements AuthService {
      * 유저 정보로 액세스 토큰을 만들어 응답 code 200
      *
      * @param user 저장된 유저 엔티티
-     * @return id, provider, email, accessToken, refreshToken 가 설정된 응답객체
+     * @return id, accessToken, refreshToken 가 설정된 응답객체
      */
     private Envelope<OAuth2Response> makeLoginSuccessResponse(final User user) {
 
@@ -218,8 +214,10 @@ public class AuthServiceImpl implements AuthService {
      * @param user 유저 엔티티
      * @return id 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeNewUserResponse(final User user,
-                                                         final Code code) {
+    private Envelope<OAuth2Response> makeNewUserResponse(final User user) {
+
+        Code code = StringUtils.hasText(user.getPhoneNumber()) ?
+                ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
 
         return Envelope.okWithCode(code, OAuth2Response.builder()
                 .id(user.getId())
