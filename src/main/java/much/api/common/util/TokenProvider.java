@@ -134,6 +134,8 @@ public class TokenProvider {
         String accessToken = decodedJWT.getToken();
 
         String role = decodedJWT.getClaim(CLAIM_ROLE).asString();
+        if (role == null) throw new JWTVerificationException("액세스 토큰이 아님");
+
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
         Set<SimpleGrantedAuthority> authorities = Collections.singleton(authority);
 

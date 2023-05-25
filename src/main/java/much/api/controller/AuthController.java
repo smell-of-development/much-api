@@ -11,6 +11,8 @@ import much.api.dto.response.OAuth2Response;
 import much.api.dto.response.OAuth2UriResponse;
 import much.api.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +55,7 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Envelope<?>> refreshAccessToken(@RequestBody Jwt jwt) {
+    public ResponseEntity<Envelope<Jwt>> refreshAccessToken(@RequestBody Jwt jwt) {
 
         final String accessToken = jwt.getAccessToken();
         final String refreshToken = jwt.getRefreshToken();
@@ -69,4 +71,11 @@ public class AuthController implements AuthApi {
     }
 
 
+    @Override
+    @GetMapping("/check")
+    public ResponseEntity<Envelope<Long>> checkToken() {
+
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(Envelope.ok(Long.parseLong(principal.getUsername())));
+    }
 }

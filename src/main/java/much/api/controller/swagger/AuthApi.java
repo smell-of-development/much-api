@@ -54,6 +54,19 @@ public interface AuthApi {
                     - code 4000 : 갱신불가
                     """,
             requestBody = @RequestBody(required = true))
-    ResponseEntity<Envelope<?>> refreshAccessToken(Jwt jwt);
+    ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt jwt);
+
+
+    @Operation(summary = "로그인 체크",
+            description = """
+                    액세스 토큰을 검사하여 로그인 여부를 체크합니다.
+                    Authorization 헤더에 액세스 토큰이 필요합니다.
+                    ### 요청값
+                    - (Header) Authorization : Bearer {accessToken}
+                    ### 응답값
+                    - code 200  : 정상토큰 ex) result: 1 (사용자의 id)
+                    - code 4000 : 토큰이 없거나 비정상
+                    """)
+    ResponseEntity<Envelope<Long>> checkToken();
 
 }

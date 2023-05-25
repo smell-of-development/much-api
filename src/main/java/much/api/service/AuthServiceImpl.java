@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
      * @param refreshToken 정상 리프레시 토큰
      * @return 재발급 된 액세스 토큰 응답
      */
+
     public Envelope<Jwt> refreshAccessToken(final String accessToken,
                                             final String refreshToken) {
 
