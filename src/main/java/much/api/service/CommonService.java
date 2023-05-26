@@ -1,11 +1,11 @@
 package much.api.service;
 
 import much.api.dto.response.Envelope;
-import much.api.dto.response.PositionResponse;
+import much.api.dto.response.Positions;
 
 public interface CommonService {
 
-    Envelope<PositionResponse> retrievePositions();
+    Envelope<Positions> retrievePositions();
 
     void checkDuplicatedNickname(String nickname);
 

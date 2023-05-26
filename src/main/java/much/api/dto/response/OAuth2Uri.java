@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class OAuth2UriResponse {
+public class OAuth2Uri {
 
     private final String provider;
 

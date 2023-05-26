@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.*;
 
 @Getter
-public class PositionResponse {
+public class Positions {
     private final List<Position> positions;
 
 
-    public PositionResponse(List<Position> positions) {
+    public Positions(List<Position> positions) {
         this.positions = positions;
     }
 

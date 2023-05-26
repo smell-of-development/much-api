@@ -6,8 +6,9 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.dto.response.Envelope;
 import much.api.dto.Jwt;
-import much.api.dto.response.OAuth2Response;
-import much.api.dto.response.OAuth2UriResponse;
+import much.api.dto.response.OAuth2;
+import much.api.dto.response.OAuth2Uri;
+import much.api.dto.response.SmsCertification;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "인증 API", description = "인증 관련 API")
@@ -22,7 +23,7 @@ public interface AuthApi {
                     """,
             parameters = {@Parameter(name = "provider", description = "kakao 또는 google")
             })
-    ResponseEntity<Envelope<OAuth2UriResponse>> retrieveOAuth2Uri(String provider);
+    ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(String provider);
 
     @Operation(summary = "OAuth2 정보 처리",
             description = """
@@ -39,7 +40,7 @@ public interface AuthApi {
                     @Parameter(name = "provider", description = "kakao 또는 google"),
                     @Parameter(name = "code", description = "redirect uri 쿼리스트링에 포함된 code")
             })
-    ResponseEntity<Envelope<OAuth2Response>> handleOAuth2(String provider, String code);
+    ResponseEntity<Envelope<OAuth2>> handleOAuth2(String provider, String code);
 
 
     @Operation(summary = "액세스토큰 갱신",
@@ -68,5 +69,19 @@ public interface AuthApi {
                     - code 4000 : 토큰이 없거나 비정상
                     """)
     ResponseEntity<Envelope<Long>> checkToken();
+
+
+    @Operation(summary = "SMS 인증번호 발송",
+            description = """
+                    phoneNumber 쿼리스트링의 휴대폰번호로 인증번호를 발송합니다.
+                    010####@@@@ 형식이어야만 합니다.
+                    ### 응답값 상세
+                    - code 200  : phoneNumber - 휴대폰번호, remainTimeInSeconds - 남은시간(초)
+                    - code 1000 : phoneNumber 파라미터가 없음
+                    - code 8001 : 휴대폰번호 형식이 아님
+                    """,
+            parameters = {@Parameter(name = "phoneNumber", description = "휴대폰번호")
+            })
+    ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(String phoneNumber);
 
 }

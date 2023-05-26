@@ -3,7 +3,7 @@ package much.api.service;
 import lombok.RequiredArgsConstructor;
 import much.api.exception.DuplicatedNicknameException;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.PositionResponse;
+import much.api.dto.response.Positions;
 import much.api.repository.PositionRepository;
 import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,12 @@ public class CommonServiceImpl implements CommonService {
 
 
     @Override
-    public Envelope<PositionResponse> retrievePositions() {
+    public Envelope<Positions> retrievePositions() {
 
         return Envelope.ok(
-                new PositionResponse(positionRepository.findByParentIsNull()
+                new Positions(positionRepository.findByParentIsNull()
                         .stream()
-                        .map(PositionResponse.Position::of)
+                        .map(Positions.Position::of)
                         .collect(Collectors.toList())
                 )
         );

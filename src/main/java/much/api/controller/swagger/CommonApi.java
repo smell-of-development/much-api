@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.common.enums.Code;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.PositionResponse;
+import much.api.dto.response.Positions;
 import org.springframework.http.ResponseEntity;
 
 
@@ -18,7 +18,7 @@ public interface CommonApi {
                     - result.positions[]            : 대분류
                     - result.positions[].children[] : 중분류
                     """)
-    ResponseEntity<Envelope<PositionResponse>> retrievePositions();
+    ResponseEntity<Envelope<Positions>> retrievePositions();
 
     @Operation(summary = "코드 목록 조회",
             description = """

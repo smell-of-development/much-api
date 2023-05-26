@@ -22,6 +22,7 @@ public enum Code {
     FORBIDDEN(4100, "권한이 없습니다."),
 
     DUPLICATED_PHONE_NUMBER(8000, "휴대폰 번호 중복"),
+    NOT_MATCHED_PHONE_NUMBER_PATTERN(8001, "휴대폰번호 형태가 아닙니다."),
     ADDITIONAL_INFORMATION_REQUIRED_1(8100, "추가정보 입력이 필요합니다."),
     ADDITIONAL_INFORMATION_REQUIRED_2(8101, "추가정보 입력과 휴대폰번호 인증이 필요합니다."),
     NOT_SUPPORTED_OAUTH2_PROVIDER(8999, "지원하지 않는 PROVIDER 입니다."),

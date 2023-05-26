@@ -22,7 +22,6 @@ class MuchApiApplicationTests {
         System.out.println("accessToken = " + accessToken);
         System.out.println("refreshToken = " + refreshToken);
         System.out.println("refreshToken2 = " + refreshToken2);
-
     }
 
 }

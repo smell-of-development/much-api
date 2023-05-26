@@ -2,13 +2,14 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import much.api.dto.response.SmsCertification;
 import much.api.exception.InvalidValueException;
 import much.api.common.properties.OAuth2Properties;
 import much.api.controller.swagger.AuthApi;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.OAuth2Response;
-import much.api.dto.response.OAuth2UriResponse;
+import much.api.dto.response.OAuth2;
+import much.api.dto.response.OAuth2Uri;
 import much.api.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +31,7 @@ public class AuthController implements AuthApi {
 
     @Override
     @GetMapping("/oauth2/authorization/{provider}")
-    public ResponseEntity<Envelope<OAuth2UriResponse>> retrieveOAuth2Uri(@PathVariable String provider) {
+    public ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(@PathVariable String provider) {
 
         return ResponseEntity.ok(
                 Envelope.ok(oAuth2Properties
@@ -42,12 +43,12 @@ public class AuthController implements AuthApi {
 
     @Override
     @GetMapping("/oauth2/code/{provider}")
-    public ResponseEntity<Envelope<OAuth2Response>> handleOAuth2(@PathVariable String provider,
-                                                                 @RequestParam String code) {
+    public ResponseEntity<Envelope<OAuth2>> handleOAuth2(@PathVariable String provider,
+                                                         @RequestParam String code) {
 
         OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
 
-        Envelope<OAuth2Response> oAuth2Response = authService.processOAuth2(providerInfo, code);
+        Envelope<OAuth2> oAuth2Response = authService.processOAuth2(providerInfo, code);
 
         return ResponseEntity.ok(oAuth2Response);
     }
@@ -78,4 +79,18 @@ public class AuthController implements AuthApi {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(Envelope.ok(Long.parseLong(principal.getUsername())));
     }
+
+
+    @Override
+    @PostMapping("/sms-certification")
+    public ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(@RequestParam String phoneNumber) {
+
+        if (!StringUtils.hasText(phoneNumber)) {
+            throw new InvalidValueException("phoneNumber");
+        }
+
+        Envelope<SmsCertification> response = authService.sendCertificationNumber(phoneNumber);
+        return ResponseEntity.ok(response);
+    }
+
 }

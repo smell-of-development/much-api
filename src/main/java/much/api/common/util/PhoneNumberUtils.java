@@ -16,10 +16,19 @@ public class PhoneNumberUtils {
 
     private static final String PHONE_NUMBER_REGEX = "(\\d{3})-?(\\d{4})-?(\\d{4})$";
 
+    private static final String ONLY_DIGITS_PHONE_NUMBER_REGEX = "(\\d{3})(\\d{4})(\\d{4})$";
+
     private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
+
+    private static final Pattern ONLY_DIGITS_PHONE_NUMBER_REGEX_PATTERN = Pattern.compile(ONLY_DIGITS_PHONE_NUMBER_REGEX);
 
     private static final String MASK = "****";
 
+
+    public static boolean isOnlyDigitsPattern(String phoneNumber) {
+
+        return ONLY_DIGITS_PHONE_NUMBER_REGEX_PATTERN.matcher(phoneNumber).matches();
+    }
 
     public static Optional<String> toHyphenFormat(String phoneNumber) {
 

@@ -7,7 +7,7 @@ import much.api.exception.RequiredException;
 import much.api.common.util.ValidationChecker;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.PositionResponse;
+import much.api.dto.response.Positions;
 import much.api.service.CommonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -24,7 +24,7 @@ public class CommonController implements CommonApi {
 
     @Override
     @GetMapping("/positions")
-    public ResponseEntity<Envelope<PositionResponse>> retrievePositions() {
+    public ResponseEntity<Envelope<Positions>> retrievePositions() {
 
         return ResponseEntity.ok(commonService.retrievePositions());
     }

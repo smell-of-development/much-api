@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.OAuth2Provider;
 import much.api.exception.NotSupportedOAuth2ProviderException;
-import much.api.dto.response.OAuth2UriResponse;
+import much.api.dto.response.OAuth2Uri;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -68,9 +68,9 @@ public class OAuth2Properties {
             return OAuth2Provider.valueOf(getName().toUpperCase());
         }
 
-        public OAuth2UriResponse makeOAuth2UriResponse() {
+        public OAuth2Uri makeOAuth2UriResponse() {
 
-            return new OAuth2UriResponse(this.getName(), getLoginUri());
+            return new OAuth2Uri(this.getName(), getLoginUri());
         }
 
         public String getLoginUri() {

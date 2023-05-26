@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/common/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers("/sms-certification").permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(configurer -> configurer

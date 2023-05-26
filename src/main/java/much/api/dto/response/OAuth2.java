@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OAuth2Response {
+public class OAuth2 {
 
     private final Long id;
 

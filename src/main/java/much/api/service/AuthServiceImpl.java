@@ -1,16 +1,21 @@
 package much.api.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
-import much.api.exception.tokenRefreshBlockedUserException;
+import much.api.common.properties.SmsProperties;
+import much.api.common.util.PhoneNumberUtils;
+import much.api.common.util.SmsSender;
+import much.api.dto.response.SmsCertification;
+import much.api.exception.NotMatchedPhoneNumberPatternException;
+import much.api.exception.TokenRefreshBlockedUserException;
 import much.api.exception.UserNotFound;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.OAuth2Response;
-import much.api.dto.OAuth2Token;
-import much.api.dto.OpenId;
+import much.api.dto.response.OAuth2;
 import much.api.entity.User;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +28,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static much.api.common.enums.Code.*;
 import static much.api.common.properties.OAuth2Properties.*;
@@ -40,6 +46,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     private final TokenProvider tokenProvider;
+
+    private final SmsSender smsSender;
+
+    private final SmsProperties smsProperties;
 
 
     /**
@@ -75,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
             String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
             return Envelope.ok(new Jwt(newAccessToken));
         }
-        throw new tokenRefreshBlockedUserException(userIdAtRefreshToken);
+        throw new TokenRefreshBlockedUserException(userIdAtRefreshToken);
     }
 
 
@@ -112,8 +122,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public Envelope<OAuth2Response> processOAuth2(final Provider providerInfo,
-                                                  final String code) {
+    public Envelope<OAuth2> processOAuth2(final Provider providerInfo,
+                                          final String code) {
 
         final OAuth2Token oAuth2Token = getOAuth2Token(providerInfo, code);
         final OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
@@ -173,13 +183,33 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    @Override
+    @Transactional
+    public Envelope<SmsCertification> sendCertificationNumber(String phoneNumber) {
+
+        if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
+            throw new NotMatchedPhoneNumberPatternException(phoneNumber);
+        }
+
+        int random = ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+        boolean success = smsSender.sendSms(phoneNumber, String.valueOf(random));
+        // TODO 레디스에 저장후 응답
+        int expirationTimeInSeconds = smsProperties.getExpirationTimeInSeconds();
+        if (success) {
+
+        }
+
+        return Envelope.ok(new SmsCertification(phoneNumber, expirationTimeInSeconds));
+    }
+
+
     /**
      * 신규사용자 혹은 로그인 완료 응답
      *
      * @param user 유저 엔티티
      * @return 케이스별 응답객체
      */
-    private Envelope<OAuth2Response> makeNewUserOrLoginSuccessResponse(User user) {
+    private Envelope<OAuth2> makeNewUserOrLoginSuccessResponse(User user) {
         // 필수정보 미입력 사용자 응답
         if (user.isNewUser()) {
             return makeNewUserResponse(user);
@@ -196,14 +226,14 @@ public class AuthServiceImpl implements AuthService {
      * @param user 저장된 유저 엔티티
      * @return id, accessToken, refreshToken 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeLoginSuccessResponse(final User user) {
+    private Envelope<OAuth2> makeLoginSuccessResponse(final User user) {
 
         String id = user.getId().toString();
 
         String accessToken = tokenProvider.createAccessToken(id, user.getRole());
         String refreshToken = tokenProvider.createRefreshToken(id);
 
-        return Envelope.ok(OAuth2Response.builder()
+        return Envelope.ok(OAuth2.builder()
                 .id(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -217,12 +247,12 @@ public class AuthServiceImpl implements AuthService {
      * @param user 유저 엔티티
      * @return id 가 설정된 응답객체
      */
-    private Envelope<OAuth2Response> makeNewUserResponse(final User user) {
+    private Envelope<OAuth2> makeNewUserResponse(final User user) {
 
         Code code = StringUtils.hasText(user.getPhoneNumber()) ?
                 ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
 
-        return Envelope.okWithCode(code, OAuth2Response.builder()
+        return Envelope.okWithCode(code, OAuth2.builder()
                 .id(user.getId())
                 .build());
     }
@@ -271,6 +301,53 @@ public class AuthServiceImpl implements AuthService {
                 .bodyToMono(OAuth2Token.class)
                 .block();
     }
+
+
+    @Getter
+    private static class OpenId {
+
+        private String sub;
+
+        private String name;
+
+        private String picture;
+
+        private String email;
+
+        @JsonProperty("email_verified")
+        private Boolean emailVerified;
+
+        @JsonProperty("phone_number")
+        private String phoneNumber;
+
+        @JsonProperty("phone_number_verified")
+        private Boolean phoneNumberVerified;
+
+    }
+
+
+    @Getter
+    private static class OAuth2Token {
+
+        @JsonProperty("token_type")
+        private String tokenType;
+
+        @JsonProperty("id_token")
+        private String idToken;
+
+        @JsonProperty("access_token")
+        private String accessToken;
+
+        @JsonProperty("expires_in")
+        private Integer expiresIn;
+
+        @JsonProperty("refresh_token")
+        private String refreshToken;
+
+        private String scope;
+
+    }
+
 
 }
 
