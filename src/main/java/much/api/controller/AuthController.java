@@ -30,7 +30,7 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @PostMapping("/oauth2/authorization/{provider}")
+    @GetMapping("/oauth2/authorization/{provider}")
     public ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(@PathVariable String provider) {
 
         return ResponseEntity.ok(
@@ -42,7 +42,7 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @GetMapping("/oauth2/code/{provider}")
+    @PostMapping("/oauth2/code/{provider}")
     public ResponseEntity<Envelope<OAuth2>> handleOAuth2(@PathVariable String provider,
                                                          @RequestParam String code) {
 
