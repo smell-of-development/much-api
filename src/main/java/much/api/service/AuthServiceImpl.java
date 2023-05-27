@@ -183,6 +183,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
+    /**
+     * 인증번호를 SMS 문자 발송을 통해 전송
+     *
+     * @param phoneNumber 수신 휴대폰번호
+     * @return 성공시, 응답객체
+     */
     @Override
     @Transactional
     public Envelope<SmsCertification> sendCertificationNumber(String phoneNumber) {

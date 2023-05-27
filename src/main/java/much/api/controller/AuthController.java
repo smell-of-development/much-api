@@ -17,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 
 @Slf4j
 @RestController
@@ -48,7 +51,8 @@ public class AuthController implements AuthApi {
 
         OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
 
-        Envelope<OAuth2> oAuth2Response = authService.processOAuth2(providerInfo, code);
+        String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
+        Envelope<OAuth2> oAuth2Response = authService.processOAuth2(providerInfo, decodedCode);
 
         return ResponseEntity.ok(oAuth2Response);
     }
