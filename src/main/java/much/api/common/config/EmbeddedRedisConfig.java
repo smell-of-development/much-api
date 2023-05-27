@@ -2,6 +2,7 @@ package much.api.common.config;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+@Slf4j
 @Configuration
 @Profile("embeddedRedis")
 public class EmbeddedRedisConfig {
@@ -24,8 +26,10 @@ public class EmbeddedRedisConfig {
     @PostConstruct
     public void redisServer() throws IOException {
 
-        redisServer = new RedisServer(isRedisRunning() ? findAvailablePort() : port);
+        int availablePort = findAvailablePort();
+        redisServer = new RedisServer(isRedisRunning() ? availablePort : port);
         redisServer.start();
+        log.debug("Embedded Redis Start. port: {}", availablePort);
     }
 
     @PreDestroy
