@@ -28,7 +28,6 @@ public interface AuthApi {
     @Operation(summary = "OAuth2 정보 처리",
             description = """
                     OAuth2 로그인 사용자 정보를 처리합니다.
-                    로그인 시도시 자동으로 리다이렉트되어 요청됩니다.
                     ### 케이스별 결과값
                     1. 최초 사용자
                     - 휴대폰번호 존재(code: 8100)   : id => 추가정보 등록 필요
