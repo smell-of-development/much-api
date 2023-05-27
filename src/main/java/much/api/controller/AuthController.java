@@ -2,6 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import much.api.dto.request.SmsVerification;
 import much.api.dto.response.SmsCertification;
 import much.api.exception.InvalidValueException;
 import much.api.common.properties.OAuth2Properties;
@@ -60,10 +61,10 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Envelope<Jwt>> refreshAccessToken(@RequestBody Jwt jwt) {
+    public ResponseEntity<Envelope<Jwt>> refreshAccessToken(@RequestBody Jwt request) {
 
-        final String accessToken = jwt.getAccessToken();
-        final String refreshToken = jwt.getRefreshToken();
+        final String accessToken = request.getAccessToken();
+        final String refreshToken = request.getRefreshToken();
 
         if (!StringUtils.hasText(accessToken)) {
             throw new InvalidValueException("accessToken");
@@ -86,7 +87,7 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @PostMapping("/sms-certification")
+    @PostMapping("/sms/certification")
     public ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(@RequestParam String phoneNumber) {
 
         if (!StringUtils.hasText(phoneNumber)) {
@@ -97,4 +98,26 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok(response);
     }
 
+
+    @Override
+    @PostMapping("/sms/verification")
+    public ResponseEntity<Envelope<Void>> verifyCertificationNumber(@RequestBody SmsVerification request) {
+
+        final Long id = request.getId();
+        final String phoneNumber = request.getPhoneNumber();
+        final String certificationNumber = request.getCertificationNumber();
+
+        if (id == null) {
+            throw new InvalidValueException("id");
+        }
+        if (!StringUtils.hasText(phoneNumber)) {
+            throw new InvalidValueException("phoneNumber");
+        }
+        if (!StringUtils.hasText(certificationNumber)) {
+            throw new InvalidValueException("certificationNumber");
+        }
+
+        Envelope<Void> response = authService.verifyCertificationNumber(id, phoneNumber, certificationNumber);
+        return ResponseEntity.ok(response);
+    }
 }

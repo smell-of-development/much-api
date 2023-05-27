@@ -14,4 +14,6 @@ public interface AuthService {
 
     Envelope<SmsCertification> sendCertificationNumber(String phoneNumber);
 
+    Envelope<Void> verifyCertificationNumber(Long id, String phoneNumber, String certificationNumber);
+
 }

@@ -9,4 +9,9 @@ public class RequiredException extends BusinessException {
         this.code = Code.REQUIRED_INFORMATION;
     }
 
+    public RequiredException(Code code, String message) {
+        super(message);
+        this.code = code;
+    }
+
 }

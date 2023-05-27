@@ -9,4 +9,6 @@ public interface PositionRepository extends JpaRepository<Position, Integer> {
 
     List<Position> findByParentIsNull();
 
+    List<Position> findByCodeIn(List<Integer> codes);
+
 }

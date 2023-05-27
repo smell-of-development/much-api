@@ -2,7 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
-import much.api.exception.InvalidNicknameException;
+import much.api.exception.InvalidValueException;
 import much.api.exception.RequiredException;
 import much.api.common.util.ValidationChecker;
 import much.api.controller.swagger.CommonApi;
@@ -46,7 +46,7 @@ public class CommonController implements CommonApi {
             throw new RequiredException("nickname");
         }
         if (!ValidationChecker.isValidNickname(nickname)) {
-            throw new InvalidNicknameException();
+            throw new InvalidValueException(Code.INVALID_NICKNAME, "닉네임 형식에 맞지 않음");
         }
 
         commonService.checkDuplicatedNickname(nickname);

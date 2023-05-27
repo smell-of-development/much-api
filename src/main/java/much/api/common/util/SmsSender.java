@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.properties.SmsProperties;
+import much.api.exception.MessageSendingFailException;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -42,10 +43,8 @@ public class SmsSender {
 
             return "202".equals(smsResponse.getStatusCode());
         } catch (Exception e) {
-            log.info("sms 전송요청 실패", e);
+            throw new MessageSendingFailException("메세지 전송요청 실패", e);
         }
-
-        return false;
     }
 
 
@@ -102,10 +101,6 @@ public class SmsSender {
         private final String content;
 
         private final List<Message> messages;
-
-        private String countryCode;
-
-        private String contentType;
 
 
         static SmsRequest of(String from,

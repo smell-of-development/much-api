@@ -9,14 +9,13 @@ import much.api.common.properties.SmsProperties;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
 import much.api.dto.response.SmsCertification;
-import much.api.exception.NotMatchedPhoneNumberPatternException;
-import much.api.exception.TokenRefreshBlockedUserException;
-import much.api.exception.UserNotFound;
+import much.api.exception.*;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.OAuth2;
 import much.api.entity.User;
+import much.api.repository.RedisRepository;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,9 +29,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static java.lang.String.*;
 import static much.api.common.enums.Code.*;
 import static much.api.common.properties.OAuth2Properties.*;
 import static much.api.common.util.PhoneNumberUtils.*;
+import static much.api.dto.response.Envelope.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Slf4j
@@ -44,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private final WebClient webClient;
 
     private final UserRepository userRepository;
+
+    private final RedisRepository redisRepository;
 
     private final TokenProvider tokenProvider;
 
@@ -78,12 +81,12 @@ public class AuthServiceImpl implements AuthService {
 
         // 사용자 조회
         User foundUser = userRepository.findById(Long.parseLong(userIdAtRefreshToken))
-                .orElseThrow(() -> new UserNotFound(userIdAtRefreshToken));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", userIdAtRefreshToken)));
 
         // 리프레시 가능 여부
         if (foundUser.getRefreshable()) {
             String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
-            return Envelope.ok(new Jwt(newAccessToken));
+            return ok(new Jwt(newAccessToken));
         }
         throw new TokenRefreshBlockedUserException(userIdAtRefreshToken);
     }
@@ -194,18 +197,69 @@ public class AuthServiceImpl implements AuthService {
     public Envelope<SmsCertification> sendCertificationNumber(String phoneNumber) {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new NotMatchedPhoneNumberPatternException(phoneNumber);
+            throw new NotMatchedException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
         }
 
+        // 휴대폰번호 중복 검사
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new DuplicatedException(DUPLICATED_PHONE_NUMBER, format("휴대폰번호 중복. [%s]", phoneNumber));
+        }
+
+        // 랜덤번호 채번
         int random = ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
-        boolean success = smsSender.sendSms(phoneNumber, String.valueOf(random));
-        // TODO 레디스에 저장후 응답
+        String content = valueOf(random);
+
+        // 문자발송
+        boolean success = smsSender.sendSms(phoneNumber, content);
+
+        // 레디스에 저장후 응답
         int expirationTimeInSeconds = smsProperties.getExpirationTimeInSeconds();
         if (success) {
-
+            redisRepository.saveSmsCertificationNumber(phoneNumber, content, expirationTimeInSeconds);
+            return ok(new SmsCertification(phoneNumber, expirationTimeInSeconds));
         }
 
-        return Envelope.ok(new SmsCertification(phoneNumber, expirationTimeInSeconds));
+        throw new MessageSendingFailException("메세지 전송요청 실패");
+    }
+
+
+    /**
+     * 전송된 인증번호를 확인
+     *
+     * @param phoneNumber         휴대폰 번호
+     * @param certificationNumber 인증번호
+     * @return 응답객체
+     */
+    @Override
+    @Transactional
+    public Envelope<Void> verifyCertificationNumber(Long id, String phoneNumber, String certificationNumber) {
+
+        if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
+            throw new NotMatchedException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+        }
+
+        // 전송기록 찾기
+        String savedCertificationNumber = redisRepository.findSmsCertificationNumber(phoneNumber);
+        if (savedCertificationNumber == null) {
+            throw new InvalidValueException("phoneNumber 발송기록 미존재");
+        }
+
+        log.info("저장된 번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
+
+        // 일치
+        if (savedCertificationNumber.equals(certificationNumber)) {
+            // 사용자 찾기
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", id)));
+            user.setPhoneNumber(phoneNumber);
+
+            // 레디스에서 삭제 후 응답
+            redisRepository.removeSmsCertificationNumber(phoneNumber);
+            return ok(null);
+        }
+
+        // 불일치
+        throw new NotMatchedException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
     }
 
 
@@ -239,7 +293,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenProvider.createAccessToken(id, user.getRole());
         String refreshToken = tokenProvider.createRefreshToken(id);
 
-        return Envelope.ok(OAuth2.builder()
+        return ok(OAuth2.builder()
                 .id(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -258,7 +312,7 @@ public class AuthServiceImpl implements AuthService {
         Code code = StringUtils.hasText(user.getPhoneNumber()) ?
                 ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
 
-        return Envelope.okWithCode(code, OAuth2.builder()
+        return okWithCode(code, OAuth2.builder()
                 .id(user.getId())
                 .build());
     }

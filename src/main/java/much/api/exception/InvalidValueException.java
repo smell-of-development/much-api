@@ -9,4 +9,9 @@ public class InvalidValueException extends BusinessException {
         this.code = Code.INVALID_VALUE_FOR;
     }
 
+    public InvalidValueException(Code code, String message) {
+        super(message);
+        this.code = code;
+    }
+
 }

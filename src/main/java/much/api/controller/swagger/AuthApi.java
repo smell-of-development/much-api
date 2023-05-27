@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
 import much.api.dto.Jwt;
 import much.api.dto.response.OAuth2;
@@ -17,7 +18,7 @@ public interface AuthApi {
     @Operation(summary = "OAuth2 URI 조회",
             description = """
                     카카오 혹은 구글 로그인 URI를 조회하는 API
-                    ### 응답값 상세
+                    ### 응답값
                     - provider : 요청 provider
                     - loginUri : 요청한 provider 로그인 주소
                     """,
@@ -54,7 +55,7 @@ public interface AuthApi {
                     - code 4000 : 갱신불가
                     """,
             requestBody = @RequestBody(required = true))
-    ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt jwt);
+    ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt request);
 
 
     @Operation(summary = "로그인 체크",
@@ -72,15 +73,37 @@ public interface AuthApi {
 
     @Operation(summary = "SMS 인증번호 발송",
             description = """
-                    phoneNumber 쿼리스트링의 휴대폰번호로 인증번호를 발송합니다.
-                    010####@@@@ 형식이어야만 합니다.
-                    ### 응답값 상세
+                    휴대폰번호로 인증번호를 발송합니다.
+                    ### 요청값
+                    - phoneNumber : 010####@@@@ 형식이어야만 합니다.
+                    ### 응답값
                     - code 200  : phoneNumber - 휴대폰번호, remainTimeInSeconds - 남은시간(초)
                     - code 1000 : phoneNumber 파라미터가 없음
+                    - code 8000 : 휴대폰번호 중복
                     - code 8001 : 휴대폰번호 형식이 아님
+                    - code 8002 : 메세지 발송 실패
                     """,
-            parameters = {@Parameter(name = "phoneNumber", description = "휴대폰번호")
+            parameters = {
+                    @Parameter(name = "phoneNumber", description = "휴대폰번호")
             })
     ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(String phoneNumber);
+
+
+    @Operation(summary = "SMS 인증번호 확인",
+            description = """
+                    발송된 인증번호를 확인하고, 휴대폰번호를 설정합니다.
+                    ### 요청값
+                    - id                  : 사용자 id
+                    - phoneNumber         : 인증번호를 받은 휴대폰번호. 010####@@@@ 형식
+                    - certificationNumber : 전송받은 인증번호
+                    ### 응답값
+                    - code 200  : 인증성공
+                    - code 1000 : 요청값이 올바른 형태가 아니거나 번호에 대한 발송 기록이 없음
+                    - code 2000 : 사용자를 찾을 수 없음
+                    - code 8001 : 휴대폰번호 형식이 아님
+                    - code 8003 : 인증번호가 일치하지 않음
+                    """,
+            requestBody = @RequestBody(required = true, description = "사용자 id, 휴대폰번호, 인증번호"))
+    ResponseEntity<Envelope<Void>> verifyCertificationNumber(SmsVerification request);
 
 }

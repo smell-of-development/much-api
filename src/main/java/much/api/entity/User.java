@@ -39,8 +39,10 @@ public class User extends BaseTimeEntity {
     @Column(length = 8)
     private String nickname;
 
+    @Setter
     private String positionIds;
 
+    @Setter
     private String positionClass;
 
     @Column(length = 20)
@@ -56,6 +58,5 @@ public class User extends BaseTimeEntity {
 
         return positionIds == null;
     }
-
 
 }
