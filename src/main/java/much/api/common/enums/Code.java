@@ -15,7 +15,7 @@ public enum Code {
 
     USER_NOT_FOUND(2000, "사용자를 찾을 수 없습니다."),
     TOKEN_REFRESH_BLOCKED_USER(2001, "토큰 리프레시가 차단된 사용자입니다."),
-    INVALID_NICKNAME(2002, "닉네임은 2글자 이상 완성된 한글, 영어, 숫자만 사용할 수 있습니다."),
+    INVALID_NICKNAME(2002, "닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있습니다."),
     DUPLICATED_NICKNAME(2003, "중복되는 닉네임이 있어 사용할 수 없습니다."),
 
     UNAUTHORIZED(4000, "정상적인 토큰이 필요합니다."),
