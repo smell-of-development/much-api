@@ -37,7 +37,7 @@ public interface CommonApi {
                     - code 1000 : nickname 파라미터가 없음
                     - code 1001 : 미입력
                     - code 2002 : 닉네임은 2글자 이상 완성된 한글, 영어, 숫자만 사용할 수 있습니다.
-                    - code 2003 : "중복되는 닉네임이 있어 사용할 수 없습니다."
+                    - code 2003 : 중복되는 닉네임이 있어 사용할 수 없습니다.
                     """)
     ResponseEntity<Envelope<Void>> retrieveDuplicatedNickname(String nickname);
 

@@ -59,19 +59,6 @@ public class GlobalExceptionHandler {
 
 
     /**
-     * 서비스 내 유효하지 않은 값
-     */
-    @ExceptionHandler(InvalidValueException.class)
-    protected ResponseEntity<Envelope<Void>> handleInvalidValueException(Exception e) {
-        log.error("InvalidValueException", e);
-
-        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getMessage());
-
-        return ResponseEntity.ok(response);
-    }
-
-
-    /**
      * 지원하지 않는 HTTP method 호출 할 경우
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
