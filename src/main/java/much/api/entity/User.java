@@ -21,22 +21,30 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String socialId;
+    @Setter
+    private String kakaoId;
+
+    @Setter
+    private String googleId;
+
+    private String loginId;
+
+    private String password;
 
     @Setter
     private String picture;
 
     @Setter
-    @Column(length = 20)
     private String phoneNumber;
 
-    @Column(length = 100)
+    @Setter
+    @ColumnDefault("0")
+    private boolean phoneVerificationCompleted;
+
     private String email;
 
-    @Column(length = 40)
     private String name;
 
-    @Column(length = 8)
     private String nickname;
 
     @Setter
@@ -45,18 +53,9 @@ public class User extends BaseTimeEntity {
     @Setter
     private String positionClass;
 
-    @Column(length = 20)
-    @ColumnDefault("'ROLE_USER'")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ColumnDefault("1")
-    private Boolean refreshable;
-
-
-    public boolean isNewUser() {
-
-        return positionIds == null;
-    }
+    private boolean refreshable;
 
 }

@@ -1,25 +1,29 @@
 package much.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import much.api.common.enums.Code;
+import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.SmsCertification;
-import much.api.exception.InvalidValueException;
 import much.api.common.properties.OAuth2Properties;
 import much.api.controller.swagger.AuthApi;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.OAuth2;
 import much.api.dto.response.OAuth2Uri;
+import much.api.entity.User;
+import much.api.exception.BusinessException;
 import much.api.service.AuthService;
+import much.api.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 
 @Slf4j
@@ -29,12 +33,20 @@ public class AuthController implements AuthApi {
 
     private final AuthService authService;
 
+    private final UserService userService;
+
     private final OAuth2Properties oAuth2Properties;
 
 
+    @Override
+    @PostMapping("/login")
+    public ResponseEntity<Envelope<Jwt>> login(@RequestBody @Valid Login request) {
+
+        return ResponseEntity.ok(authService.login(request));
+    }
 
     @Override
-    @GetMapping("/oauth2/authorization/{provider}")
+//    @GetMapping("/oauth2/authorization/{provider}")
     public ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(@PathVariable String provider) {
 
         return ResponseEntity.ok(
@@ -46,14 +58,14 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @PostMapping("/oauth2/code/{provider}")
-    public ResponseEntity<Envelope<OAuth2>> handleOAuth2(@PathVariable String provider,
-                                                         @RequestParam String code) {
+//    @PostMapping("/oauth2/code/{provider}")
+    public ResponseEntity<Envelope<Jwt>> handleOAuth2(@PathVariable String provider,
+                                                        @RequestParam String code) {
 
         OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
 
         String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
-        Envelope<OAuth2> oAuth2Response = authService.processOAuth2(providerInfo, decodedCode);
+        Envelope<Jwt> oAuth2Response = authService.processOAuth2(providerInfo, decodedCode);
 
         return ResponseEntity.ok(oAuth2Response);
     }
@@ -65,13 +77,6 @@ public class AuthController implements AuthApi {
 
         final String accessToken = request.getAccessToken();
         final String refreshToken = request.getRefreshToken();
-
-        if (!StringUtils.hasText(accessToken)) {
-            throw new InvalidValueException("accessToken");
-        }
-        if (!StringUtils.hasText(refreshToken)) {
-            throw new InvalidValueException("refreshToken");
-        }
 
         return ResponseEntity.ok(authService.refreshAccessToken(accessToken, refreshToken));
     }
@@ -87,11 +92,12 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @PostMapping("/sms/certification")
-    public ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(@RequestParam String phoneNumber) {
+    @PostMapping("/sms/join-certification")
+    public ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(@RequestParam String phoneNumber) {
 
-        if (!StringUtils.hasText(phoneNumber)) {
-            throw new InvalidValueException("phoneNumber");
+        Optional<User> userByPhoneNumber = userService.findUserByPhoneNumber(phoneNumber);
+        if (userByPhoneNumber.isPresent()) {
+            throw new BusinessException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
         }
 
         Envelope<SmsCertification> response = authService.sendCertificationNumber(phoneNumber);
@@ -100,24 +106,16 @@ public class AuthController implements AuthApi {
 
 
     @Override
-    @PostMapping("/sms/verification")
-    public ResponseEntity<Envelope<Void>> verifyCertificationNumber(@RequestBody SmsVerification request) {
+    @PostMapping("/sms/join-verification")
+    public ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(@RequestBody @Valid SmsVerification request) {
 
-        final Long id = request.getId();
         final String phoneNumber = request.getPhoneNumber();
         final String certificationNumber = request.getCertificationNumber();
 
-        if (id == null) {
-            throw new InvalidValueException("id");
-        }
-        if (!StringUtils.hasText(phoneNumber)) {
-            throw new InvalidValueException("phoneNumber");
-        }
-        if (!StringUtils.hasText(certificationNumber)) {
-            throw new InvalidValueException("certificationNumber");
-        }
-
-        Envelope<Void> response = authService.verifyCertificationNumber(id, phoneNumber, certificationNumber);
-        return ResponseEntity.ok(response);
+        authService.verifyCertificationNumber(phoneNumber, certificationNumber);
+        return ResponseEntity.ok(Envelope.empty());
     }
+
+
+
 }

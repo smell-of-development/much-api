@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
 import much.api.common.enums.OAuth2Provider;
-import much.api.exception.NotSupportedException;
 import much.api.dto.response.OAuth2Uri;
+import much.api.exception.BusinessException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class OAuth2Properties {
         return getProviders().stream()
                 .filter(p -> name.equalsIgnoreCase(p.getName()))
                 .findFirst()
-                .orElseThrow(() -> new NotSupportedException(Code.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
+                .orElseThrow(() -> new BusinessException(Code.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
     }
 
     @Getter
@@ -58,11 +58,6 @@ public class OAuth2Properties {
         private final String userInfoUri;
 
         private final String scope;
-
-        public String makeUserSocialId(String socialId) {
-
-            return getEnum().name() + "_" + socialId;
-        }
 
         public OAuth2Provider getEnum() {
 

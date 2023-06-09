@@ -4,35 +4,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.enums.Code;
+import much.api.common.properties.OAuth2Properties;
 import much.api.common.properties.SmsProperties;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
+import much.api.dto.request.Login;
 import much.api.dto.response.SmsCertification;
 import much.api.exception.*;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.OAuth2;
 import much.api.entity.User;
 import much.api.repository.RedisRepository;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.String.*;
 import static much.api.common.enums.Code.*;
 import static much.api.common.properties.OAuth2Properties.*;
-import static much.api.common.util.PhoneNumberUtils.*;
 import static much.api.dto.response.Envelope.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
@@ -54,6 +52,27 @@ public class AuthServiceImpl implements AuthService {
 
     private final SmsProperties smsProperties;
 
+    private final OAuth2Properties oAuth2Properties;
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public Envelope<Jwt> login(Login loginRequest) {
+
+        final String requestId = loginRequest.getLoginId();
+        final String requestPassword = loginRequest.getPassword();
+
+        User user = userRepository.findByLoginId(requestId)
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND, format("로그인시도시 ID: [%s]에 해당하는 사용자가 없음", requestId)));
+
+        // 비밀번호 일치 => 토큰 반환
+        if (passwordEncoder.matches(requestPassword, user.getPassword())) {
+            String idToString = user.getId().toString();
+            return Envelope.ok(tokenProvider.createTokenResponse(idToString, user.getRole()));
+        }
+
+        throw new BusinessException(INCORRECT_PASSWORD, "비밀번호 불일치");
+    }
 
     /**
      * 액세스 토큰을 재발급한다.
@@ -62,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
      * @param refreshToken 정상 리프레시 토큰
      * @return 재발급 된 액세스 토큰 응답
      */
-
+    @Override
     public Envelope<Jwt> refreshAccessToken(final String accessToken,
                                             final String refreshToken) {
 
@@ -81,14 +100,16 @@ public class AuthServiceImpl implements AuthService {
 
         // 사용자 조회
         User foundUser = userRepository.findById(Long.parseLong(userIdAtRefreshToken))
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", userIdAtRefreshToken)));
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND, format("사용자 ID: [%s] 를 찾지 못함", userIdAtRefreshToken)));
 
         // 리프레시 가능 여부
-        if (foundUser.getRefreshable()) {
+        if (foundUser.isRefreshable()) {
             String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
-            return ok(new Jwt(newAccessToken));
+            return ok(Jwt.builder()
+                    .accessToken(newAccessToken)
+                    .build());
         }
-        throw new TokenRefreshBlockedUserException(userIdAtRefreshToken);
+        throw new BusinessException(TOKEN_REFRESH_BLOCKED_USER, String.format("사용자 ID: [%s] 리프레시 불가", userIdAtRefreshToken));
     }
 
 
@@ -125,64 +146,16 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public Envelope<OAuth2> processOAuth2(final Provider providerInfo,
-                                          final String code) {
+    public Envelope<Jwt> processOAuth2(final Provider providerInfo,
+                                       final String code) {
 
         final OAuth2Token oAuth2Token = getOAuth2Token(providerInfo, code);
         final OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
 
         final String socialId = openId.getSub();
-        final String serviceSocialId = providerInfo.makeUserSocialId(socialId);
 
-        /*
-        1. 소셜 ID로 기존 등록자 확인
-         */
-        Optional<User> optionalUser = userRepository.findBySocialId(serviceSocialId);
-
-        if (optionalUser.isPresent()) {
-            User joinedUser = optionalUser.get();
-
-            // 정보 업데이트 (휴대폰 번호)
-            toOnlyDigits(openId.getPhoneNumber())
-                    .ifPresent(joinedUser::setPhoneNumber);
-
-            return makeNewUserOrLoginSuccessResponse(joinedUser);
-        }
-
-        /*
-        2. 신규 등록자
-         */
-        // 신규 등록자 공통 등록정보
-        User.UserBuilder userBuilder = User.builder()
-                .socialId(serviceSocialId)
-                .picture(openId.getPicture())
-                .email(openId.getEmail())
-                .name(openId.getName());
-
-        Optional<String> phoneNumberOptional = toOnlyDigits(openId.getPhoneNumber());
-
-        // 2-1. 휴대폰번호 미존재 최초등록자.
-        if (phoneNumberOptional.isEmpty()) {
-            User newUser = userBuilder.build();
-            User savedUser = userRepository.save(newUser);
-            return makeNewUserResponse(savedUser);
-        }
-
-        // 휴대폰번호로 중복 사용자 조회
-        final String phoneNumber = phoneNumberOptional.get();
-        Optional<User> optionalDuplicatedUser = userRepository.findByPhoneNumber(phoneNumber);
-
-        // 중복이 없다면
-        if (optionalDuplicatedUser.isEmpty()) {
-            // 2-2. 휴대폰번호 최초등록자
-            User newUser = userBuilder.phoneNumber(phoneNumber).build();
-            User savedUser = userRepository.save(newUser);
-            return makeNewUserResponse(savedUser);
-        }
-
-        // 2-2. 휴대폰번호 중복 => 기존 사용자 정보로 진행
-        User duplicatedUser = optionalDuplicatedUser.get();
-        return makeNewUserOrLoginSuccessResponse(duplicatedUser);
+        // TODO 연동된 계정에 대해서만 로그인 진행
+        return null;
     }
 
 
@@ -196,13 +169,9 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public Envelope<SmsCertification> sendCertificationNumber(String phoneNumber) {
 
+        // 휴대폰번호 형식 검사
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new NotMatchedException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
-        }
-
-        // 휴대폰번호 중복 검사
-        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new DuplicatedException(DUPLICATED_PHONE_NUMBER, format("휴대폰번호 중복. [%s]", phoneNumber));
+            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
         }
 
         // 랜덤번호 채번
@@ -219,7 +188,7 @@ public class AuthServiceImpl implements AuthService {
             return ok(new SmsCertification(phoneNumber, expirationTimeInSeconds));
         }
 
-        throw new MessageSendingFailException("메세지 전송요청 실패");
+        throw new BusinessException(MESSAGE_SENDING_FAIL, "메세지 전송요청 실패");
     }
 
 
@@ -228,93 +197,33 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param phoneNumber         휴대폰 번호
      * @param certificationNumber 인증번호
-     * @return 응답객체
      */
     @Override
     @Transactional
-    public Envelope<Void> verifyCertificationNumber(Long id, String phoneNumber, String certificationNumber) {
+    public void verifyCertificationNumber(String phoneNumber, String certificationNumber) {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new NotMatchedException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
         }
 
         // 전송기록 찾기
         String savedCertificationNumber = redisRepository.findSmsCertificationNumber(phoneNumber);
         if (savedCertificationNumber == null) {
-            throw new InvalidValueException("phoneNumber 발송기록 미존재");
+            throw new BusinessException(SENDING_HISTORY_NOT_FOUND, String.format("[%s] 발송기록 미존재", phoneNumber));
         }
 
         log.info("저장된 번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
 
-        // 일치
+        // 인증번호 일치
         if (savedCertificationNumber.equals(certificationNumber)) {
-            // 사용자 찾기
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", id)));
-            user.setPhoneNumber(phoneNumber);
 
-            // 레디스에서 삭제 후 응답
+            // 확인한 번호 삭제
             redisRepository.removeSmsCertificationNumber(phoneNumber);
-            return ok(null);
+            return;
         }
 
         // 불일치
-        throw new NotMatchedException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
-    }
-
-
-    /**
-     * 신규사용자 혹은 로그인 완료 응답
-     *
-     * @param user 유저 엔티티
-     * @return 케이스별 응답객체
-     */
-    private Envelope<OAuth2> makeNewUserOrLoginSuccessResponse(User user) {
-        // 필수정보 미입력 사용자 응답
-        if (user.isNewUser()) {
-            return makeNewUserResponse(user);
-        }
-
-        // 로그인 처리. 토큰 생성하여 응답
-        return makeLoginSuccessResponse(user);
-    }
-
-
-    /**
-     * 유저 정보로 액세스 토큰을 만들어 응답 code 200
-     *
-     * @param user 저장된 유저 엔티티
-     * @return id, accessToken, refreshToken 가 설정된 응답객체
-     */
-    private Envelope<OAuth2> makeLoginSuccessResponse(final User user) {
-
-        String id = user.getId().toString();
-
-        String accessToken = tokenProvider.createAccessToken(id, user.getRole());
-        String refreshToken = tokenProvider.createRefreshToken(id);
-
-        return ok(OAuth2.builder()
-                .id(user.getId())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build());
-    }
-
-
-    /**
-     * 필수정보를 받아야 하는 유저의 응답을 생성 code 8100 또는 8101
-     *
-     * @param user 유저 엔티티
-     * @return id 가 설정된 응답객체
-     */
-    private Envelope<OAuth2> makeNewUserResponse(final User user) {
-
-        Code code = StringUtils.hasText(user.getPhoneNumber()) ?
-                ADDITIONAL_INFORMATION_REQUIRED_1 : ADDITIONAL_INFORMATION_REQUIRED_2;
-
-        return okWithCode(code, OAuth2.builder()
-                .id(user.getId())
-                .build());
+        throw new BusinessException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
     }
 
 

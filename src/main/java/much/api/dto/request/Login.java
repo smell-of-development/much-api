@@ -4,12 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class SmsVerification {
+public class Login {
 
     @NotBlank
-    private String phoneNumber;
+    private String loginId;
 
     @NotBlank
-    private String certificationNumber;
+    private String password;
 
 }

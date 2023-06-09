@@ -1,22 +1,29 @@
 package much.api.service;
 
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
+import much.api.common.enums.Role;
+import much.api.common.util.PhoneNumberUtils;
+import much.api.common.util.TokenProvider;
+import much.api.common.util.ValidationChecker;
+import much.api.dto.Jwt;
+import much.api.dto.request.JoinInformation;
+import much.api.dto.response.Envelope;
 import much.api.entity.Position;
 import much.api.entity.User;
-import much.api.exception.InvalidValueException;
-import much.api.exception.NotFoundException;
-import much.api.exception.RequiredException;
+import much.api.exception.*;
 import much.api.repository.PositionRepository;
 import much.api.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.*;
+import static java.util.stream.Collectors.*;
+import static much.api.common.enums.Code.*;
+import static much.api.dto.response.Envelope.*;
 
 
 @Service
@@ -26,42 +33,105 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final CommonService commonService;
+
     private final PositionRepository positionRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final TokenProvider tokenProvider;
+
 
 
     @Override
     @Transactional
-    public User initUser(Long id, String positionIds, String positionClass) {
+    public Envelope<Jwt> registerUser(JoinInformation joinInformation) {
+
+        // 로그인 ID 형식, 중복체크
+        commonService.checkDuplicatedLoginId(joinInformation.getId());
+
+        // 비밀번호 형식 체크
+        if (!ValidationChecker.isValidPassword(joinInformation.getPassword())) {
+            throw new BusinessException(INVALID_PASSWORD, "패스워드 형식에 맞지 않음");
+        }
+
+        // 닉네임 형식, 중복체크
+        commonService.checkDuplicatedNickname(joinInformation.getNickname());
+
+        // 휴대폰번호 형식 검사
+        final String phoneNumber = joinInformation.getPhoneNumber();
+        if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
+            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+        }
+
+        // 휴대폰번호 중복 검사
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new BusinessException(DUPLICATED_PHONE_NUMBER, format("휴대폰번호 중복. [%s]", phoneNumber));
+        }
+
+        // 포지션코드 확인
+        final Integer positionParent = joinInformation.getPositionParent();
+        final Integer positionChild = joinInformation.getPositionChild();
+
+        List<Integer> codes = List.of(positionParent, positionChild);
+        List<Position> byCodeIn = positionRepository.findByCodeIn(codes);
+        if (codes.size() != byCodeIn.size()) {
+            throw new BusinessException(POSITION_CODE_NOT_FOUNT, "서버 포지션 코드와 불일치");
+        }
+
+        // 등록
+        // 포지션코드 구분자 사용하여 한줄로 ex) 100,101
+        final String positionIds = codes.stream()
+                .map(String::valueOf)
+                .collect(joining(","));
+
+        User user = User.builder()
+                .loginId(joinInformation.getId())
+                .password(passwordEncoder.encode(joinInformation.getPassword()))
+                .nickname(joinInformation.getNickname())
+                .phoneNumber(joinInformation.getPhoneNumber())
+                .positionIds(positionIds)
+                .positionClass(joinInformation.getPositionClass())
+                .role(Role.ROLE_USER)
+                .refreshable(true)
+                .build();
+
+        userRepository.save(user);
+
+        return ok(tokenProvider.createTokenResponse(user.getId().toString(), user.getRole()));
+    }
+
+    @Override
+    @Transactional
+    public Envelope<Jwt> linkUser(String targetPhoneNumber, Long toDeletedId) {
 
         // 사용자 확인
-        final User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", id)));
+        final User toBeDeletedUser = userRepository.findById(toDeletedId)
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND, format("사용자 [%s] 를 찾지 못함", toDeletedId)));
 
-        // 포지션코드 검증
-        List<Integer> codes = null;
-        List<Position> byCodeIn = null;
-        try {
-            codes = Arrays.stream(positionIds.split(","))
-                    .map(Integer::parseInt)
-                    .toList();
+        // 휴대폰 인증이 완료된 다른 멀쩡한 사용자와 연동되는것 방지
+        if (toBeDeletedUser.isPhoneVerificationCompleted()) {
 
-            byCodeIn = positionRepository.findByCodeIn(codes);
-        } catch (Exception ignored) {}
-
-        if (codes == null || byCodeIn == null || codes.size() <= 1 || codes.size() != byCodeIn.size()) {
-            throw new InvalidValueException("positionIds");
         }
 
-        // 휴대폰번호 인증여부 확인
-        if (!StringUtils.hasText(foundUser.getPhoneNumber())) {
-            throw new RequiredException(Code.PHONE_NUMBER_CERTIFICATION_REQUIRED, "번호 미인증으로 번호 미등록상태");
+        // 휴대폰번호 형식 검사
+        if (!PhoneNumberUtils.isOnlyDigitsPattern(targetPhoneNumber)) {
+            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", targetPhoneNumber));
         }
 
-        // 정보 변경
-        foundUser.setPositionIds(positionIds);
-        foundUser.setPositionClass(positionClass);
+        // 휴대폰번호 사용자
+        final User targetUser = userRepository.findByPhoneNumber(targetPhoneNumber)
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND_FOR_PHONE_NUMBER, format("[%s]번호에 해당하는 사용자를 찾지 못함", targetPhoneNumber)));
 
-        return foundUser;
+        // 기존 휴대폰번호 사용자의 최초 소셜 연결을 확인하여 다른 소셜도 연결
+
+        return null;
+    }
+
+    @Override
+    public Optional<User> findUserByPhoneNumber(String phoneNumber) {
+
+        return userRepository.findByPhoneNumber(phoneNumber);
     }
 
 }

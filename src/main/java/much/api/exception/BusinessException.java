@@ -4,15 +4,17 @@ import lombok.Getter;
 import much.api.common.enums.Code;
 
 @Getter
-public abstract class BusinessException extends RuntimeException {
+public class BusinessException extends RuntimeException {
 
-    protected Code code;
+    private final Code code;
 
-    public BusinessException(String message) {
+    public BusinessException(Code code, String message) {
         super(message);
+        this.code = code;
     }
 
-    public BusinessException(String message, Throwable cause) {
+    public BusinessException(Code code, String message, Throwable cause) {
         super(message, cause);
+        this.code = code;
     }
 }

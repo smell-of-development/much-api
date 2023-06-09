@@ -5,7 +5,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import much.api.common.enums.Code;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,6 +54,13 @@ public class Envelope<R> {
 
         this.code = code.getCode();
         this.message = String.format(code.getMessage(), args);
+    }
+
+    private Envelope(final Code code,
+                     final Error error) {
+
+        this.code = code.getCode();
+        this.message = String.format(code.getMessage(), String.format("Field: [%s], Input: [%s], %s", error.target, error.value, error.reason));
     }
 
     private Envelope(final Code code,
@@ -103,12 +118,12 @@ public class Envelope<R> {
 //    }
 
 
-    //    public static Envelope<Void> error(final Code code,
-//                                       final BindingResult bindingResult,
-//                                       final MessageSource messageSource) {
-//
-//        return new Envelope<>(code, Error.of(bindingResult, messageSource));
-//    }
+    public static Envelope<Void> error(final Code code,
+                                       final BindingResult bindingResult,
+                                       final MessageSource messageSource) {
+
+        return new Envelope<>(code, Error.of(bindingResult, messageSource));
+    }
 
 
 //    public static Envelope<Void> of(final ErrorCode code,
@@ -117,22 +132,22 @@ public class Envelope<R> {
 //        return new Envelope<>(code, errors);
 //    }
 
-//    private record Error(String target, String value, String reason) {
-//
-//        public static List<Error> of(final String target,
-//                                     final String value,
-//                                     final String reason) {
-//
-//
-//            List<Error> errors = new ArrayList<>();
-//            errors.add(new Error(target, value, reason));
-//            return errors;
-//        }
-//
-//
-//        private static List<Error> of(final BindingResult bindingResult,
-//                                      final MessageSource messageSource) {
-//
+    private record Error(String target, String value, String reason) {
+
+        public static List<Error> of(final String target,
+                                     final String value,
+                                     final String reason) {
+
+
+            List<Error> errors = new ArrayList<>();
+            errors.add(new Error(target, value, reason));
+            return errors;
+        }
+
+
+        private static Error of(final BindingResult bindingResult,
+                                final MessageSource messageSource) {
+
 //            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
 //            if (!fieldErrors.isEmpty()) {
 //                return fieldErrors.stream()
@@ -142,13 +157,15 @@ public class Envelope<R> {
 //                                messageSource.getMessage(fieldError, Locale.KOREA)))
 //                        .collect(Collectors.toList());
 //            }
-////            FieldError fieldError = bindingResult.getFieldErrors().get(0);
-////            if (fieldError != null) {
-////                return new Error(
-////                        fieldError.getField(),
-////                        messageSource.getMessage(fieldError, Locale.KOREA));
-////            }
-//
+
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            if (fieldError != null) {
+                return new Error(
+                        fieldError.getField(),
+                        fieldError.getRejectedValue() == null ? "" : fieldError.getRejectedValue().toString(),
+                        messageSource.getMessage(fieldError, Locale.KOREA));
+            }
+
 //            List<ObjectError> allErrors = bindingResult.getAllErrors();
 //            return allErrors.stream()
 //                    .map(objectError -> new Error(
@@ -156,16 +173,18 @@ public class Envelope<R> {
 //                            "",
 //                            objectError.getDefaultMessage()))
 //                    .collect(Collectors.toList());
-////            ObjectError globalError = bindingResult.getGlobalErrors().get(0);
-////            if (globalError != null) {
-////                return new Error(
-////                        globalError.getObjectName(),
-////                        globalError.getDefaultMessage()
-////                );
-////            }
-//
-////            return new Error(null, null);
-//        }
-//    }
+
+            ObjectError globalError = bindingResult.getGlobalErrors().get(0);
+            if (globalError != null) {
+                return new Error(
+                        globalError.getObjectName(),
+                        "",
+                        globalError.getDefaultMessage()
+                );
+            }
+
+            return new Error("", "", "");
+        }
+    }
 
 }

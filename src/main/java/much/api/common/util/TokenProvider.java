@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
 import much.api.common.properties.JwtProperties;
+import much.api.dto.Jwt;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,19 @@ public class TokenProvider {
     public static final String CLAIM_ROLE = "role";
 
     private final JwtProperties properties;
+
+
+    public Jwt createTokenResponse(String id, Role role) {
+
+        String accessToken = this.createAccessToken(id, role);
+        String refreshToken = this.createRefreshToken(id);
+
+        return Jwt.builder()
+                .id(Long.parseLong(id))
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 
 
     public String createAccessToken(String id, Role role) {

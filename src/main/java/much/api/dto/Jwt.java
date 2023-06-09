@@ -1,21 +1,18 @@
 package much.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Jwt {
+
+    private Long id;
 
     private String accessToken;
 
     private String refreshToken;
-
-    public Jwt(String accessToken) {
-        this.accessToken = accessToken;
-    }
 
 }

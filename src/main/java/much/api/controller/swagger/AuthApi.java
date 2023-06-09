@@ -4,16 +4,28 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
 import much.api.dto.Jwt;
-import much.api.dto.response.OAuth2;
 import much.api.dto.response.OAuth2Uri;
 import much.api.dto.response.SmsCertification;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "인증 API", description = "인증 관련 API")
 public interface AuthApi {
+
+    @Operation(summary = "로그인",
+            description = """
+                    로그인을 요청합니다.
+                    ### 요청값
+                    - id       : id
+                    - password : 비밀번호
+                    ### 응답값
+                    - 토큰발급(code: 200) : id, accessToken, refreshToken
+                    """,
+            requestBody = @RequestBody(required = true))
+    ResponseEntity<Envelope<Jwt>> login(Login request);
 
     @Operation(summary = "OAuth2 URI 조회",
             description = """
@@ -32,7 +44,7 @@ public interface AuthApi {
                     ### 케이스별 결과값
                     1. 최초 사용자
                     - 휴대폰번호 존재(code: 8100)   : id => 추가정보 등록 필요
-                    - 휴대폰번호 미존재(code: 8101) : id => 추가정보 + 문자인증 필요
+                    - 휴대폰번호 미존재(code: 8101) : id => 추가정보 + 문자인증 필요.
                     2. 기존 사용자 / 기존 사용자와 휴대폰번호가 같은 최초 사용자
                     - 토큰발급(code: 200) : id, accessToken, refreshToken
                     """,
@@ -40,7 +52,7 @@ public interface AuthApi {
                     @Parameter(name = "provider", description = "kakao 또는 google"),
                     @Parameter(name = "code", description = "redirect uri 쿼리스트링에 포함된 code")
             })
-    ResponseEntity<Envelope<OAuth2>> handleOAuth2(String provider, String code);
+    ResponseEntity<Envelope<Jwt>> handleOAuth2(String provider, String code);
 
 
     @Operation(summary = "액세스토큰 갱신",
@@ -71,25 +83,25 @@ public interface AuthApi {
     ResponseEntity<Envelope<Long>> checkToken();
 
 
-    @Operation(summary = "SMS 인증번호 발송",
+    @Operation(summary = "가입 SMS 인증번호 발송",
             description = """
-                    휴대폰번호로 인증번호를 발송합니다.
+                    가입을 위해 휴대폰번호로 인증번호를 발송합니다.
                     ### 요청값
-                    - phoneNumber : 010####@@@@ 형식이어야만 합니다.
+                    - phoneNumber : 010####@@@@ 형식이어야 합니다.
                     ### 응답값
                     - code 200  : phoneNumber - 휴대폰번호, remainTimeInSeconds - 남은시간(초)
                     - code 1000 : phoneNumber 파라미터가 없음
-                    - code 8000 : 휴대폰번호 중복
+                    - code 8000 : 휴대폰 번호 중복
                     - code 8001 : 휴대폰번호 형식이 아님
                     - code 8002 : 메세지 발송 실패
                     """,
             parameters = {
                     @Parameter(name = "phoneNumber", description = "휴대폰번호")
             })
-    ResponseEntity<Envelope<SmsCertification>> sendCertificationNumber(String phoneNumber);
+    ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(String phoneNumber);
 
 
-    @Operation(summary = "SMS 인증번호 확인",
+    @Operation(summary = "가입 SMS 인증번호 확인",
             description = """
                     발송된 인증번호를 확인하고, 휴대폰번호를 설정합니다.
                     ### 요청값
@@ -98,12 +110,12 @@ public interface AuthApi {
                     - certificationNumber : 전송받은 인증번호
                     ### 응답값
                     - code 200  : 인증성공
-                    - code 1000 : 요청값이 올바른 형태가 아니거나 번호에 대한 발송 기록이 없음
-                    - code 2000 : 사용자를 찾을 수 없음
+                    - code 1000 : 요청값이 올바른 형태가 아님
                     - code 8001 : 휴대폰번호 형식이 아님
                     - code 8003 : 인증번호가 일치하지 않음
+                    - code 8004 : 발송기록을 찾을 수 없음
                     """,
             requestBody = @RequestBody(required = true, description = "사용자 id, 휴대폰번호, 인증번호"))
-    ResponseEntity<Envelope<Void>> verifyCertificationNumber(SmsVerification request);
+    ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(SmsVerification request);
 
 }

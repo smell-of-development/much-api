@@ -7,9 +7,12 @@ import much.api.filter.JwtFilter;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -58,9 +61,9 @@ public class SecurityConfig {
                         .requestMatchers("/common/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
-                        .requestMatchers("/sms/certification").permitAll()
-                        .requestMatchers("/sms/verification").permitAll()
-                        .requestMatchers("/user/init").permitAll()
+                        .requestMatchers("/sms/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(configurer -> configurer
@@ -74,6 +77,12 @@ public class SecurityConfig {
                 .getOrBuild();
     }
 
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

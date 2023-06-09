@@ -28,14 +28,23 @@ public interface CommonApi {
                     """)
     ResponseEntity<Envelope<Code[]>> retrieveCodes();
 
+    @Operation(summary = "중복 로그인 ID 조회",
+            description = """
+                    로그인 ID 유효성 검사와 중복 닉네임 검사 API
+                    ### 응답값 설명
+                    - code 200  : 사용할 수 있는 로그인 ID
+                    - code 1000 : 값 미존재
+                    - code 2007 : ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다.
+                    - code 2006 : 중복되는 로그인 ID가 있어 사용할 수 없습니다.
+                    """)
+    ResponseEntity<Envelope<Void>> retrieveDuplicatedLoginId(String id);
 
-    @Operation(summary = "중복닉네임 조회",
+    @Operation(summary = "중복 닉네임 조회",
             description = """
                     닉네임 유효성 검사와 중복 닉네임 검사 API
                     ### 응답값 설명
                     - code 200  : 사용할 수 있는 닉네임
-                    - code 1000 : nickname 파라미터가 없음
-                    - code 1001 : 미입력
+                    - code 1000 : 값 미존재
                     - code 2002 : 닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있습니다.
                     - code 2003 : 중복되는 닉네임이 있어 사용할 수 없습니다.
                     """)
