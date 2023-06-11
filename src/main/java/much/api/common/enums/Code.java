@@ -21,7 +21,7 @@ public enum Code {
     INCORRECT_PASSWORD(2005, "일치하지 않는 비밀번호 입니다."),
     DUPLICATED_LOGIN_ID(2006, "중복되는 로그인 ID가 있어 사용할 수 없습니다."),
     INVALID_LOGIN_ID(2007, "ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다."),
-    INVALID_PASSWORD(2008, "비밀번호는 8글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다."),
+    INVALID_PASSWORD(2008, "비밀번호는 공백을 제외한 8글자 이상 20글자 이하만 가능합니다."),
 
     UNAUTHORIZED(4000, "정상적인 토큰이 필요합니다."),
     FORBIDDEN(4100, "권한이 없습니다."),

@@ -8,7 +8,7 @@ public class ValidationChecker {
 
     private static final String LOGIN_ID_REGEX = "[a-zA-Z0-9]{4,20}$";
 
-    private static final String PASSWORD_REGEX = "[a-zA-Z0-9]{8,20}$";
+    private static final String PASSWORD_REGEX = "\\S{8,20}$";
 
     private static final String NICKNAME_REGEX = "[가-힣a-zA-Z0-9]{2,8}$";
 
