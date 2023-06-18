@@ -47,10 +47,10 @@ public class User extends BaseTimeEntity {
 
     private String nickname;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Position jobGroup;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Position career;
 
     @Enumerated(EnumType.STRING)
