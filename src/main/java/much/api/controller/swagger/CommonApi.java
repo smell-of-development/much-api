@@ -15,8 +15,8 @@ public interface CommonApi {
             description = """
                     대분류와 중분류 포지션 목록을 조회한다.
                     ### 응답값 설명
-                    - result.positions[]            : 대분류
-                    - result.positions[].children[] : 중분류
+                    - result.positions.jobGroups : 직군
+                    - result.positions.careers   : 경력
                     """)
     ResponseEntity<Envelope<Positions>> retrievePositions();
 

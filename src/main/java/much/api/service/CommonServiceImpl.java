@@ -28,11 +28,17 @@ public class CommonServiceImpl implements CommonService {
     public Envelope<Positions> retrievePositions() {
 
         return Envelope.ok(
-                new Positions(positionRepository.findByParentIsNull()
-                        .stream()
-                        .map(Positions.Position::of)
-                        .collect(Collectors.toList())
-                )
+                new Positions(
+                        // 직군
+                        positionRepository.findAllByCodeBetween(100, 999)
+                                .stream()
+                                .map(p -> new Positions.Position(p.getCode(), p.getName()))
+                                .collect(Collectors.toList()),
+                        // 경력
+                        positionRepository.findAllByCodeBetween(1000, 9999)
+                                .stream()
+                                .map(p -> new Positions.Position(p.getCode(), p.getName()))
+                                .collect(Collectors.toList()))
         );
     }
 
