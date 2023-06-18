@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "TB_POSITION")
-public class Position {
+public class Position extends BaseTimeEntity {
 
     @Id
     private Integer code;
