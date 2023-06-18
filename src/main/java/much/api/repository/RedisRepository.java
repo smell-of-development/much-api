@@ -15,10 +15,10 @@ public class RedisRepository {
 
     public void saveSmsCertificationNumber(final String phoneNumber,
                                            final String certificationNumber,
-                                           final int expirationTimeInSeconds) {
+                                           final int expirationTimeInMinutes) {
 
         stringRedisTemplate.opsForValue()
-                .set(phoneNumber, certificationNumber, Duration.ofSeconds(expirationTimeInSeconds));
+                .set(phoneNumber, certificationNumber, Duration.ofSeconds(expirationTimeInMinutes * 60L));
     }
 
 

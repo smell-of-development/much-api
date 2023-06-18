@@ -37,7 +37,6 @@ public class AuthController implements AuthApi {
 
     private final OAuth2Properties oAuth2Properties;
 
-
     @Override
     @PostMapping("/login")
     public ResponseEntity<Envelope<Jwt>> login(@RequestBody @Valid Login request) {

@@ -9,6 +9,6 @@ public class SmsCertification {
 
     private final String phoneNumber;
 
-    private final int remainTimeInSeconds;
+    private final int remainTimeInMinutes;
 
 }

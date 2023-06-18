@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "sms")
 public class SmsProperties {
 
-    private final int expirationTimeInSeconds;
+    private final int expirationTimeInMinutes;
 
     private final String messageFormat;
 

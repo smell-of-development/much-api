@@ -86,10 +86,11 @@ public interface AuthApi {
     @Operation(summary = "가입 SMS 인증번호 발송",
             description = """
                     가입을 위해 휴대폰번호로 인증번호를 발송합니다.
+                    - 개발환경 + 프로퍼티 smsPass: true 설정시 인증번호를 보내지 않고, 성공을 응답합니다.
                     ### 요청값
                     - phoneNumber : 010####@@@@ 형식이어야 합니다.
                     ### 응답값
-                    - code 200  : phoneNumber - 휴대폰번호, remainTimeInSeconds - 남은시간(초)
+                    - code 200  : phoneNumber - 휴대폰번호, remainTimeInMinutes - 남은시간(분)
                     - code 1000 : phoneNumber 파라미터가 없음
                     - code 8000 : 휴대폰 번호 중복
                     - code 8001 : 휴대폰번호 형식이 아님
@@ -104,6 +105,7 @@ public interface AuthApi {
     @Operation(summary = "가입 SMS 인증번호 확인",
             description = """
                     발송된 인증번호를 확인하고, 휴대폰번호를 설정합니다.
+                    - 개발환경 + 프로퍼티 smsPass: true 설정시 모든 인증번호에 대해 성공을 응답합니다.
                     ### 요청값
                     - id                  : 사용자 id
                     - phoneNumber         : 인증번호를 받은 휴대폰번호. 010####@@@@ 형식

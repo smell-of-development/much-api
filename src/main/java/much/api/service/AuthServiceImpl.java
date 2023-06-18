@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.properties.OAuth2Properties;
 import much.api.common.properties.SmsProperties;
+import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
 import much.api.dto.request.Login;
@@ -30,6 +31,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.String.*;
 import static much.api.common.enums.Code.*;
+import static much.api.common.enums.RunMode.DEV;
 import static much.api.common.properties.OAuth2Properties.*;
 import static much.api.dto.response.Envelope.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
@@ -174,6 +176,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
         }
 
+        // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
+        if (ContextUtils.getRunMode().equals(DEV) && ContextUtils.isSmsPass()) {
+            return Envelope.ok(new SmsCertification(phoneNumber, smsProperties.getExpirationTimeInMinutes()));
+        }
+
         // 랜덤번호 채번
         int random = ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
         String content = valueOf(random);
@@ -182,10 +189,10 @@ public class AuthServiceImpl implements AuthService {
         boolean success = smsSender.sendSms(phoneNumber, content);
 
         // 레디스에 저장후 응답
-        int expirationTimeInSeconds = smsProperties.getExpirationTimeInSeconds();
+        int expirationTimeInMinutes = smsProperties.getExpirationTimeInMinutes();
         if (success) {
-            redisRepository.saveSmsCertificationNumber(phoneNumber, content, expirationTimeInSeconds);
-            return ok(new SmsCertification(phoneNumber, expirationTimeInSeconds));
+            redisRepository.saveSmsCertificationNumber(phoneNumber, content, expirationTimeInMinutes);
+            return ok(new SmsCertification(phoneNumber, expirationTimeInMinutes));
         }
 
         throw new BusinessException(MESSAGE_SENDING_FAIL, "메세지 전송요청 실패");
@@ -204,6 +211,11 @@ public class AuthServiceImpl implements AuthService {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+        }
+
+        // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
+        if (ContextUtils.getRunMode().equals(DEV) && ContextUtils.isSmsPass()) {
+            return;
         }
 
         // 전송기록 찾기
