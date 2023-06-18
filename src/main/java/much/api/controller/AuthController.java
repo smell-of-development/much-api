@@ -3,7 +3,7 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.enums.ResponseCode;
+import much.api.common.enums.Code;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.SmsCertification;
@@ -97,7 +97,7 @@ public class AuthController implements AuthApi {
 
         Optional<User> userByPhoneNumber = userService.findUserByPhoneNumber(phoneNumber);
         if (userByPhoneNumber.isPresent()) {
-            throw new BusinessException(ResponseCode.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
+            throw new BusinessException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
         }
 
         Envelope<SmsCertification> response = authService.sendCertificationNumber(phoneNumber);

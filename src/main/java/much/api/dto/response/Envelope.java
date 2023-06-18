@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import much.api.common.enums.ResponseCode;
+import much.api.common.enums.Code;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -38,10 +38,10 @@ public class Envelope<R> {
         this.result = result;
     }
 
-    private Envelope(final ResponseCode responseCode) {
+    private Envelope(final Code code) {
 
-        this.code = responseCode.getCode();
-        this.message = responseCode.getMessage();
+        this.code = code.getCode();
+        this.message = code.getMessage();
     }
 
     private Envelope(final int code) {
@@ -49,25 +49,25 @@ public class Envelope<R> {
         this.code = code;
     }
 
-    private Envelope(final ResponseCode responseCode,
+    private Envelope(final Code code,
                      final Object... args) {
 
-        this.code = responseCode.getCode();
-        this.message = String.format(responseCode.getMessage(), args);
+        this.code = code.getCode();
+        this.message = String.format(code.getMessage(), args);
     }
 
-    private Envelope(final ResponseCode responseCode,
+    private Envelope(final Code code,
                      final Error error) {
 
-        this.code = responseCode.getCode();
-        this.message = String.format(responseCode.getMessage(), String.format("Field: [%s], Input: [%s], %s", error.target, error.value, error.reason));
+        this.code = code.getCode();
+        this.message = String.format(code.getMessage(), String.format("Field: [%s], Input: [%s], %s", error.target, error.value, error.reason));
     }
 
-    private Envelope(final ResponseCode responseCode,
+    private Envelope(final Code code,
                      final R result) {
 
-        this.code = responseCode.getCode();
-        this.message = responseCode.getMessage();
+        this.code = code.getCode();
+        this.message = code.getMessage();
         this.result = result;
     }
 
@@ -78,10 +78,10 @@ public class Envelope<R> {
     }
 
 
-    public static <R> Envelope<R> okWithCode(final ResponseCode responseCode,
+    public static <R> Envelope<R> okWithCode(final Code code,
                                              final R data) {
 
-        return new Envelope<>(responseCode, data);
+        return new Envelope<>(code, data);
     }
 
 
@@ -91,15 +91,15 @@ public class Envelope<R> {
     }
 
 
-    public static Envelope<Void> error(final ResponseCode responseCode) {
+    public static Envelope<Void> error(final Code code) {
 
-        return new Envelope<>(responseCode);
+        return new Envelope<>(code);
     }
 
-    public static Envelope<Void> error(final ResponseCode responseCode,
+    public static Envelope<Void> error(final Code code,
                                        final Object... args) {
 
-        return new Envelope<>(responseCode, args);
+        return new Envelope<>(code, args);
     }
 
 //    private Envelope(final Code code,
@@ -118,11 +118,11 @@ public class Envelope<R> {
 //    }
 
 
-    public static Envelope<Void> error(final ResponseCode responseCode,
+    public static Envelope<Void> error(final Code code,
                                        final BindingResult bindingResult,
                                        final MessageSource messageSource) {
 
-        return new Envelope<>(responseCode, Error.of(bindingResult, messageSource));
+        return new Envelope<>(code, Error.of(bindingResult, messageSource));
     }
 
 

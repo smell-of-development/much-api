@@ -18,7 +18,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import static much.api.common.enums.ResponseCode.*;
+import static much.api.common.enums.Code.*;
 
 
 @Slf4j
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Envelope<Void>> handleBusinessException(BusinessException e) {
         log.error("handleBusinessException", e);
 
-        Envelope<Void> response = Envelope.error(e.getResponseCode());
+        Envelope<Void> response = Envelope.error(e.getCode());
 
         return ResponseEntity.ok(response);
     }

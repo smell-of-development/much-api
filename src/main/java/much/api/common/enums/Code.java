@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum ResponseCode {
+public enum Code {
 
     INVALID_VALUE_FOR(1000, "요청값 [%s]을 확인해주세요."),
     REQUIRED_INFORMATION(1001, "필수 정보입니다."),

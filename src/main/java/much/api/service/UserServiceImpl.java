@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static java.lang.String.*;
-import static much.api.common.enums.ResponseCode.*;
+import static much.api.common.enums.Code.*;
 import static much.api.dto.response.Envelope.*;
 
 
