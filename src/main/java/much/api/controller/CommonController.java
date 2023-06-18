@@ -3,14 +3,24 @@ package much.api.controller;
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
 import much.api.common.enums.Skill;
+import much.api.common.util.FileStore;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.Positions;
+import much.api.exception.BusinessException;
 import much.api.service.CommonService;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +31,8 @@ import java.util.List;
 public class CommonController implements CommonApi {
 
     private final CommonService commonService;
+
+    private final FileStore fileStore;
 
     @Override
     @GetMapping("/positions")
@@ -66,8 +78,29 @@ public class CommonController implements CommonApi {
     }
 
     @Override
-    @PostMapping("/image")
-    public ResponseEntity<Envelope<String>> uploadImage(MultipartFile file) {
+    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image) {
+
+        final String contentType = image.getContentType();
+        if (contentType == null || !contentType.startsWith("image")) {
+            throw new BusinessException(Code.NOT_IMAGE_FILE, String.format("이미지 형식이 아님[%s]", contentType));
+        }
+
+        return ResponseEntity.ok(Envelope.ok(fileStore.temporaryUpload(image).getUrl()));
+    }
+
+    @Override
+    @GetMapping("/image/{path}/{storedFilename}")
+    public ResponseEntity<Resource> retrieveImage(@PathVariable String path, @PathVariable String storedFilename) throws IOException {
+
+        if ("temp".equals(path)) {
+            String fullPath = fileStore.getTemporaryPath() + File.separator + storedFilename;
+            MediaType mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fullPath)));
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
+                    .body(new FileSystemResource(new File(fullPath)));
+        }
 
         return null;
     }

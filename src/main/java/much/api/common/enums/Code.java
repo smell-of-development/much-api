@@ -39,6 +39,8 @@ public enum Code {
     HANDLER_NOT_FOUND(9000, "처리 가능한 핸들러를 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(9001, "허용된 메서드가 아닙니다."),
     FILE_UPLOAD_SIZE_EXCEEDED(9002, "최대 업로드 크기를 초과합니다."),
+    FILE_UPLOAD_ERROR(9003, "파일 업로드중 오류"),
+    NOT_IMAGE_FILE(9004, "이미지 파일이 아닙니다."),
 
     INTERNAL_SERVER_ERROR(9999, "확인되지 않은 예외");
 

@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.common.enums.Code;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.Positions;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -62,5 +65,28 @@ public interface CommonApi {
                     - result[] : [string, ...]
                     """)
     ResponseEntity<Envelope<List<String>>> retrieveSkills(String name);
+
+    @Operation(summary = "이미지 업로드",
+            description = """
+                    이미지를 업로드합니다.
+                    ### 요청
+                    - POST /common/image
+                    - (multipart/form-data) image
+                    ### 응답값 설명
+                    - code 200  : "result": string(이미지 주소)
+                    - code 9003 : 파일 업로드중 오류
+                    - code 9004 : 이미지 파일이 아닙니다.
+                    """)
+    ResponseEntity<Envelope<String>> uploadImage(MultipartFile file);
+
+    @Operation(summary = "이미지 획득",
+            description = """
+                    업로드 된 이미지를 획득합니다.
+                    ### 요청
+                    - GET 이미지주소
+                    ### 응답값
+                    - 이미지 리소스
+                    """)
+    ResponseEntity<Resource> retrieveImage(String path, String storedFilename) throws IOException;
 
 }
