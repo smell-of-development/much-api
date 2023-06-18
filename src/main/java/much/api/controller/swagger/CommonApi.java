@@ -7,6 +7,8 @@ import much.api.dto.response.Envelope;
 import much.api.dto.response.Positions;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 
 @Tag(name = "공통 API")
 public interface CommonApi {
@@ -24,7 +26,7 @@ public interface CommonApi {
             description = """
                     서버에서 응답하는 모든 코드와 메세지들을 조회합니다.
                     ### 응답값 설명
-                    - result[] : {"id": integer, "message": "string"}
+                    - result[] : [{"id": integer, "message": "string"}, ...]
                     """)
     ResponseEntity<Envelope<Code[]>> retrieveCodes();
 
@@ -49,5 +51,16 @@ public interface CommonApi {
                     - code 2003 : 중복되는 닉네임이 있어 사용할 수 없습니다.
                     """)
     ResponseEntity<Envelope<Void>> retrieveDuplicatedNickname(String nickname);
+
+    @Operation(summary = "스킬태그 검색",
+            description = """
+                    스킬 태그목록을 검색합니다.
+                    ### 요청
+                    - 쿼리스트링 name=value : value 문자열이 포함되는 스킬태그 검색
+                    - 영어와 순수한글 모두 지원합니다. ex) name=script | name=스크립트
+                    ### 응답값 설명
+                    - result[] : [string, ...]
+                    """)
+    ResponseEntity<Envelope<List<String>>> retrieveSkills(String name);
 
 }
