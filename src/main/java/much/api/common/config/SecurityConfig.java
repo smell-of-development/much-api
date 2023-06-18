@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/sms/**").permitAll()
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/testToken").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
                         .anyRequest().authenticated())
 

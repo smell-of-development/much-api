@@ -15,6 +15,14 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "인증 API", description = "인증 관련 API")
 public interface AuthApi {
 
+    @Operation(summary = "Swagger 테스트용 토큰 발급받기",
+            description = """
+                    개발모드일때만 동작합니다.
+                    ### 응답값
+                    - 토큰발급(code: 200) : id, accessToken, refreshToken
+                    """)
+    ResponseEntity<Envelope<Jwt>> testToken(String id);
+
     @Operation(summary = "로그인",
             description = """
                     로그인을 요청합니다.

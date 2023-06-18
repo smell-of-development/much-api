@@ -13,8 +13,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TB_USER")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(name = "TB_USER")
 public class User extends BaseTimeEntity {
 
     @Id

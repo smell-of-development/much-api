@@ -4,6 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
+import much.api.common.enums.Role;
+import much.api.common.enums.RunMode;
+import much.api.common.util.ContextUtils;
+import much.api.common.util.TokenProvider;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.SmsCertification;
@@ -17,6 +21,7 @@ import much.api.exception.BusinessException;
 import much.api.service.AuthService;
 import much.api.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +41,20 @@ public class AuthController implements AuthApi {
     private final UserService userService;
 
     private final OAuth2Properties oAuth2Properties;
+
+    private final TokenProvider tokenProvider;
+
+    @Override
+    @GetMapping("/testToken")
+    public ResponseEntity<Envelope<Jwt>> testToken(@RequestParam(defaultValue = "0") String id) {
+
+        if (!ContextUtils.getRunMode().equals(RunMode.DEV)) {
+            throw new AccessDeniedException("개발모드가 아님");
+        }
+
+        Jwt response = tokenProvider.createTokenResponse(id, Role.ROLE_USER);
+        return ResponseEntity.ok(Envelope.ok(response));
+    }
 
     @Override
     @PostMapping("/login")
