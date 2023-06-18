@@ -21,11 +21,11 @@ public interface UserApi {
                     - password       : 로그인 패스워드
                     - nickname       : 닉네임
                     - phoneNumber    : 휴대폰번호
-                    - positionParent : 포지션 대분류
-                    - positionChild  : 포지션 중분류
-                    - positionClass  : 포지션 수준
+                    - jobGroup       : 직군
+                    - career         : 경력
                     ### 응답값
                     - code 200  : 설정 성공, 토큰 발급 (id, accessToken, refreshToken)
+                    
                     - code 1000 : 필수값 미존재 및 불일치
                     
                     - code 2007 : ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다.
@@ -38,8 +38,10 @@ public interface UserApi {
                     
                     - code 8000 : 휴대폰 번호 중복
                     - code 8001 : 휴대폰번호 형식이 아님
+                    
+                    - code 8100 : 서버 포지션 코드와 불일치
                     """,
-            requestBody = @RequestBody(required = true, description = "사용자 id, 휴대폰번호, 포지션 대분류, 포지션 중분류, 포지션수준"))
+            requestBody = @RequestBody(required = true, description = "사용자 id, 패스워드, 닉네임, 휴대폰번호, 직군, 경력"))
     ResponseEntity<Envelope<Jwt>> registerUser(JoinInformation request);
 
     @Operation(summary = "사용자 소셜 연동처리",

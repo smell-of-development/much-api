@@ -47,11 +47,11 @@ public class User extends BaseTimeEntity {
 
     private String nickname;
 
-    @Setter
-    private String positionIds;
+    @OneToOne
+    private Position jobGroup;
 
-    @Setter
-    private String positionClass;
+    @OneToOne
+    private Position career;
 
     @Enumerated(EnumType.STRING)
     private Role role;

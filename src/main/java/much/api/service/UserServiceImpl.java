@@ -17,11 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.*;
-import static java.util.stream.Collectors.*;
 import static much.api.common.enums.Code.*;
 import static much.api.dto.response.Envelope.*;
 
@@ -70,28 +68,22 @@ public class UserServiceImpl implements UserService {
         }
 
         // 포지션코드 확인
-        final Integer positionParent = joinInformation.getPositionParent();
-        final Integer positionChild = joinInformation.getPositionChild();
+        final Integer jobGroupCode = joinInformation.getJobGroup();
+        final Integer careerCode = joinInformation.getCareer();
 
-        List<Integer> codes = List.of(positionParent, positionChild);
-        List<Position> byCodeIn = positionRepository.findByCodeIn(codes);
-        if (codes.size() != byCodeIn.size()) {
-            throw new BusinessException(POSITION_CODE_NOT_FOUNT, "서버 포지션 코드와 불일치");
-        }
+        Position jobGroup = positionRepository.findByJogGroupCode(jobGroupCode)
+                .orElseThrow(() -> new BusinessException(POSITION_CODE_NOT_FOUNT, "직군 코드와 불일치"));
+        Position career = positionRepository.findByCareerCode(careerCode)
+                .orElseThrow(() -> new BusinessException(POSITION_CODE_NOT_FOUNT, "경력 코드와 불일치"));
 
-        // 등록
-        // 포지션코드 구분자 사용하여 한줄로 ex) 100,101
-        final String positionIds = codes.stream()
-                .map(String::valueOf)
-                .collect(joining(","));
-
+        // 유저 등록
         User user = User.builder()
                 .loginId(joinInformation.getId())
                 .password(passwordEncoder.encode(joinInformation.getPassword()))
                 .nickname(joinInformation.getNickname())
                 .phoneNumber(joinInformation.getPhoneNumber())
-                .positionIds(positionIds)
-                .positionClass(joinInformation.getPositionClass())
+                .jobGroup(jobGroup)
+                .career(career)
                 .role(Role.ROLE_USER)
                 .refreshable(true)
                 .build();

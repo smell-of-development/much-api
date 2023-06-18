@@ -20,12 +20,9 @@ public class JoinInformation {
     private String phoneNumber;
 
     @NotNull
-    private Integer positionParent;
+    private Integer jobGroup;
 
     @NotNull
-    private Integer positionChild;
-
-    @NotBlank
-    private String positionClass;
+    private Integer career;
 
 }

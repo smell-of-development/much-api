@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "TB_POSITION")
 public class Position {
 
-    public static final int REQUIRED_POSITION_SIZE = 2;
-
     @Id
     private Integer code;
 
