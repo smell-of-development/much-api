@@ -1,7 +1,7 @@
 package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
+import much.api.common.enums.ResponseCode;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.Positions;
@@ -27,9 +27,9 @@ public class CommonController implements CommonApi {
 
     @Override
     @GetMapping("/codes")
-    public ResponseEntity<Envelope<Code[]>> retrieveCodes() {
+    public ResponseEntity<Envelope<ResponseCode[]>> retrieveCodes() {
 
-        return ResponseEntity.ok(Envelope.ok(Code.values()));
+        return ResponseEntity.ok(Envelope.ok(ResponseCode.values()));
     }
 
     @Override

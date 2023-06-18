@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.String.*;
-import static much.api.common.enums.Code.*;
+import static much.api.common.enums.ResponseCode.*;
 import static much.api.common.properties.OAuth2Properties.*;
 import static much.api.dto.response.Envelope.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;

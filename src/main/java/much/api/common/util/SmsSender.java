@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.enums.Code;
+import much.api.common.enums.ResponseCode;
 import much.api.common.properties.SmsProperties;
 import much.api.exception.BusinessException;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -44,7 +44,7 @@ public class SmsSender {
 
             return "202".equals(smsResponse.getStatusCode());
         } catch (Exception e) {
-            throw new BusinessException(Code.MESSAGE_SENDING_FAIL, "메세지 전송요청 실패", e);
+            throw new BusinessException(ResponseCode.MESSAGE_SENDING_FAIL, "메세지 전송요청 실패", e);
         }
     }
 

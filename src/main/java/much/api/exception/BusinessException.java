@@ -1,20 +1,20 @@
 package much.api.exception;
 
 import lombok.Getter;
-import much.api.common.enums.Code;
+import much.api.common.enums.ResponseCode;
 
 @Getter
 public class BusinessException extends RuntimeException {
 
-    private final Code code;
+    private final ResponseCode responseCode;
 
-    public BusinessException(Code code, String message) {
+    public BusinessException(ResponseCode responseCode, String message) {
         super(message);
-        this.code = code;
+        this.responseCode = responseCode;
     }
 
-    public BusinessException(Code code, String message, Throwable cause) {
+    public BusinessException(ResponseCode responseCode, String message, Throwable cause) {
         super(message, cause);
-        this.code = code;
+        this.responseCode = responseCode;
     }
 }

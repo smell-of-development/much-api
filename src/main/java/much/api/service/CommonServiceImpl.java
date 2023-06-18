@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
-import static much.api.common.enums.Code.*;
+import static much.api.common.enums.ResponseCode.*;
 
 @Service
 @RequiredArgsConstructor

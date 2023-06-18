@@ -2,7 +2,7 @@ package much.api.common.properties;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
+import much.api.common.enums.ResponseCode;
 import much.api.common.enums.OAuth2Provider;
 import much.api.dto.response.OAuth2Uri;
 import much.api.exception.BusinessException;
@@ -32,7 +32,7 @@ public class OAuth2Properties {
         return getProviders().stream()
                 .filter(p -> name.equalsIgnoreCase(p.getName()))
                 .findFirst()
-                .orElseThrow(() -> new BusinessException(Code.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
+                .orElseThrow(() -> new BusinessException(ResponseCode.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
     }
 
     @Getter
