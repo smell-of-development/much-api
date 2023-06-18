@@ -9,6 +9,7 @@ import much.api.dto.response.Positions;
 import much.api.service.CommonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +54,7 @@ public class CommonController implements CommonApi {
     }
 
     @Override
-    @GetMapping("/skill")
+    @GetMapping("/skills")
     public ResponseEntity<Envelope<List<String>>> retrieveSkills(@RequestParam(defaultValue = "") String name) {
 
         return ResponseEntity.ok(Envelope.ok(
@@ -62,6 +63,13 @@ public class CommonController implements CommonApi {
                                 || skill.getKoreanName().contains(name))
                         .map(Skill::getEnglishName)
                         .toList()));
+    }
+
+    @Override
+    @PostMapping("/image")
+    public ResponseEntity<Envelope<String>> uploadImage(MultipartFile file) {
+
+        return null;
     }
 
 }
