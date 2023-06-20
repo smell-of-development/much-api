@@ -26,6 +26,8 @@ public enum Code {
     UNAUTHORIZED(4000, "정상적인 토큰이 필요합니다."),
     FORBIDDEN(4100, "권한이 없습니다."),
 
+    PROJECT_NOT_FOUND(5000, "프로젝트 정보를 찾을 수 없습니다."),
+
     DUPLICATED_PHONE_NUMBER(8000, "휴대폰 번호 중복"),
     NOT_MATCHED_PHONE_NUMBER_PATTERN(8001, "휴대폰번호 형태가 아닙니다."),
     MESSAGE_SENDING_FAIL(8002, "메세지 발송에 실패하였습니다."),

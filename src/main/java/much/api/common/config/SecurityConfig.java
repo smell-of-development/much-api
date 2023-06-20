@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/testToken").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/project/**").permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(configurer -> configurer

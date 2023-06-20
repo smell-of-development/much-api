@@ -1,16 +1,11 @@
 package much.api.dto.request;
 
 import lombok.Getter;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@ToString
 public class MuchRegistration {
-
-    private Long id;
 
     private String title;
 

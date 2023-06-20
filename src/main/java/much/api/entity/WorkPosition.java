@@ -26,6 +26,8 @@ public class WorkPosition {
 
     private String position;
 
+    private Integer current;
+
     private Integer needs;
 
 }

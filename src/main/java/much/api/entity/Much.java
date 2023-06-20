@@ -22,6 +22,10 @@ public class Much extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer")
+    private User writer;
+
     @Enumerated(EnumType.STRING)
     private MuchType type;
 
@@ -54,10 +58,11 @@ public class Much extends BaseTimeEntity {
     private String introduction;
 
     @Builder
-    public Much(MuchType type, String title, String imageUrl, boolean isOnline, String location,
-                LocalDateTime deadline, LocalDateTime startDate, LocalDateTime endDate,
-                String schedule, String target, Integer maximumPeople, String skills, String introduction) {
+    public Much(User writer, MuchType type, String title, String imageUrl, boolean isOnline, String location,
+                LocalDateTime deadline, LocalDateTime startDate, LocalDateTime endDate, String schedule,
+                String target, Integer maximumPeople, String skills, String introduction) {
 
+        this.writer = writer;
         this.type = type;
         this.title = title;
         this.imageUrl = imageUrl;

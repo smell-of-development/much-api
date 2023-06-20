@@ -2,6 +2,7 @@ package much.api.common.util;
 
 import much.api.common.enums.RunMode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import static much.api.common.enums.RunMode.*;
@@ -13,6 +14,11 @@ public class ContextUtils {
 
     private static boolean smsPass;
 
+
+    public static long getUserId() {
+
+        return Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
 
     public static RunMode getRunMode() {
 

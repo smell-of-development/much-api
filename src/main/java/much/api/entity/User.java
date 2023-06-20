@@ -32,7 +32,7 @@ public class User extends BaseTimeEntity {
     private String password;
 
     @Setter
-    private String picture;
+    private String pictureUrl;
 
     @Setter
     private String phoneNumber;
