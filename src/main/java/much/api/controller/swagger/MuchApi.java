@@ -6,7 +6,7 @@ import much.api.dto.request.MuchRegistration;
 import much.api.dto.response.Envelope;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "프로젝트 및 스터디 등록 API")
+@Tag(name = "프로젝트 및 스터디 관련 API")
 public interface MuchApi {
 
     @Operation(summary = "프로젝트 등록 API",
