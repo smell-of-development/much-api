@@ -70,14 +70,16 @@ public interface CommonApi {
             description = """
                     이미지를 업로드합니다.
                     ### 요청
-                    - POST /common/image
+                    - POST /common/image?type=thumbnail
                     - (multipart/form-data) image
+                    - type 파라미터 종류 : thumbnail, profile, none
+                    - type 파라미터 종류에 따라서 이미지 리사이징
                     ### 응답값 설명
                     - code 200  : "result": string(이미지 주소)
                     - code 9003 : 파일 업로드중 오류
                     - code 9004 : 이미지 파일이 아닙니다.
                     """)
-    ResponseEntity<Envelope<String>> uploadImage(MultipartFile file);
+    ResponseEntity<Envelope<String>> uploadImage(MultipartFile file, String type);
 
     @Operation(summary = "이미지 획득",
             description = """

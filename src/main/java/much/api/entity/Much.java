@@ -57,6 +57,9 @@ public class Much extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String introduction;
 
+    // 이미지 관리용
+    private String introductionImageNames;
+
     @Builder
     public Much(User writer, MuchType type, String title, String imageUrl, boolean isOnline, String location,
                 LocalDateTime deadline, LocalDateTime startDate, LocalDateTime endDate, String schedule,

@@ -1,21 +1,12 @@
 package much.api.common.util;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import much.api.common.enums.ImageResizeType;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStore {
 
-    String getTemporaryPath();
+    String getImagePath();
 
-    UploadResult temporaryUpload(MultipartFile file);
-
-    @Getter
-    @RequiredArgsConstructor
-    class UploadResult {
-
-        private final String url;
-
-    }
+    String uploadImage(MultipartFile file, ImageResizeType resizeType);
 
 }

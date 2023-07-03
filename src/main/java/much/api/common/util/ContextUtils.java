@@ -12,6 +12,8 @@ public class ContextUtils {
 
     private static String runMode;
 
+    private static String host;
+
     private static boolean smsPass;
 
 
@@ -23,6 +25,11 @@ public class ContextUtils {
     public static RunMode getRunMode() {
 
         return runMode.equals(PROD.name()) ? PROD : DEV;
+    }
+
+    public static String getHost() {
+
+        return host;
     }
 
 
@@ -40,9 +47,16 @@ public class ContextUtils {
     }
 
     @Value("${context.smsPass}")
-    public void setRunMode(boolean smsPass) {
+    public void setRunMode(Boolean smsPass) {
 
-        if (runMode == null) throw new IllegalArgumentException();
+        if (smsPass == null) throw new IllegalArgumentException();
         ContextUtils.smsPass = smsPass;
+    }
+
+    @Value("${context.host}")
+    public void setHost(String host) {
+
+        if (host == null) throw new IllegalArgumentException();
+        ContextUtils.host = host;
     }
 }

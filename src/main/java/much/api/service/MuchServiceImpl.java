@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
 import much.api.common.enums.MuchType;
 import much.api.common.util.ContextUtils;
+import much.api.common.util.FileStore;
 import much.api.dto.request.MuchRegistration;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.MuchDetail;
@@ -19,23 +20,46 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MuchServiceImpl implements MuchService {
 
+    private final static String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
+
+    private final static Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
+
     private final MuchRepository muchRepository;
 
     private final UserRepository userRepository;
+
+    private final FileStore fileStore;
+
 
     @Override
     @Transactional
     public Envelope<Long> registerMuch(MuchRegistration registration, MuchType type) {
 
         final String skills = String.join(",", registration.getSkills());
-        // TODO 업로드된 소개이미지/에디터이미지 폴더이동과 에디터 내 주소값 치환 필요
         final String introduction = registration.getIntroduction();
+
+        // TODO 업로드된 소개이미지/에디터이미지 폴더이동과 에디터 내 주소값 치환
+//        Matcher imageTagMatcher = IMAGE_TAG_PATTERN.matcher(introduction);
+//            while (imageTagMatcher.find()) {
+//                String imageUrl = imageTagMatcher.group("imageUrl");
+//                String[] hostAndFilename = imageUrl.split();
+//
+//                if (hostAndFilename.length != 2) continue;
+//                String host = hostAndFilename[0];
+//                String filename = hostAndFilename[1];
+//
+//                fileStore.moveFile(fileStore.getImagePath() + File.separator + filename,
+//                        fileStore.getProjectPath() + File.separator + filename);
+//
+//                introduction = introduction.replace()
+//            }
 
         long userId = ContextUtils.getUserId();
         User user = userRepository.findById(userId)

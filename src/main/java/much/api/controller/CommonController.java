@@ -2,12 +2,13 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
+import much.api.common.enums.ImageResizeType;
 import much.api.common.enums.Skill;
+import much.api.common.util.ContextUtils;
 import much.api.common.util.FileStore;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.Positions;
-import much.api.exception.BusinessException;
 import much.api.service.CommonService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -79,22 +80,24 @@ public class CommonController implements CommonApi {
 
     @Override
     @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image) {
+    public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image,
+                                                        @RequestParam(defaultValue = "none") String type) {
 
-        final String contentType = image.getContentType();
-        if (contentType == null || !contentType.startsWith("image")) {
-            throw new BusinessException(Code.NOT_IMAGE_FILE, String.format("이미지 형식이 아님[%s]", contentType));
-        }
-
-        return ResponseEntity.ok(Envelope.ok(fileStore.temporaryUpload(image).getUrl()));
+        return ResponseEntity.ok(Envelope.ok(
+                ContextUtils.getHost()
+                        + "/common/image"
+                        + fileStore.uploadImage(image, ImageResizeType.valueOf(type.toUpperCase()))));
     }
 
     @Override
     @GetMapping("/image/{path}/{storedFilename}")
-    public ResponseEntity<Resource> retrieveImage(@PathVariable String path, @PathVariable String storedFilename) throws IOException {
+    public ResponseEntity<Resource> retrieveImage(@PathVariable String path,
+                                                  @PathVariable String storedFilename) throws IOException {
+
+        // TODO FileNotFoundException 생각하기
 
         if ("temp".equals(path)) {
-            String fullPath = fileStore.getTemporaryPath() + File.separator + storedFilename;
+            String fullPath = fileStore.getImagePath() + File.separator + storedFilename;
             MediaType mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fullPath)));
 
             return ResponseEntity.ok()
