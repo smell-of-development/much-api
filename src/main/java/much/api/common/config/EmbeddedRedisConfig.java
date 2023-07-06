@@ -52,10 +52,10 @@ public class EmbeddedRedisConfig {
      */
     public int findAvailablePort() throws IOException {
 
-        for (int port = 10000; port <= 65535; port++) {
-            Process process = executeGrepProcessCommand(port);
+        for (int loopPort = 10000; loopPort <= 65535; loopPort++) {
+            Process process = executeGrepProcessCommand(loopPort);
             if (!isRunning(process)) {
-                return port;
+                return loopPort;
             }
         }
 
@@ -74,17 +74,13 @@ public class EmbeddedRedisConfig {
     /**
      * 해당 Process가 현재 실행중인지 확인
      */
-    private boolean isRunning(Process process) {
+    private boolean isRunning(Process process) throws IOException {
         String line;
         StringBuilder pidInfo = new StringBuilder();
 
-        try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-
-            while ((line = input.readLine()) != null) {
-                pidInfo.append(line);
-            }
-
-        } catch (Exception ignored) {
+        BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        while ((line = input.readLine()) != null) {
+            pidInfo.append(line);
         }
 
         return StringUtils.hasText(pidInfo.toString());

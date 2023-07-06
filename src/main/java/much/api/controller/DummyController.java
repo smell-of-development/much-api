@@ -10,7 +10,7 @@ public class DummyController {
 
     @GetMapping("/favicon.ico")
     public void handleFavicon() {
-
+        // Do nothing
     }
 
 }

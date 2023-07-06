@@ -1,7 +1,11 @@
 package much.api.common.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.regex.Pattern;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidationChecker {
 
     private static final String PHONE_NUMBER_REGEX = "(\\d{3})-?(\\d{4})-?(\\d{4})$";

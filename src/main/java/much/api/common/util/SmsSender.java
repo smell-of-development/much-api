@@ -36,7 +36,7 @@ public class SmsSender {
     public boolean sendSms(String phoneNumber, String content) {
 
         try {
-            List<SmsRequest.Message> messages = List.of(SmsRequest.Message.to(phoneNumber));
+            List<SmsRequest.Message> messages = List.of(SmsRequest.Message.ofTo(phoneNumber));
             String message = String.format(smsProperties.getMessageFormat(), content);
 
             SmsRequest request = SmsRequest.of(smsProperties.getFrom(), message, messages);
@@ -126,7 +126,7 @@ public class SmsSender {
                 this.content = content;
             }
 
-            static Message to(String to) {
+            static Message ofTo(String to) {
 
                 return new Message(to);
             }

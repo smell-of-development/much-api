@@ -10,8 +10,6 @@ import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.stream.Collectors;
-
 import static much.api.common.enums.Code.*;
 
 @Service
@@ -33,13 +31,13 @@ public class CommonServiceImpl implements CommonService {
                         positionRepository.findAllByCodeBetween(100, 999)
                                 .stream()
                                 .map(p -> new Positions.Position(p.getCode(), p.getName()))
-                                .collect(Collectors.toList()),
+                                .toList(),
                         // 경력
                         positionRepository.findAllByCodeBetween(1000, 9999)
                                 .stream()
                                 .map(p -> new Positions.Position(p.getCode(), p.getName()))
-                                .collect(Collectors.toList()))
-        );
+                                .toList()
+                ));
     }
 
 

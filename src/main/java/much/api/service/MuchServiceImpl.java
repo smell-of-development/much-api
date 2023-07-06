@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MuchServiceImpl implements MuchService {
 
-    private final static String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
+    private static final String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
 
-    private final static Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
+    private static final Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
 
     private final MuchRepository muchRepository;
 

@@ -2,6 +2,8 @@ package much.api.common.util;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
@@ -10,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PhoneNumberUtils {
 
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
