@@ -11,7 +11,8 @@ import much.api.dto.response.MuchDetail;
 import much.api.entity.Much;
 import much.api.entity.User;
 import much.api.entity.WorkPosition;
-import much.api.exception.BusinessException;
+import much.api.exception.MuchException;
+import much.api.exception.UserNotFound;
 import much.api.repository.MuchRepository;
 import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -45,25 +47,20 @@ public class MuchServiceImpl implements MuchService {
         final String skills = String.join(",", registration.getSkills());
         final String introduction = registration.getIntroduction();
 
-        // TODO 업로드된 소개이미지/에디터이미지 폴더이동과 에디터 내 주소값 치환
-//        Matcher imageTagMatcher = IMAGE_TAG_PATTERN.matcher(introduction);
-//            while (imageTagMatcher.find()) {
-//                String imageUrl = imageTagMatcher.group("imageUrl");
-//                String[] hostAndFilename = imageUrl.split();
-//
-//                if (hostAndFilename.length != 2) continue;
-//                String host = hostAndFilename[0];
-//                String filename = hostAndFilename[1];
-//
-//                fileStore.moveFile(fileStore.getImagePath() + File.separator + filename,
-//                        fileStore.getProjectPath() + File.separator + filename);
-//
-//                introduction = introduction.replace()
-//            }
+        // TODO 업로드 된 이미지 DB 저장
+        Matcher imageTagMatcher = IMAGE_TAG_PATTERN.matcher(introduction);
+            while (imageTagMatcher.find()) {
+                String imageUrl = imageTagMatcher.group("imageUrl");
+                String[] hostAndFilename = imageUrl.split("image/");
+
+                if (hostAndFilename.length != 2) continue;
+                String storedFilename = hostAndFilename[1];
+
+            }
 
         long userId = ContextUtils.getUserId();
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(Code.USER_NOT_FOUND, String.format("사용자 [%s] 미존재", userId)));
+                .orElseThrow(() -> new UserNotFound(userId));
 
         Much much = Much.builder()
                 .writer(user)
@@ -100,7 +97,7 @@ public class MuchServiceImpl implements MuchService {
     public Envelope<MuchDetail> retrieveProject(Long id) {
 
         final Much project = muchRepository.findByIdAndType(id, MuchType.PROJECT)
-                .orElseThrow(() -> new BusinessException(Code.PROJECT_NOT_FOUND, String.format("프로젝트 없음 [%s] ", id)));
+                .orElseThrow(() -> new MuchException(Code.PROJECT_NOT_FOUND, String.format("프로젝트 없음 [%s] ", id)));
 
         final User projectWriter = project.getWriter();
 

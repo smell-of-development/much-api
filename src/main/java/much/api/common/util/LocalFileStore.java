@@ -2,7 +2,7 @@ package much.api.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.ImageResizeType;
-import much.api.exception.BusinessException;
+import much.api.exception.MuchException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +22,7 @@ public class LocalFileStore implements FileStore {
 
     private static final String ROOT_PATH = System.getProperty("user.home");
     private static final String FILE_DIR = ROOT_PATH + File.separator + "muchFiles";
-    private static final String IMAGE_DIR = FILE_DIR + File.separator + "temp";
+    private static final String IMAGE_DIR = FILE_DIR + File.separator + "image";
 
     private static final String ATTACHED_DIR = FILE_DIR + File.separator + "attached";
 
@@ -37,7 +37,7 @@ public class LocalFileStore implements FileStore {
     public String uploadImage(MultipartFile image, ImageResizeType resizeType) {
 
         if (image == null || image.isEmpty()) {
-            throw new BusinessException(INVALID_VALUE_FOR, "업로드 파일 미존재");
+            throw new MuchException(DEV_MESSAGE, "업로드 파일 미존재");
         }
         checkImageType(image);
 
@@ -50,7 +50,7 @@ public class LocalFileStore implements FileStore {
 
         File dir = new File(IMAGE_DIR);
         if (!dir.exists() && !dir.mkdirs()) {
-            throw new BusinessException(FILE_PROCESS_ERROR, "경로생성 실패");
+            throw new MuchException(FILE_PROCESS_ERROR, "경로생성 실패");
         }
 
         try {
@@ -92,10 +92,10 @@ public class LocalFileStore implements FileStore {
             }
 
         } catch (IOException e) {
-            throw new BusinessException(FILE_PROCESS_ERROR, "파일 업로드 실패", e);
+            throw new MuchException(FILE_PROCESS_ERROR, "파일 업로드 실패", e);
         }
 
-        return "/temp/" + storedFilename;
+        return storedFilename;
     }
 
     private static void checkImageType(MultipartFile image) {
@@ -103,7 +103,7 @@ public class LocalFileStore implements FileStore {
         final String contentType = image.getContentType();
 
         if (contentType == null || !contentType.startsWith("image")) {
-            throw new BusinessException(NOT_IMAGE_FILE, String.format("이미지 형식이 아님[%s]", contentType));
+            throw new MuchException(NOT_IMAGE_FILE, String.format("이미지 형식이 아님[%s]", contentType));
         }
     }
 

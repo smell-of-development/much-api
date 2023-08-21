@@ -12,9 +12,11 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "TB_MUCH")
 public class Much extends BaseTimeEntity {
 
@@ -57,29 +59,8 @@ public class Much extends BaseTimeEntity {
     @Column(columnDefinition = "text")
     private String introduction;
 
-    // 이미지 관리용
-    private String introductionImageNames;
-
-    @Builder
-    public Much(User writer, MuchType type, String title, String imageUrl, boolean isOnline, String location,
-                LocalDateTime deadline, LocalDateTime startDate, LocalDateTime endDate, String schedule,
-                String target, Integer maximumPeople, String skills, String introduction) {
-
-        this.writer = writer;
-        this.type = type;
-        this.title = title;
-        this.imageUrl = imageUrl;
-        this.isOnline = isOnline;
-        this.location = location;
-        this.deadline = deadline;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.schedule = schedule;
-        this.target = target;
-        this.maximumPeople = maximumPeople;
-        this.skills = skills;
-        this.introduction = introduction;
-    }
+    // 에디터 이미지 관리용
+    private String ImageFileIds;
 
     public void addWorkPosition(WorkPosition workPosition) {
 

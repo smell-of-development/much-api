@@ -4,36 +4,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.properties.OAuth2Properties;
 import much.api.common.properties.SmsProperties;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
-import much.api.dto.request.Login;
-import much.api.dto.response.SmsCertification;
-import much.api.exception.*;
 import much.api.common.util.TokenProvider;
 import much.api.dto.Jwt;
+import much.api.dto.request.Login;
 import much.api.dto.response.Envelope;
+import much.api.dto.response.SmsCertification;
 import much.api.entity.User;
+import much.api.exception.*;
 import much.api.repository.RedisRepository;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static java.lang.String.*;
+import static java.lang.String.valueOf;
 import static much.api.common.enums.Code.*;
 import static much.api.common.enums.RunMode.DEV;
 import static much.api.common.properties.OAuth2Properties.*;
-import static much.api.dto.response.Envelope.*;
+import static much.api.dto.response.Envelope.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Slf4j
@@ -54,8 +51,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final SmsProperties smsProperties;
 
-    private final OAuth2Properties oAuth2Properties;
-
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -65,15 +60,13 @@ public class AuthServiceImpl implements AuthService {
         final String requestPassword = loginRequest.getPassword();
 
         User user = userRepository.findByLoginId(requestId)
-                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND, format("로그인시도시 ID: [%s]에 해당하는 사용자가 없음", requestId)));
+                .orElseThrow(() -> new IncorrectLoginInfo(Long.valueOf(requestId)));
 
-        // 비밀번호 일치 => 토큰 반환
-        if (passwordEncoder.matches(requestPassword, user.getPassword())) {
-            String idToString = user.getId().toString();
-            return Envelope.ok(tokenProvider.createTokenResponse(idToString, user.getRole()));
+        if (!passwordEncoder.matches(requestPassword, user.getPassword())) {
+            throw new IncorrectLoginInfo(Long.valueOf(requestId));
         }
 
-        throw new BusinessException(INCORRECT_PASSWORD, "비밀번호 불일치");
+        return Envelope.ok(tokenProvider.createTokenResponse(user.getId(), user.getRole()));
     }
 
     /**
@@ -87,55 +80,23 @@ public class AuthServiceImpl implements AuthService {
     public Envelope<Jwt> refreshAccessToken(final String accessToken,
                                             final String refreshToken) {
 
-        // 유효한 리프레시 토큰이 아니라면 종료
-        if (!tokenProvider.isValidRefreshToken(refreshToken)) {
-            throw new InsufficientAuthenticationException("리프레시 토큰이 유효하지 않음");
-        }
-
-        // 유효한 리프레시 토큰의 유저 id (검증됨)
-        final String userIdAtRefreshToken = tokenProvider.extractSubject(refreshToken);
-
-        // 리프레시 가능한 액세스 토큰이 아니라면
-        if (!isRefreshableAccessToken(accessToken, userIdAtRefreshToken)) {
-            throw new InsufficientAuthenticationException("리프레시 불가");
-        }
+        final Long userId = tokenProvider.getSubject(accessToken);
 
         // 사용자 조회
-        User foundUser = userRepository.findById(Long.parseLong(userIdAtRefreshToken))
-                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND, format("사용자 ID: [%s] 를 찾지 못함", userIdAtRefreshToken)));
+        User foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFound(userId));
 
-        // 리프레시 가능 여부
-        if (foundUser.isRefreshable()) {
-            String newAccessToken = tokenProvider.createAccessToken(userIdAtRefreshToken, foundUser.getRole());
-            return ok(Jwt.builder()
-                    .accessToken(newAccessToken)
-                    .build());
+        // 사용자의 리프레시 가능 여부
+        if (!foundUser.isRefreshable()) {
+            throw new TokenRefreshBlocked(userId);
         }
-        throw new BusinessException(TOKEN_REFRESH_BLOCKED_USER, String.format("사용자 ID: [%s] 리프레시 불가", userIdAtRefreshToken));
-    }
 
+        TokenProvider.Token token = tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole());
 
-    /**
-     * 리프레시 가능한 액세스 토큰인지 검사
-     *
-     * @param accessToken          액세스 토큰
-     * @param userIdAtRefreshToken 리프레시 토큰의 user id
-     * @return 리프레시 가능여부
-     */
-    private boolean isRefreshableAccessToken(final String accessToken,
-                                             final String userIdAtRefreshToken) {
-
-        // 액세스 토큰의 유저 id, role (미검증됨)
-        final String userIdAtAccessToken = tokenProvider.extractSubject(accessToken);
-        final String userRoleAtAccessToken = tokenProvider.extractClaim(accessToken, TokenProvider.CLAIM_ROLE);
-
-        // 유효기간만 만료된 정상 발급되었던 액세스토큰이거나(액세스 토큰값은 이때 검증됨)
-        // 유효한 액세스 토큰이면서
-        // 같은 유저에 대한 토큰일 때
-        return
-                ((tokenProvider.isExpiredToken(accessToken) && userIdAtAccessToken != null && userRoleAtAccessToken != null)
-                        || tokenProvider.isValidAccessToken(accessToken)
-                ) && Objects.equals(userIdAtAccessToken, userIdAtRefreshToken);
+        return ok(Jwt.builder()
+                .accessToken(token.getAccessToken())
+                .refreshToken(token.getRefreshToken())
+                .build());
     }
 
 
@@ -173,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 휴대폰번호 형식 검사
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+            throw new InvalidPhoneNumber(phoneNumber);
         }
 
         // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
@@ -195,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
             return ok(new SmsCertification(phoneNumber, expirationTimeInMinutes));
         }
 
-        throw new BusinessException(MESSAGE_SENDING_FAIL, "메세지 전송요청 실패");
+        throw new MuchException(MESSAGE_SENDING_FAIL, "메세지 전송요청 실패");
     }
 
 
@@ -210,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
     public void verifyCertificationNumber(String phoneNumber, String certificationNumber) {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new BusinessException(NOT_MATCHED_PHONE_NUMBER_PATTERN, format("휴대폰번호 형식이 아님. [%s]", phoneNumber));
+            throw new InvalidPhoneNumber(phoneNumber);
         }
 
         // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
@@ -221,7 +182,7 @@ public class AuthServiceImpl implements AuthService {
         // 전송기록 찾기
         String savedCertificationNumber = redisRepository.findSmsCertificationNumber(phoneNumber);
         if (savedCertificationNumber == null) {
-            throw new BusinessException(SENDING_HISTORY_NOT_FOUND, String.format("[%s] 발송기록 미존재", phoneNumber));
+            throw new MuchException(SENDING_HISTORY_NOT_FOUND, String.format("[%s] 발송기록 미존재", phoneNumber));
         }
 
         log.info("저장된 번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
@@ -235,7 +196,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 불일치
-        throw new BusinessException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
+        throw new MuchException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
     }
 
 

@@ -1,9 +1,9 @@
-package much.api.exception;
+package much.api.controller;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.dto.response.Envelope;
+import much.api.exception.MuchException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,33 +31,47 @@ public class GlobalExceptionHandler {
 
     /**
      * validation.Valid or @Validated binding error 발생시
+     * => 개발용으로 사용. 사용자 입력은 위에서부터 하나씩 검증
      */
-    @ExceptionHandler({BindException.class, ValidationException.class})
+    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     protected ResponseEntity<Envelope<Void>> handleBindException(BindException e) {
         log.error("handleBindException", e);
 
         Envelope<Void> response = Envelope.error(
-                INVALID_VALUE_FOR,
+                DEV_INVALID_VALUE,
                 e.getBindingResult(),
                 messageSource
         );
-//        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getTarget());
 
         return ResponseEntity.ok(response);
     }
 
 
     /**
-     * binding 못할 경우
+     * @RequestParam 값 미존재로 바인딩 실패시
      */
-    @ExceptionHandler({ServletRequestBindingException.class, MethodArgumentTypeMismatchException.class})
-    protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(Exception e) {
+    @ExceptionHandler(ServletRequestBindingException.class)
+    protected ResponseEntity<Envelope<Void>> handleServletRequestBindingException(ServletRequestBindingException e) {
         log.error("bindingException", e);
 
-        Envelope<Void> response = Envelope.error(INVALID_VALUE_FOR, e.getMessage());
+        Envelope<Void> response = Envelope.error(DEV_INVALID_PARAM_NAME);
 
         return ResponseEntity.ok(response);
     }
+
+
+    /**
+     * @RequestParam 타입 바인딩 실패시
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.error("bindingException", e);
+
+        Envelope<Void> response = Envelope.error(DEV_INVALID_PARAM_VALUE);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
     /**
@@ -118,7 +133,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Envelope<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.error("handleHttpMessageNotReadableException", e);
 
-        Envelope<Void> response = Envelope.error(INCORRECT_FORMAT);
+        Envelope<Void> response = Envelope.error(DEV_INCORRECT_FORMAT);
 
         return ResponseEntity.ok(response);
     }
@@ -138,13 +153,13 @@ public class GlobalExceptionHandler {
 
 
     /**
-     * 비즈니스 예외
+     * 서비스 예외
      */
-    @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<Envelope<Void>> handleBusinessException(BusinessException e) {
+    @ExceptionHandler(MuchException.class)
+    protected ResponseEntity<Envelope<Void>> handleBusinessException(MuchException e) {
         log.error("handleBusinessException", e);
 
-        Envelope<Void> response = Envelope.error(e.getCode());
+        Envelope<Void> response = Envelope.error(e.getCode(), e.getMessage());
 
         return ResponseEntity.ok(response);
     }

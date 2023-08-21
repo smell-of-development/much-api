@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
 import much.api.common.properties.SmsProperties;
-import much.api.exception.BusinessException;
+import much.api.exception.MuchException;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class SmsSender {
 
             return "202".equals(smsResponse.getStatusCode());
         } catch (Exception e) {
-            throw new BusinessException(Code.MESSAGE_SENDING_FAIL, "메세지 전송요청 실패", e);
+            throw new MuchException(Code.MESSAGE_SENDING_FAIL, "메세지 전송요청 실패", e);
         }
     }
 

@@ -1,9 +1,12 @@
 package much.api.common.util;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
@@ -18,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+import static java.lang.String.format;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,106 +30,9 @@ public class TokenProvider {
 
     public static final String CLAIM_ROLE = "role";
 
+    private static final String CLAIM_UUID = "uuid";
+
     private final JwtProperties properties;
-
-
-    public Jwt createTokenResponse(String id, Role role) {
-
-        String accessToken = this.createAccessToken(id, role);
-        String refreshToken = this.createRefreshToken(id);
-
-        return Jwt.builder()
-                .id(Long.parseLong(id))
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-
-    public String createAccessToken(String id, Role role) {
-
-        return JWT.create()
-                .withSubject(id)
-                .withClaim(CLAIM_ROLE, role.name())
-                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getAccessTokenExpirationTime()))
-                .sign(Algorithm.HMAC512(properties.getSecret()));
-    }
-
-
-    public String createRefreshToken(String id) {
-
-        return JWT.create()
-                .withSubject(id)
-                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()))
-                .sign(Algorithm.HMAC512(properties.getSecret()));
-    }
-
-
-    public boolean isExpiredToken(String token) {
-
-        try {
-            parse(token);
-            return false;
-        } catch (TokenExpiredException e) {
-            log.info("토큰기한 만료[{}]", token);
-            return true;
-        } catch (Exception e) {
-            log.info("토큰해독 불가[{}]", token);
-            return false;
-        }
-    }
-
-
-    public boolean isValidToken(String token) {
-
-        try {
-            parse(token);
-            return true;
-        } catch (Exception e) {
-            log.info("토큰해독 불가[{}]", token);
-            return false;
-        }
-    }
-
-
-    public boolean isValidAccessToken(String token) {
-
-        try {
-            DecodedJWT decodedJWT = parse(token);
-
-            return !decodedJWT.getClaim(CLAIM_ROLE)
-                    .isMissing();
-        } catch (Exception e) {
-            log.info("토큰해독 불가[{}]", token);
-            return false;
-        }
-    }
-
-
-    public boolean isValidRefreshToken(String token) {
-
-        return isValidToken(token) && extractClaim(token, CLAIM_ROLE) == null;
-    }
-
-
-    public String extractSubject(String token) {
-
-        try {
-            return JWT.decode(token).getSubject();
-        } catch (JWTDecodeException e) {
-            throw new InsufficientAuthenticationException("토큰 디코딩 실패");
-        }
-    }
-
-
-    public String extractClaim(String token, String claim) {
-
-        try {
-            return JWT.decode(token).getClaim(claim).asString();
-        } catch (JWTDecodeException e) {
-            throw new InsufficientAuthenticationException("토큰 디코딩 실패");
-        }
-    }
 
 
     /**
@@ -156,5 +64,147 @@ public class TokenProvider {
         User user = new User(decodedJWT.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(user, accessToken, authorities);
     }
+
+
+    public Long getSubject(String token) {
+
+        return extractSubject(token);
+    }
+
+
+    public Jwt createTokenResponse(long id, Role role) {
+
+        String accessToken = this.createAccessToken(id, role);
+        String refreshToken = this.createRefreshToken(id);
+
+        return Jwt.builder()
+                .id(id)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+
+    public Token createToken(Long id, Role role) {
+
+        return Token.builder()
+                .accessToken(createAccessToken(id, role))
+                .refreshToken(createRefreshToken(id))
+                .build();
+    }
+
+
+    public Token checkRefreshableAndCreateToken(String accessToken, String refreshToken, Role role) {
+
+        checkValidAccessToken(accessToken, true);
+        checkValidRefreshToken(refreshToken);
+
+        // 액세스 토큰의 유저 ID 추출
+        Long userIdAtAccessToken = extractSubject(accessToken);
+        // 리프레시 토큰의 유저 ID 추출
+        Long userIdAtRefreshToken = extractSubject(refreshToken);
+
+        // 액세스 토큰의 UUID 추출
+        String uuidAtAccessToken = extractClaim(accessToken, CLAIM_UUID);
+        // 리프레시 토큰의 UUID 추출
+        String uuidAtRefreshToken = extractClaim(refreshToken, CLAIM_UUID);
+
+        // 같은 유저에 대한 토큰이 아니거나, 짝이 안맞으면 리프레시 불가
+        if (!userIdAtAccessToken.equals(userIdAtRefreshToken) || !uuidAtAccessToken.equals(uuidAtRefreshToken)) {
+            throw new InsufficientAuthenticationException("토큰 리프레시 불가");
+        }
+
+        return createToken(userIdAtAccessToken, role);
+    }
+
+
+    private String createAccessToken(Long id, Role role) {
+
+        return getJwtCommonBuilder(id)
+                .withClaim(CLAIM_ROLE, role.name())
+                .sign(Algorithm.HMAC512(properties.getSecret()));
+    }
+
+
+    private String createRefreshToken(Long id) {
+
+        return getJwtCommonBuilder(id)
+                .sign(Algorithm.HMAC512(properties.getSecret()));
+    }
+
+
+    private void checkValidAccessToken(String token, boolean ignoreExpired) {
+
+        try {
+            parse(token);
+        } catch (TokenExpiredException e) {
+            if (!ignoreExpired) {
+                throw new InsufficientAuthenticationException("토큰검증 실패 - 유효기간 만료", e);
+            }
+        } catch (Exception e) {
+            throw new InsufficientAuthenticationException("토큰검증 실패", e);
+        }
+
+        String roleClaim = extractClaim(token, CLAIM_ROLE);
+        if (roleClaim == null) {
+            throw new InsufficientAuthenticationException("액세스 토큰이 아님");
+        }
+    }
+
+
+    private void checkValidRefreshToken(String token) {
+
+        DecodedJWT decodedJWT;
+        try {
+            decodedJWT = parse(token);
+        } catch (Exception e) {
+            throw new InsufficientAuthenticationException("토큰검증 실패", e);
+        }
+
+        if (decodedJWT == null || !decodedJWT.getClaim(CLAIM_ROLE).isMissing()) {
+            throw new InsufficientAuthenticationException("리프레시 토큰이 아님");
+        }
+    }
+
+
+    private Long extractSubject(String token) {
+
+        try {
+            return Long.valueOf(JWT.decode(token).getSubject());
+        } catch (JWTDecodeException e) {
+            throw new InsufficientAuthenticationException(format("토큰[%s] - decode() 실패", token));
+        }
+    }
+
+
+    private String extractClaim(String token, String claim) {
+
+        try {
+            return JWT.decode(token).getClaim(claim).asString();
+        } catch (JWTDecodeException e) {
+            throw new InsufficientAuthenticationException(format("토큰[%s] - getClaim(%s) 실패", token, claim));
+        }
+    }
+
+
+    private JWTCreator.Builder getJwtCommonBuilder(long id) {
+
+        return JWT.create()
+                .withSubject(String.valueOf(id))
+                .withClaim(CLAIM_UUID, UUID.randomUUID().toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()));
+    }
+
+
+    @Builder
+    @Getter
+    public static class Token {
+
+        private String accessToken;
+
+        private String refreshToken;
+
+    }
+
 
 }

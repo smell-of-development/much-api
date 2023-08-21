@@ -2,10 +2,8 @@ package much.api.common.properties;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
 import much.api.common.enums.OAuth2Provider;
 import much.api.dto.response.OAuth2Uri;
-import much.api.exception.BusinessException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -27,13 +25,13 @@ public class OAuth2Properties {
 
     private final List<Provider> providers;
 
-    public Provider findProviderWithName(String name) {
-
-        return getProviders().stream()
-                .filter(p -> name.equalsIgnoreCase(p.getName()))
-                .findFirst()
-                .orElseThrow(() -> new BusinessException(Code.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
-    }
+//    public Provider findProviderWithName(String name) {
+//
+//        return getProviders().stream()
+//                .filter(p -> name.equalsIgnoreCase(p.getName()))
+//                .findFirst()
+//                .orElseThrow(() -> new MuchException(Code.NOT_SUPPORTED_OAUTH2_PROVIDER, String.format("지원하지 않는 프로바이더[%s]", name)));
+//    }
 
     @Getter
     @RequiredArgsConstructor

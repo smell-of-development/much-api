@@ -68,11 +68,14 @@ public class CommonController implements CommonApi {
 
     @Override
     @GetMapping("/skills")
-    public ResponseEntity<Envelope<List<String>>> retrieveSkills(@RequestParam(defaultValue = "") String name) {
+    public ResponseEntity<Envelope<List<String>>> retrieveSkills(@RequestParam String name) {
 
         return ResponseEntity.ok(Envelope.ok(
                 Arrays.stream(Skill.values())
-                        .filter(skill -> skill.getEnglishName().toLowerCase().contains(name.toLowerCase())
+                        .filter(skill -> skill.getEnglishName()
+                                                .replace(" ", "")
+                                                .toLowerCase()
+                                                .contains(name.toLowerCase().replace(" ", ""))
                                 || skill.getKoreanName().contains(name))
                         .map(Skill::getEnglishName)
                         .toList()));
@@ -83,29 +86,25 @@ public class CommonController implements CommonApi {
     public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image,
                                                         @RequestParam(defaultValue = "none") String type) {
 
+        // TODO 업로드시 DB 관리 서비스레이어 만들기
         return ResponseEntity.ok(Envelope.ok(
                 ContextUtils.getHost()
-                        + "/common/image"
+                        + "/common/image/"
                         + fileStore.uploadImage(image, ImageResizeType.valueOf(type.toUpperCase()))));
     }
 
     @Override
-    @GetMapping("/image/{path}/{storedFilename}")
-    public ResponseEntity<Resource> retrieveImage(@PathVariable String path,
-                                                  @PathVariable String storedFilename) throws IOException {
+    @GetMapping("/image/{storedFilename}")
+    public ResponseEntity<Resource> retrieveImage(@PathVariable String storedFilename) throws IOException {
 
         // TODO FileNotFoundException 생각하기
 
-        if ("temp".equals(path)) {
-            String fullPath = fileStore.getImagePath() + File.separator + storedFilename;
-            MediaType mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fullPath)));
+        String fullPath = fileStore.getImagePath() + File.separator + storedFilename;
+        MediaType mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fullPath)));
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
-                    .body(new FileSystemResource(new File(fullPath)));
-        }
-
-        return null;
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
+                .body(new FileSystemResource(new File(fullPath)));
     }
 
 }

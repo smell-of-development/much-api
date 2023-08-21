@@ -10,12 +10,22 @@ import static much.api.common.enums.RunMode.*;
 @Component
 public class ContextUtils {
 
-    private static String runMode;
+    private static RunMode runMode;
 
     private static String host;
 
     private static boolean smsPass;
 
+
+    public static boolean isDevMode() {
+
+        return runMode == DEV;
+    }
+
+    public static boolean isProdMode() {
+
+        return runMode == PROD;
+    }
 
     public static long getUserId() {
 
@@ -24,7 +34,7 @@ public class ContextUtils {
 
     public static RunMode getRunMode() {
 
-        return runMode.equals(PROD.name()) ? PROD : DEV;
+        return runMode;
     }
 
     public static String getHost() {
@@ -43,7 +53,7 @@ public class ContextUtils {
     public void setRunMode(String runMode) {
 
         if (runMode == null) throw new IllegalArgumentException();
-        ContextUtils.runMode = runMode;
+        ContextUtils.runMode = RunMode.valueOf(runMode);
     }
 
     @Value("${context.smsPass}")

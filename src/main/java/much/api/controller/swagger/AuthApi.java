@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.Jwt;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
-import much.api.dto.Jwt;
-import much.api.dto.response.OAuth2Uri;
 import much.api.dto.response.SmsCertification;
 import org.springframework.http.ResponseEntity;
 
@@ -17,11 +16,14 @@ public interface AuthApi {
 
     @Operation(summary = "Swagger 테스트용 토큰 발급받기",
             description = """
-                    개발모드일때만 동작합니다.
+                    개발모드일때만 동작합니다. id에 해당하는 토큰을 받습니다.
+                    ### 요청값
+                    - id : long
+                    - ex) /testToken?id=1
                     ### 응답값
-                    - 토큰발급(code: 200) : id, accessToken, refreshToken
+                    - id, accessToken, refreshToken
                     """)
-    ResponseEntity<Envelope<Jwt>> testToken(String id);
+    ResponseEntity<Envelope<Jwt>> testToken(long id);
 
     @Operation(summary = "로그인",
             description = """
@@ -30,49 +32,47 @@ public interface AuthApi {
                     - id       : id
                     - password : 비밀번호
                     ### 응답값
-                    - 토큰발급(code: 200) : id, accessToken, refreshToken
+                    - id, accessToken, refreshToken
                     """,
             requestBody = @RequestBody(required = true))
     ResponseEntity<Envelope<Jwt>> login(Login request);
 
-    @Operation(summary = "OAuth2 URI 조회",
-            description = """
-                    카카오 혹은 구글 로그인 URI를 조회하는 API
-                    ### 응답값
-                    - provider : 요청 provider
-                    - loginUri : 요청한 provider 로그인 주소
-                    """,
-            parameters = {@Parameter(name = "provider", description = "kakao 또는 google")
-            })
-    ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(String provider);
+//    @Operation(summary = "OAuth2 URI 조회",
+//            description = """
+//                    카카오 혹은 구글 로그인 URI를 조회하는 API
+//                    ### 응답값
+//                    - provider : 요청 provider
+//                    - loginUri : 요청한 provider 로그인 주소
+//                    """,
+//            parameters = {@Parameter(name = "provider", description = "kakao 또는 google")
+//            })
+//    ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(String provider);
 
-    @Operation(summary = "OAuth2 정보 처리",
-            description = """
-                    OAuth2 로그인 사용자 정보를 처리합니다.
-                    ### 케이스별 결과값
-                    1. 최초 사용자
-                    - 휴대폰번호 존재(code: 8100)   : id => 추가정보 등록 필요
-                    - 휴대폰번호 미존재(code: 8101) : id => 추가정보 + 문자인증 필요.
-                    2. 기존 사용자 / 기존 사용자와 휴대폰번호가 같은 최초 사용자
-                    - 토큰발급(code: 200) : id, accessToken, refreshToken
-                    """,
-            parameters = {
-                    @Parameter(name = "provider", description = "kakao 또는 google"),
-                    @Parameter(name = "code", description = "redirect uri 쿼리스트링에 포함된 code")
-            })
-    ResponseEntity<Envelope<Jwt>> handleOAuth2(String provider, String code);
+//    @Operation(summary = "OAuth2 정보 처리",
+//            description = """
+//                    OAuth2 로그인 사용자 정보를 처리합니다.
+//                    ### 케이스별 결과값
+//                    1. 최초 사용자
+//                    - 휴대폰번호 존재(code: 8100)   : id => 추가정보 등록 필요
+//                    - 휴대폰번호 미존재(code: 8101) : id => 추가정보 + 문자인증 필요.
+//                    2. 기존 사용자 / 기존 사용자와 휴대폰번호가 같은 최초 사용자
+//                    - 토큰발급(code: 200) : id, accessToken, refreshToken
+//                    """,
+//            parameters = {
+//                    @Parameter(name = "provider", description = "kakao 또는 google"),
+//                    @Parameter(name = "code", description = "redirect uri 쿼리스트링에 포함된 code")
+//            })
+//    ResponseEntity<Envelope<Jwt>> handleOAuth2(String provider, String code);
 
 
     @Operation(summary = "액세스토큰 갱신",
             description = """
                     액세스 토큰을 갱신합니다.
                     ### 요청값
-                    - accessToken  : 만료되었거나 정상인 액세스토큰
-                    - refreshToken : 액세스 토큰에 해당하는 정상 리프레시토큰
+                    - accessToken  : 만료되었거나 정상인 액세스토큰(필수)
+                    - refreshToken : 액세스 토큰에 해당하는 정상 리프레시토큰(필수)
                     ### 응답값
-                    - code 200  : accessToken - 리프레시 된 액세스 토큰
-                    - code 1000 : 요청값 이상 (accessToken, refreshToken 모두 필수)
-                    - code 4000 : 갱신불가
+                    - result{}: accessToken - 리프레시 된 액세스 토큰
                     """,
             requestBody = @RequestBody(required = true))
     ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt request);
@@ -85,8 +85,8 @@ public interface AuthApi {
                     ### 요청값
                     - (Header) Authorization : Bearer {accessToken}
                     ### 응답값
-                    - code 200  : 정상토큰 ex) result: 1 (사용자의 id)
-                    - code 4000 : 토큰이 없거나 비정상
+                    - code 200  : 정상토큰 => ex) result(number): 1 (사용자의 id)
+                    - code 4001 : 토큰이 없거나 비정상
                     """)
     ResponseEntity<Envelope<Long>> checkToken();
 

@@ -5,19 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Code;
 import much.api.common.enums.Role;
-import much.api.common.enums.RunMode;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
-import much.api.dto.request.Login;
-import much.api.dto.request.SmsVerification;
-import much.api.dto.response.SmsCertification;
-import much.api.common.properties.OAuth2Properties;
 import much.api.controller.swagger.AuthApi;
 import much.api.dto.Jwt;
+import much.api.dto.request.Login;
+import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.OAuth2Uri;
+import much.api.dto.response.SmsCertification;
 import much.api.entity.User;
-import much.api.exception.BusinessException;
+import much.api.exception.MuchException;
 import much.api.service.AuthService;
 import much.api.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 
@@ -40,15 +35,13 @@ public class AuthController implements AuthApi {
 
     private final UserService userService;
 
-    private final OAuth2Properties oAuth2Properties;
-
     private final TokenProvider tokenProvider;
 
     @Override
     @GetMapping("/testToken")
-    public ResponseEntity<Envelope<Jwt>> testToken(@RequestParam(defaultValue = "0") String id) {
+    public ResponseEntity<Envelope<Jwt>> testToken(@RequestParam long id) {
 
-        if (!ContextUtils.getRunMode().equals(RunMode.DEV)) {
+        if (!ContextUtils.isProdMode()) {
             throw new AccessDeniedException("개발모드가 아님");
         }
 
@@ -63,30 +56,30 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @Override
+//    @Override
 //    @GetMapping("/oauth2/authorization/{provider}")
-    public ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(@PathVariable String provider) {
+//    public ResponseEntity<Envelope<OAuth2Uri>> retrieveOAuth2Uri(@PathVariable String provider) {
+//
+//        return ResponseEntity.ok(
+//                Envelope.ok(oAuth2Properties
+//                        .findProviderWithName(provider)
+//                        .makeOAuth2UriResponse()
+//                ));
+//    }
 
-        return ResponseEntity.ok(
-                Envelope.ok(oAuth2Properties
-                        .findProviderWithName(provider)
-                        .makeOAuth2UriResponse()
-                ));
-    }
 
-
-    @Override
+//    @Override
 //    @PostMapping("/oauth2/code/{provider}")
-    public ResponseEntity<Envelope<Jwt>> handleOAuth2(@PathVariable String provider,
-                                                        @RequestParam String code) {
-
-        OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
-
-        String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
-        Envelope<Jwt> oAuth2Response = authService.processOAuth2(providerInfo, decodedCode);
-
-        return ResponseEntity.ok(oAuth2Response);
-    }
+//    public ResponseEntity<Envelope<Jwt>> handleOAuth2(@PathVariable String provider,
+//                                                        @RequestParam String code) {
+//
+//        OAuth2Properties.Provider providerInfo = oAuth2Properties.findProviderWithName(provider);
+//
+//        String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
+//        Envelope<Jwt> oAuth2Response = authService.processOAuth2(providerInfo, decodedCode);
+//
+//        return ResponseEntity.ok(oAuth2Response);
+//    }
 
 
     @Override
@@ -115,7 +108,7 @@ public class AuthController implements AuthApi {
 
         Optional<User> userByPhoneNumber = userService.findUserByPhoneNumber(phoneNumber);
         if (userByPhoneNumber.isPresent()) {
-            throw new BusinessException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
+            throw new MuchException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
         }
 
         Envelope<SmsCertification> response = authService.sendCertificationNumber(phoneNumber);

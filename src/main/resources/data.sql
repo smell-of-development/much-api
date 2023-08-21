@@ -1,3 +1,4 @@
+-- TODO 인메모리 DB용 기본사용자 INERT
 INSERT INTO TB_POSITION(code, name)
 VALUES (100, 'PM'),
        (200, '기획'),
