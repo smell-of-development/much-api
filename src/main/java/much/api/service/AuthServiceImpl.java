@@ -91,12 +91,9 @@ public class AuthServiceImpl implements AuthService {
             throw new TokenRefreshBlocked(userId);
         }
 
-        TokenProvider.Token token = tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole());
-
-        return ok(Jwt.builder()
-                .accessToken(token.getAccessToken())
-                .refreshToken(token.getRefreshToken())
-                .build());
+        return ok(
+                tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole())
+        );
     }
 
 

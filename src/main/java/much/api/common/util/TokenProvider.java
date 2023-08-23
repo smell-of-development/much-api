@@ -3,10 +3,10 @@ package much.api.common.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
@@ -19,7 +19,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 import static java.lang.String.format;
 
@@ -30,7 +33,7 @@ public class TokenProvider {
 
     public static final String CLAIM_ROLE = "role";
 
-    private static final String CLAIM_UUID = "uuid";
+    private static final String CLAIM_PAIR_ID = "pair_id";
 
     private final JwtProperties properties;
 
@@ -72,10 +75,12 @@ public class TokenProvider {
     }
 
 
-    public Jwt createTokenResponse(long id, Role role) {
+    public Jwt createTokenResponse(Long id, Role role) {
 
-        String accessToken = this.createAccessToken(id, role);
-        String refreshToken = this.createRefreshToken(id);
+        String uuid = UUID.randomUUID().toString();
+
+        String accessToken = this.createAccessToken(id, role, uuid);
+        String refreshToken = this.createRefreshToken(id, uuid);
 
         return Jwt.builder()
                 .id(id)
@@ -85,16 +90,7 @@ public class TokenProvider {
     }
 
 
-    public Token createToken(Long id, Role role) {
-
-        return Token.builder()
-                .accessToken(createAccessToken(id, role))
-                .refreshToken(createRefreshToken(id))
-                .build();
-    }
-
-
-    public Token checkRefreshableAndCreateToken(String accessToken, String refreshToken, Role role) {
+    public Jwt checkRefreshableAndCreateToken(String accessToken, String refreshToken, Role role) {
 
         checkValidAccessToken(accessToken, true);
         checkValidRefreshToken(refreshToken);
@@ -105,30 +101,30 @@ public class TokenProvider {
         Long userIdAtRefreshToken = extractSubject(refreshToken);
 
         // 액세스 토큰의 UUID 추출
-        String uuidAtAccessToken = extractClaim(accessToken, CLAIM_UUID);
+        String uuidAtAccessToken = extractClaim(accessToken, CLAIM_PAIR_ID);
         // 리프레시 토큰의 UUID 추출
-        String uuidAtRefreshToken = extractClaim(refreshToken, CLAIM_UUID);
+        String uuidAtRefreshToken = extractClaim(refreshToken, CLAIM_PAIR_ID);
 
         // 같은 유저에 대한 토큰이 아니거나, 짝이 안맞으면 리프레시 불가
         if (!userIdAtAccessToken.equals(userIdAtRefreshToken) || !uuidAtAccessToken.equals(uuidAtRefreshToken)) {
             throw new InsufficientAuthenticationException("토큰 리프레시 불가");
         }
 
-        return createToken(userIdAtAccessToken, role);
+        return createTokenResponse(userIdAtAccessToken, role);
     }
 
 
-    private String createAccessToken(Long id, Role role) {
+    private String createAccessToken(Long id, Role role, String uuid) {
 
-        return getJwtCommonBuilder(id)
+        return getJwtCommonBuilder(id, uuid)
                 .withClaim(CLAIM_ROLE, role.name())
                 .sign(Algorithm.HMAC512(properties.getSecret()));
     }
 
 
-    private String createRefreshToken(Long id) {
+    private String createRefreshToken(Long id, String uuid) {
 
-        return getJwtCommonBuilder(id)
+        return getJwtCommonBuilder(id, uuid)
                 .sign(Algorithm.HMAC512(properties.getSecret()));
     }
 
@@ -187,23 +183,12 @@ public class TokenProvider {
     }
 
 
-    private JWTCreator.Builder getJwtCommonBuilder(long id) {
+    private JWTCreator.Builder getJwtCommonBuilder(Long id, String uuid) {
 
         return JWT.create()
                 .withSubject(String.valueOf(id))
-                .withClaim(CLAIM_UUID, UUID.randomUUID().toString())
+                .withClaim(CLAIM_PAIR_ID, uuid)
                 .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()));
-    }
-
-
-    @Builder
-    @Getter
-    public static class Token {
-
-        private String accessToken;
-
-        private String refreshToken;
-
     }
 
 
