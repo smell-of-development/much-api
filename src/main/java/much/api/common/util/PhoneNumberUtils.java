@@ -9,70 +9,94 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static much.api.common.util.ValidationChecker.HYPHEN_PHONE_NUMBER_PATTERN;
+import static much.api.common.util.ValidationChecker.PHONE_NUMBER_PATTERN;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PhoneNumberUtils {
 
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-
-    private static final String PHONE_NUMBER_REGEX = "(\\d{3})-?(\\d{4})-?(\\d{4})$";
-
-    private static final String ONLY_DIGITS_PHONE_NUMBER_REGEX = "(\\d{3})(\\d{4})(\\d{4})$";
-
-    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
-
-    private static final Pattern ONLY_DIGITS_PHONE_NUMBER_REGEX_PATTERN = Pattern.compile(ONLY_DIGITS_PHONE_NUMBER_REGEX);
-
     private static final String MASK = "****";
 
 
     public static boolean isOnlyDigitsPattern(String phoneNumber) {
 
-        return ONLY_DIGITS_PHONE_NUMBER_REGEX_PATTERN.matcher(phoneNumber).matches();
+        return PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches();
     }
 
-    public static Optional<String> toHyphenFormat(String phoneNumber) {
+    public static boolean isHyphenPattern(String phoneNumber) {
 
-        return toNational(phoneNumber);
+        return HYPHEN_PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches();
+    }
+
+    public static Optional<String> toHyphenFormat(String phoneNumber, boolean masked) {
+
+        String hyphenPhoneNumber = toNational(phoneNumber);
+        if (hyphenPhoneNumber == null) {
+            return Optional.empty();
+        }
+
+        return masked ?
+                Optional.ofNullable(masking(hyphenPhoneNumber))
+                : Optional.of(hyphenPhoneNumber);
     }
 
 
-    public static Optional<String> toMaskedHyphenFormat(String phoneNumber) {
+    public static Optional<String> toOnlyDigitsFormat(String phoneNumber, boolean masked) {
 
-        return toNational(phoneNumber)
-                .map(PhoneNumberUtils::masking);
+        String hyphenPhoneNumber = toNational(phoneNumber);
+        if (hyphenPhoneNumber == null) {
+            return Optional.empty();
+        }
+
+        String digitsFormat = hyphenPhoneNumber.replace("-", "");
+        return masked ?
+                Optional.ofNullable(masking(digitsFormat))
+                : Optional.of(digitsFormat);
     }
 
 
-    public static Optional<String> toOnlyDigits(String phoneNumber) {
-
-        return toNational(phoneNumber)
-                .map(PhoneNumberUtil::normalizeDigitsOnly);
-    }
-
-
-    private static Optional<String> toNational(String phoneNumber) {
+    /**
+     * 입력된 휴대폰번호를 검사하고, 하이픈이 포함된 번호로 변환
+     *
+     * @param phoneNumber 여러가지 형식의 휴대폰번호
+     * @return 010-####-@@@@ 형태의 휴대폰번호 문자열. 변환불가시 null
+     */
+    private static String toNational(String phoneNumber) {
 
         try {
             Phonenumber.PhoneNumber toParsed = phoneNumberUtil.parse(phoneNumber, Locale.KOREA.getCountry());
 
             String format = phoneNumberUtil.format(toParsed, PhoneNumberUtil.PhoneNumberFormat.NATIONAL);
-            if (format.matches(PHONE_NUMBER_REGEX)) {
-                return Optional.of(format);
+            if (HYPHEN_PHONE_NUMBER_PATTERN.matcher(format).matches()) {
+                return format;
             }
 
         } catch (Exception e) {
             log.debug("phoneNumber 파싱중 예외", e);
         }
-        return Optional.empty();
+
+        return null;
     }
 
 
     private static String masking(String phoneNumber) {
 
-        Matcher matcher = PHONE_NUMBER_PATTERN.matcher(phoneNumber);
+        Matcher matcher = null;
+
+        if (isOnlyDigitsPattern(phoneNumber)) {
+            matcher = PHONE_NUMBER_PATTERN.matcher(phoneNumber);
+        }
+        if (isHyphenPattern(phoneNumber)) {
+            matcher = HYPHEN_PHONE_NUMBER_PATTERN.matcher(phoneNumber);
+        }
+
+        if (matcher == null) {
+            return null;
+        }
+
         if (matcher.find()) {
             String middle = matcher.group(2);
             return phoneNumber.replace(middle, MASK);

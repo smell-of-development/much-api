@@ -31,7 +31,8 @@ public class GlobalExceptionHandler {
 
     /**
      * validation.Valid or @Validated binding error 발생시
-     * => 개발용으로 사용. 사용자 입력은 위에서부터 하나씩 검증
+     * => 기본제공 기능은 컨트롤러에서 개발용으로 사용.
+     * 사용자 입력은 커스텀 Validator 사용하여 위에서부터 하나씩 검증
      */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     protected ResponseEntity<Envelope<Void>> handleBindException(BindException e) {

@@ -7,8 +7,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -51,9 +49,6 @@ public class Much extends BaseTimeEntity {
 
     private Integer maximumPeople;
 
-    @OneToMany(mappedBy = "much", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorkPosition> workPositions = new ArrayList<>();
-
     private String skills;
 
     @Column(columnDefinition = "text")
@@ -61,11 +56,5 @@ public class Much extends BaseTimeEntity {
 
     // 에디터 이미지 관리용
     private String ImageFileIds;
-
-    public void addWorkPosition(WorkPosition workPosition) {
-
-        workPositions.add(workPosition);
-        workPosition.setMuch(this);
-    }
 
 }

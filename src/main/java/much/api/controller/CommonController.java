@@ -8,8 +8,8 @@ import much.api.common.util.ContextUtils;
 import much.api.common.util.FileStore;
 import much.api.controller.swagger.CommonApi;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.Positions;
 import much.api.service.CommonService;
+import much.api.service.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -33,14 +33,9 @@ public class CommonController implements CommonApi {
 
     private final CommonService commonService;
 
+    private final UserService userService;
+
     private final FileStore fileStore;
-
-    @Override
-    @GetMapping("/positions")
-    public ResponseEntity<Envelope<Positions>> retrievePositions() {
-
-        return ResponseEntity.ok(commonService.retrievePositions());
-    }
 
 
     @Override
@@ -54,7 +49,7 @@ public class CommonController implements CommonApi {
     @GetMapping("/id-validation")
     public ResponseEntity<Envelope<Void>> retrieveDuplicatedLoginId(@RequestParam String id) {
 
-        commonService.checkDuplicatedLoginId(id);
+        userService.checkDuplicatedLoginId(id);
         return ResponseEntity.ok(Envelope.empty());
     }
 
@@ -62,7 +57,7 @@ public class CommonController implements CommonApi {
     @GetMapping("/name-validation")
     public ResponseEntity<Envelope<Void>> retrieveDuplicatedNickname(@RequestParam String nickname) {
 
-        commonService.checkDuplicatedNickname(nickname);
+        userService.checkDuplicatedNickname(nickname);
         return ResponseEntity.ok(Envelope.empty());
     }
 

@@ -7,11 +7,12 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
 import much.api.common.properties.JwtProperties;
-import much.api.dto.Jwt;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -191,5 +192,17 @@ public class TokenProvider {
                 .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()));
     }
 
+
+    @Getter
+    @Builder
+    public static class Jwt {
+
+        private Long id;
+
+        private String accessToken;
+
+        private String refreshToken;
+
+    }
 
 }

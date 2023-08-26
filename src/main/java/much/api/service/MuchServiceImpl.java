@@ -10,7 +10,6 @@ import much.api.dto.response.Envelope;
 import much.api.dto.response.MuchDetail;
 import much.api.entity.Much;
 import much.api.entity.User;
-import much.api.entity.WorkPosition;
 import much.api.exception.MuchException;
 import much.api.exception.UserNotFound;
 import much.api.repository.MuchRepository;
@@ -78,15 +77,6 @@ public class MuchServiceImpl implements MuchService {
                 .introduction(introduction)
                 .build();
 
-
-        registration.getWork().stream()
-                .map(w -> WorkPosition.builder()
-                        .position(w.getPosition())
-                        .current(0)
-                        .needs(w.getNeeds())
-                        .build())
-                .forEach(much::addWorkPosition);
-
         muchRepository.save(much);
 
         return Envelope.ok(much.getId());
@@ -112,24 +102,24 @@ public class MuchServiceImpl implements MuchService {
                         .build()));
 
         // 포지션 상세 생성 + 포지션 총 인원 합/포지션 전체 필요 인원 합구하기 + 포지션별 인원 설정
-        final List<WorkPosition> workPositions = project.getWorkPositions();
-        List<MuchDetail.WorkDetail> workDetails = new ArrayList<>();
-
-        int currentSum = 0;
-        int needsSum = 0;
-        for (WorkPosition position : workPositions) {
-            Integer current = position.getCurrent();
-            Integer needs = position.getNeeds();
-
-            currentSum += current;
-            needsSum += needs;
-
-            workDetails.add(MuchDetail.WorkDetail.builder()
-                    .position(position.getPosition())
-                    .current(current)
-                    .needs(needs)
-                    .build());
-        }
+//        final List<WorkPosition> workPositions = project.getWorkPositions();
+//        List<MuchDetail.WorkDetail> workDetails = new ArrayList<>();
+//
+//        int currentSum = 0;
+//        int needsSum = 0;
+//        for (WorkPosition position : workPositions) {
+//            Integer current = position.getCurrent();
+//            Integer needs = position.getNeeds();
+//
+//            currentSum += current;
+//            needsSum += needs;
+//
+//            workDetails.add(MuchDetail.WorkDetail.builder()
+//                    .position(position.getPosition())
+//                    .current(current)
+//                    .needs(needs)
+//                    .build());
+//        }
 
         // 최종 조립 후 반환
         return Envelope.ok(
@@ -149,11 +139,11 @@ public class MuchServiceImpl implements MuchService {
                         .endDate(project.getEndDate())
                         .schedule(project.getSchedule())
                         .target(project.getTarget())
-                        .currentTotal(currentSum)
-                        .maximumPeople(needsSum)
+//                        .currentTotal(currentSum)
+//                        .maximumPeople(needsSum)
                         .introduction(project.getIntroduction())
                         .skills(skillDetails)
-                        .work(workDetails)
+//                        .work(workDetails)
                         .build()
         );
     }

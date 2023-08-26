@@ -11,7 +11,9 @@ public class SmsProperties {
 
     private final int expirationTimeInMinutes;
 
-    private final String messageFormat;
+    private final int maxSendingCountPerDay;
+
+    private final String certificationMessageFormat;
 
     private final String from;
 

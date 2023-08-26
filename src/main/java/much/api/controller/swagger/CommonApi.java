@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.common.enums.Code;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.Positions;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,15 +14,6 @@ import java.util.List;
 
 @Tag(name = "공통 API")
 public interface CommonApi {
-
-    @Operation(summary = "포지션 목록 조회",
-            description = """
-                    대분류와 중분류 포지션 목록을 조회한다.
-                    ### 응답값 설명
-                    - result.positions.jobGroups : 직군
-                    - result.positions.careers   : 경력
-                    """)
-    ResponseEntity<Envelope<Positions>> retrievePositions();
 
     @Operation(summary = "코드 목록 조회",
             description = """

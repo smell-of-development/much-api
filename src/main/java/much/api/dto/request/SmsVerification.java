@@ -1,15 +1,15 @@
 package much.api.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class SmsVerification {
 
-    @NotBlank
+    @NotNull
     private String phoneNumber;
 
-    @NotBlank
+    @NotNull
     private String certificationNumber;
 
 }

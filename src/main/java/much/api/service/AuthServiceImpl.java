@@ -9,13 +9,14 @@ import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
 import much.api.common.util.TokenProvider;
-import much.api.dto.Jwt;
 import much.api.dto.request.Login;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.SmsCertification;
+import much.api.dto.response.WebToken;
+import much.api.entity.SmsCertificationHist;
 import much.api.entity.User;
 import much.api.exception.*;
-import much.api.repository.RedisRepository;
+import much.api.repository.SmsCertificationHistRepository;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,11 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static java.lang.String.valueOf;
-import static much.api.common.enums.Code.*;
-import static much.api.common.enums.RunMode.DEV;
+import static java.time.LocalDateTime.now;
 import static much.api.common.properties.OAuth2Properties.*;
 import static much.api.dto.response.Envelope.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
 
-    private final RedisRepository redisRepository;
+    private final SmsCertificationHistRepository smsCertificationHistRepository;
 
     private final TokenProvider tokenProvider;
 
@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Envelope<Jwt> login(Login loginRequest) {
+    public Envelope<WebToken> login(Login loginRequest) {
 
         final String requestId = loginRequest.getLoginId();
         final String requestPassword = loginRequest.getPassword();
@@ -66,7 +66,8 @@ public class AuthServiceImpl implements AuthService {
             throw new IncorrectLoginInfo(Long.valueOf(requestId));
         }
 
-        return Envelope.ok(tokenProvider.createTokenResponse(user.getId(), user.getRole()));
+        TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(user.getId(), user.getRole());
+        return Envelope.ok(WebToken.ofJwt(jwt));
     }
 
     /**
@@ -77,8 +78,8 @@ public class AuthServiceImpl implements AuthService {
      * @return 재발급 된 액세스 토큰 응답
      */
     @Override
-    public Envelope<Jwt> refreshAccessToken(final String accessToken,
-                                            final String refreshToken) {
+    public Envelope<WebToken> refreshAccessToken(final String accessToken,
+                                                 final String refreshToken) {
 
         final Long userId = tokenProvider.getSubject(accessToken);
 
@@ -91,9 +92,8 @@ public class AuthServiceImpl implements AuthService {
             throw new TokenRefreshBlocked(userId);
         }
 
-        return ok(
-                tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole())
-        );
+        TokenProvider.Jwt jwt = tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole());
+        return ok(WebToken.ofJwt(jwt));
     }
 
 
@@ -106,8 +106,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public Envelope<Jwt> processOAuth2(final Provider providerInfo,
-                                       final String code) {
+    public Envelope<WebToken> processOAuth2(final Provider providerInfo,
+                                            final String code) {
 
         final OAuth2Token oAuth2Token = getOAuth2Token(providerInfo, code);
         final OpenId openId = getUserFromProvider(providerInfo, oAuth2Token);
@@ -133,27 +133,48 @@ public class AuthServiceImpl implements AuthService {
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);
         }
-
         // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
-        if (ContextUtils.getRunMode().equals(DEV) && ContextUtils.isSmsPass()) {
+        if (ContextUtils.isSmsPass()) {
             return Envelope.ok(new SmsCertification(phoneNumber, smsProperties.getExpirationTimeInMinutes()));
+        }
+        // 이미 가입된 휴대폰번호인지 검사
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new DuplicatedPhoneNumber(phoneNumber);
+        }
+
+        // 하루 최대 전송횟수 초과 검사
+        LocalDateTime previousDateTime = now().minusDays(1L);
+        if (smsCertificationHistRepository
+                .existsHistMoreThanN(
+                        phoneNumber,
+                        previousDateTime,
+                        smsProperties.getMaxSendingCountPerDay())) {
+
+            throw new CertificationMessageSendingCountExceeded(phoneNumber);
         }
 
         // 랜덤번호 채번
         int random = ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
-        String content = valueOf(random);
+        String randomToString = String.valueOf(random);
+        String content = String.format(smsProperties.getCertificationMessageFormat(), randomToString);
 
         // 문자발송
         boolean success = smsSender.sendSms(phoneNumber, content);
 
-        // 레디스에 저장후 응답
-        int expirationTimeInMinutes = smsProperties.getExpirationTimeInMinutes();
+        // DB 저장후 응답
         if (success) {
-            redisRepository.saveSmsCertificationNumber(phoneNumber, content, expirationTimeInMinutes);
-            return ok(new SmsCertification(phoneNumber, expirationTimeInMinutes));
+
+            SmsCertificationHist hist = SmsCertificationHist.builder()
+                    .phoneNumber(phoneNumber)
+                    .number(content)
+                    .build();
+
+            smsCertificationHistRepository.save(hist);
+
+            return ok(new SmsCertification(phoneNumber, smsProperties.getExpirationTimeInMinutes()));
         }
 
-        throw new MuchException(MESSAGE_SENDING_FAIL, "메세지 전송요청 실패");
+        throw new MessageSendingFail(phoneNumber);
     }
 
 
@@ -170,30 +191,28 @@ public class AuthServiceImpl implements AuthService {
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);
         }
-
         // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
-        if (ContextUtils.getRunMode().equals(DEV) && ContextUtils.isSmsPass()) {
+        if (ContextUtils.isSmsPass()) {
             return;
         }
 
-        // 전송기록 찾기
-        String savedCertificationNumber = redisRepository.findSmsCertificationNumber(phoneNumber);
-        if (savedCertificationNumber == null) {
-            throw new MuchException(SENDING_HISTORY_NOT_FOUND, String.format("[%s] 발송기록 미존재", phoneNumber));
-        }
+        // 유효시간 내 전송기록 찾기
+        LocalDateTime after = now().minusMinutes(smsProperties.getExpirationTimeInMinutes());
 
-        log.info("저장된 번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
+        SmsCertificationHist hist = smsCertificationHistRepository.findLatestSent(phoneNumber, after)
+                .orElseThrow(() -> new CertificationMessageSendingNeeded(phoneNumber));
+
+        String savedCertificationNumber = hist.getPhoneNumber();
+
+        log.info("휴대폰번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
 
         // 인증번호 일치
-        if (savedCertificationNumber.equals(certificationNumber)) {
-
-            // 확인한 번호 삭제
-            redisRepository.removeSmsCertificationNumber(phoneNumber);
-            return;
+        if (!savedCertificationNumber.equals(certificationNumber)) {
+            throw new CertificationNumberNotMatched(certificationNumber);
         }
 
-        // 불일치
-        throw new MuchException(CERTIFICATION_NUMBER_NOT_MATCHED, "인증번호 불일치");
+        // 완료
+        hist.certify();
     }
 
 

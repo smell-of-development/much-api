@@ -45,7 +45,7 @@ public class ContextUtils {
 
     public static boolean isSmsPass() {
 
-        return smsPass;
+        return ContextUtils.getRunMode().equals(DEV) && smsPass;
     }
 
 

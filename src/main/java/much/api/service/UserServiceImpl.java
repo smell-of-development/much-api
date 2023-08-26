@@ -2,26 +2,25 @@ package much.api.service;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Role;
+import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
-import much.api.common.util.ValidationChecker;
-import much.api.dto.Jwt;
+import much.api.dto.MuchValid;
 import much.api.dto.request.JoinInformation;
 import much.api.dto.response.Envelope;
+import much.api.dto.response.WebToken;
+import much.api.entity.SmsCertificationHist;
 import much.api.entity.User;
-import much.api.exception.InvalidPhoneNumber;
-import much.api.exception.MuchException;
-import much.api.exception.UserNotFound;
-import much.api.repository.PositionRepository;
+import much.api.exception.*;
+import much.api.repository.SmsCertificationHistRepository;
 import much.api.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static java.lang.String.format;
-import static much.api.common.enums.Code.*;
 import static much.api.dto.response.Envelope.ok;
 
 
@@ -32,9 +31,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final CommonService commonService;
-
-    private final PositionRepository positionRepository;
+    private final SmsCertificationHistRepository smsCertificationHistRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -44,49 +41,61 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Envelope<Jwt> registerUser(JoinInformation joinInformation) {
+    public Envelope<WebToken> registerUser(@MuchValid JoinInformation joinInformation) {
 
-        // 로그인 ID 형식, 중복체크
-        commonService.checkDuplicatedLoginId(joinInformation.getId());
+        // 로그인 ID 중복체크
+        checkDuplicatedLoginId(joinInformation.getLoginId());
 
-        // 비밀번호 형식 체크
-        if (!ValidationChecker.isValidPassword(joinInformation.getPassword())) {
-            throw new MuchException(INVALID_PASSWORD, "패스워드 형식에 맞지 않음");
-        }
+        // 닉네임 중복체크
+        checkDuplicatedNickname(joinInformation.getNickname());
 
-        // 닉네임 형식, 중복체크
-        commonService.checkDuplicatedNickname(joinInformation.getNickname());
-
-        // 휴대폰번호 형식 검사
         final String phoneNumber = joinInformation.getPhoneNumber();
-        if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
-            throw new InvalidPhoneNumber(phoneNumber);
-        }
 
-        // 휴대폰번호 중복 검사
+        // 이미 가입된 휴대폰번호인지 검사
         if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new MuchException(DUPLICATED_PHONE_NUMBER, format("휴대폰번호 중복. [%s]", phoneNumber));
+            throw new DuplicatedPhoneNumber(phoneNumber);
         }
 
+        // 휴대폰인증 SELECT - 1시간 이내
+        LocalDateTime after = LocalDateTime.now().minusHours(1L);
+        Optional<SmsCertificationHist> histOptional = smsCertificationHistRepository.findLatestSent(phoneNumber, after);
+
+        // 개발환경 + 프로파일 smsPass 가 true 라면 인증검사 패스
+        boolean certificationCompleted = ContextUtils.isSmsPass();
+
+        // 인증이 완료된 번호인지 확인
+        if (!certificationCompleted && histOptional.isPresent()) {
+
+            SmsCertificationHist hist = histOptional.get();
+            if (hist.isCertified()) {
+                certificationCompleted = true;
+            }
+        }
+
+        if (!certificationCompleted) {
+            throw new CertificationMessageSendingNeeded(phoneNumber);
+        }
 
         // 유저 등록
         User user = User.builder()
-                .loginId(joinInformation.getId())
+                .loginId(joinInformation.getLoginId())
                 .password(passwordEncoder.encode(joinInformation.getPassword()))
                 .nickname(joinInformation.getNickname())
-                .phoneNumber(joinInformation.getPhoneNumber())
+                .phoneNumber(phoneNumber)
                 .role(Role.ROLE_USER)
+                .position(joinInformation.getPosition())
                 .refreshable(true)
                 .build();
 
         userRepository.save(user);
 
-        return ok(tokenProvider.createTokenResponse(user.getId(), user.getRole()));
+        TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(user.getId(), user.getRole());
+        return ok(WebToken.ofJwt(jwt));
     }
 
     @Override
     @Transactional
-    public Envelope<Jwt> linkUser(String targetPhoneNumber, Long toDeletedId) {
+    public Envelope<WebToken> linkUser(String targetPhoneNumber, Long toDeletedId) {
 
         // 사용자 확인
         final User toBeDeletedUser = userRepository.findById(toDeletedId)
@@ -115,6 +124,25 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findUserByPhoneNumber(String phoneNumber) {
 
         return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+
+    @Override
+    public void checkDuplicatedLoginId(String loginId) {
+
+        if (userRepository.existsByLoginId(loginId)) {
+            throw new DuplicatedLoginID(loginId);
+        }
+    }
+
+
+    @Override
+    public void checkDuplicatedNickname(String nickname) {
+
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicatedNickname(nickname);
+        }
+
     }
 
 }

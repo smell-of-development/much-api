@@ -8,7 +8,7 @@ import much.api.common.enums.Role;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
 import much.api.controller.swagger.AuthApi;
-import much.api.dto.Jwt;
+import much.api.dto.response.WebToken;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
@@ -39,19 +39,21 @@ public class AuthController implements AuthApi {
 
     @Override
     @GetMapping("/testToken")
-    public ResponseEntity<Envelope<Jwt>> testToken(@RequestParam long id) {
+    public ResponseEntity<Envelope<WebToken>> testToken(@RequestParam long id) {
 
         if (!ContextUtils.isProdMode()) {
             throw new AccessDeniedException("개발모드가 아님");
         }
 
-        Jwt response = tokenProvider.createTokenResponse(id, Role.ROLE_USER);
-        return ResponseEntity.ok(Envelope.ok(response));
+        TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(id, Role.ROLE_USER);
+
+        WebToken token = WebToken.ofJwt(jwt);
+        return ResponseEntity.ok(Envelope.ok(token));
     }
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<Envelope<Jwt>> login(@RequestBody @Valid Login request) {
+    public ResponseEntity<Envelope<WebToken>> login(@RequestBody @Valid Login request) {
 
         return ResponseEntity.ok(authService.login(request));
     }
@@ -84,7 +86,7 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Envelope<Jwt>> refreshAccessToken(@RequestBody Jwt request) {
+    public ResponseEntity<Envelope<WebToken>> refreshAccessToken(@RequestBody @Valid WebToken request) {
 
         final String accessToken = request.getAccessToken();
         final String refreshToken = request.getRefreshToken();

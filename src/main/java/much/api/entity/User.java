@@ -47,13 +47,7 @@ public class User extends BaseTimeEntity {
 
     private String nickname;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_group_code")
-    private Position jobGroup;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "career_code")
-    private Position career;
+    private String position;
 
     @Enumerated(EnumType.STRING)
     private Role role;

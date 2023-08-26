@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import much.api.dto.Jwt;
+import much.api.dto.response.WebToken;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
@@ -23,7 +23,7 @@ public interface AuthApi {
                     ### 응답값
                     - id, accessToken, refreshToken
                     """)
-    ResponseEntity<Envelope<Jwt>> testToken(long id);
+    ResponseEntity<Envelope<WebToken>> testToken(long id);
 
     @Operation(summary = "로그인",
             description = """
@@ -35,7 +35,7 @@ public interface AuthApi {
                     - id, accessToken, refreshToken
                     """,
             requestBody = @RequestBody(required = true))
-    ResponseEntity<Envelope<Jwt>> login(Login request);
+    ResponseEntity<Envelope<WebToken>> login(Login request);
 
 //    @Operation(summary = "OAuth2 URI 조회",
 //            description = """
@@ -75,7 +75,7 @@ public interface AuthApi {
                     - result{}: accessToken - 리프레시 된 액세스 토큰
                     """,
             requestBody = @RequestBody(required = true))
-    ResponseEntity<Envelope<Jwt>> refreshAccessToken(Jwt request);
+    ResponseEntity<Envelope<WebToken>> refreshAccessToken(WebToken request);
 
 
     @Operation(summary = "로그인 체크",
@@ -99,10 +99,11 @@ public interface AuthApi {
                     - phoneNumber : 010####@@@@ 형식이어야 합니다.
                     ### 응답값
                     - code 200  : phoneNumber - 휴대폰번호, remainTimeInMinutes - 남은시간(분)
-                    - code 1000 : phoneNumber 파라미터가 없음
-                    - code 8000 : 휴대폰 번호 중복
-                    - code 8001 : 휴대폰번호 형식이 아님
-                    - code 8002 : 메세지 발송 실패
+                    - code 2000
+                    - 휴대폰 번호 중복
+                    - 휴대폰번호 형식이 아님
+                    - 메세지 발송 실패
+                    - 하루 최대 인증번호 전송횟수를 초과
                     """,
             parameters = {
                     @Parameter(name = "phoneNumber", description = "휴대폰번호")
@@ -120,10 +121,10 @@ public interface AuthApi {
                     - certificationNumber : 전송받은 인증번호
                     ### 응답값
                     - code 200  : 인증성공
-                    - code 1000 : 요청값이 올바른 형태가 아님
-                    - code 8001 : 휴대폰번호 형식이 아님
-                    - code 8003 : 인증번호가 일치하지 않음
-                    - code 8004 : 발송기록을 찾을 수 없음
+                    - code 2000
+                    - 휴대폰번호 형식이 아님
+                    - 인증번호가 일치하지 않음
+                    - 발송기록을 찾을 수 없음
                     """,
             requestBody = @RequestBody(required = true, description = "사용자 id, 휴대폰번호, 인증번호"))
     ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(SmsVerification request);

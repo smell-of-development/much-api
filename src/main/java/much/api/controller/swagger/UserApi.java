@@ -3,7 +3,7 @@ package much.api.controller.swagger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import much.api.dto.Jwt;
+import much.api.dto.response.WebToken;
 import much.api.dto.request.JoinInformation;
 import much.api.dto.request.SocialUserLinking;
 import much.api.dto.response.Envelope;
@@ -21,28 +21,21 @@ public interface UserApi {
                     - password       : 로그인 패스워드
                     - nickname       : 닉네임
                     - phoneNumber    : 휴대폰번호
-                    - jobGroup       : 직군
-                    - career         : 경력
+                    - position       : 포지션
                     ### 응답값
                     - code 200  : 설정 성공, 토큰 발급 (id, accessToken, refreshToken)
                     
-                    - code 1000 : 필수값 미존재 및 불일치
-                    
-                    - code 2007 : ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다.
-                    - code 2006 : 중복되는 로그인 ID가 있어 사용할 수 없습니다.
-                    
-                    - code 2002 : 닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있습니다.
-                    - code 2003 : 중복되는 닉네임이 있어 사용할 수 없습니다.
-                    
-                    - code 2008 : 비밀번호는 공백을 제외한 8글자 이상 20글자 이하만 가능합니다.
-                    
-                    - code 8000 : 휴대폰 번호 중복
-                    - code 8001 : 휴대폰번호 형식이 아님
-                    
-                    - code 8100 : 서버 포지션 코드와 불일치
+                    - code 2000
+                    - ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다.
+                    - 중복되는 로그인 ID가 있어 사용할 수 없습니다.
+                    - 닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있습니다.
+                    - 중복되는 닉네임이 있어 사용할 수 없습니다.
+                    - 비밀번호는 공백을 제외한 8글자 이상 20글자 이하만 가능합니다.
+                    - 휴대폰 번호 중복
+                    - 휴대폰번호 형식이 아님
                     """,
-            requestBody = @RequestBody(required = true, description = "사용자 id, 패스워드, 닉네임, 휴대폰번호, 직군, 경력"))
-    ResponseEntity<Envelope<Jwt>> registerUser(JoinInformation request);
+            requestBody = @RequestBody(required = true, description = "사용자 id, 패스워드, 닉네임, 휴대폰번호, 포지션"))
+    ResponseEntity<Envelope<WebToken>> registerUser(JoinInformation request);
 
     @Operation(summary = "사용자 소셜 연동처리",
             description = """
@@ -61,6 +54,6 @@ public interface UserApi {
                     - code 8001 : 휴대폰번호 형태가 아님
                     """,
             requestBody = @RequestBody(required = true, description = "현재 id, 연동 대상 휴대폰 번호"))
-    ResponseEntity<Envelope<Jwt>> linkSocialUser(SocialUserLinking request);
+    ResponseEntity<Envelope<WebToken>> linkSocialUser(SocialUserLinking request);
 
 }

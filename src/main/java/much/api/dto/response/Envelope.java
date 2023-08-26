@@ -28,8 +28,8 @@ public class Envelope<R> {
     @Schema(description = "메세지")
     private String message;
 
-    @Schema(description = "(개발용)입력값 확인")
-    private List<Error> validations;
+    @Schema(description = "(개발용)필수값 누락 확인")
+    private List<Error> requires;
 
     private R result;
 
@@ -55,7 +55,7 @@ public class Envelope<R> {
                      final String... args) {
 
         this.code = code.getCode();
-        this.message = String.format(code.getMessage(), (Object) args);
+        this.message = String.format(code.getMessage(), (Object[]) args);
     }
 
     private Envelope(final Code code,
@@ -63,7 +63,7 @@ public class Envelope<R> {
 
         this.code = code.getCode();
         this.message = code.getMessage();
-        this.validations = errors;
+        this.requires = errors;
     }
 
     private Envelope(final Code code,

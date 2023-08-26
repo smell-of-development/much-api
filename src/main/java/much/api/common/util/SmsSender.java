@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.enums.Code;
 import much.api.common.properties.SmsProperties;
-import much.api.exception.MuchException;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static much.api.common.util.SmsSender.SmsRequest.Message.ofTo;
 
 @Slf4j
 @Component
@@ -36,15 +35,14 @@ public class SmsSender {
     public boolean sendSms(String phoneNumber, String content) {
 
         try {
-            List<SmsRequest.Message> messages = List.of(SmsRequest.Message.ofTo(phoneNumber));
-            String message = String.format(smsProperties.getMessageFormat(), content);
+            List<SmsRequest.Message> messages = List.of(ofTo(phoneNumber));
 
-            SmsRequest request = SmsRequest.of(smsProperties.getFrom(), message, messages);
+            SmsRequest request = SmsRequest.of(smsProperties.getFrom(), content, messages);
             SmsResponse smsResponse = callApi(request);
 
             return "202".equals(smsResponse.getStatusCode());
         } catch (Exception e) {
-            throw new MuchException(Code.MESSAGE_SENDING_FAIL, "메세지 전송요청 실패", e);
+            return false;
         }
     }
 
@@ -93,7 +91,7 @@ public class SmsSender {
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class SmsRequest {
+    static class SmsRequest {
 
         private final String type;
 

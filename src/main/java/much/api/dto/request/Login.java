@@ -1,15 +1,15 @@
 package much.api.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class Login {
 
-    @NotBlank
+    @NotNull
     private String loginId;
 
-    @NotBlank
+    @NotNull
     private String password;
 
 }
