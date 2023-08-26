@@ -6,7 +6,7 @@ import lombok.Getter;
 import much.api.dto.Check;
 
 @Getter
-public class JoinInformation {
+public class UserCreation {
 
     @NotNull
     @Check("isValidLoginId")
@@ -26,15 +26,15 @@ public class JoinInformation {
 
     private String position;
 
-    public JoinInformation() {
+    public UserCreation() {
     }
 
     @Builder
-    public JoinInformation(@NotNull String loginId,
-                           @NotNull String password,
-                           @NotNull String nickname,
-                           @NotNull String phoneNumber,
-                           String position) {
+    public UserCreation(@NotNull String loginId,
+                        @NotNull String password,
+                        @NotNull String nickname,
+                        @NotNull String phoneNumber,
+                        String position) {
 
         this.loginId = loginId;
         this.password = password;

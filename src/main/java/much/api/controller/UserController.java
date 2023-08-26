@@ -3,7 +3,7 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.UserApi;
-import much.api.dto.request.JoinInformation;
+import much.api.dto.request.UserCreation;
 import much.api.dto.request.SocialUserLinking;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.WebToken;
@@ -24,7 +24,7 @@ public class UserController implements UserApi {
 
     @Override
     @PostMapping
-    public ResponseEntity<Envelope<WebToken>> registerUser(@RequestBody @Valid JoinInformation request) {
+    public ResponseEntity<Envelope<WebToken>> createUser(@RequestBody @Valid UserCreation request) {
 
         return ResponseEntity.ok(userService.registerUser(request));
     }

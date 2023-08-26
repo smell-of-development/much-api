@@ -2,13 +2,13 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import much.api.dto.request.MuchRegistration;
+import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.MuchDetail;
+import much.api.dto.response.ProjectDetail;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "프로젝트 및 스터디 관련 API")
-public interface MuchApi {
+@Tag(name = "프로젝트 관련 API")
+public interface ProjectApi {
 
     @Operation(summary = "프로젝트 등록 API",
             description = """
@@ -34,7 +34,7 @@ public interface MuchApi {
                     - code 1100 : 요청필드 누락 등 잘못된 형식
                     - code 2000 : 등록요청 사용자 미존재
                     """)
-    ResponseEntity<Envelope<Long>> registerProject(MuchRegistration request);
+    ResponseEntity<Envelope<Long>> createProject(ProjectCreation request);
 
     @Operation(summary = "프로젝트 상세 조회 API",
             description = """
@@ -59,6 +59,6 @@ public interface MuchApi {
                     - skills        : 스킬([{"name": "string", "imageUrl": "string"}]])
                     - work          : 포지션별 현재인원/모집인원([{"position": "string", "current": number, "needs": number}, ...])
                     """)
-    ResponseEntity<Envelope<MuchDetail>> retrieveProject(Long id);
+    ResponseEntity<Envelope<ProjectDetail>> getProject(Long id);
 
 }

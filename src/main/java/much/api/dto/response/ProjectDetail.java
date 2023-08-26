@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class MuchDetail {
+public class ProjectDetail {
 
     private Long id;
 

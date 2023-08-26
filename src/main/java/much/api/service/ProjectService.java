@@ -5,14 +5,14 @@ import much.api.common.enums.Code;
 import much.api.common.enums.MuchType;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.FileStore;
-import much.api.dto.request.MuchRegistration;
+import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.MuchDetail;
-import much.api.entity.Much;
+import much.api.dto.response.ProjectDetail;
+import much.api.entity.Project;
 import much.api.entity.User;
 import much.api.exception.MuchException;
 import much.api.exception.UserNotFound;
-import much.api.repository.MuchRepository;
+import much.api.repository.ProjectRepository;
 import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +26,13 @@ import java.util.regex.Pattern;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MuchService {
+public class ProjectService {
 
     private static final String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
 
     private static final Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
 
-    private final MuchRepository muchRepository;
+    private final ProjectRepository projectRepository;
 
     private final UserRepository userRepository;
 
@@ -40,7 +40,7 @@ public class MuchService {
 
 
     @Transactional
-    public Envelope<Long> registerMuch(MuchRegistration registration, MuchType type) {
+    public Envelope<Long> createProject(ProjectCreation registration, MuchType type) {
 
         final String skills = String.join(",", registration.getSkills());
         final String introduction = registration.getIntroduction();
@@ -60,7 +60,7 @@ public class MuchService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFound(userId));
 
-        Much much = Much.builder()
+        Project project = Project.builder()
                 .writer(user)
                 .type(type)
                 .title(registration.getTitle())
@@ -76,25 +76,25 @@ public class MuchService {
                 .introduction(introduction)
                 .build();
 
-        muchRepository.save(much);
+        projectRepository.save(project);
 
-        return Envelope.ok(much.getId());
+        return Envelope.ok(project.getId());
     }
 
 
-    public Envelope<MuchDetail> retrieveProject(Long id) {
+    public Envelope<ProjectDetail> getProject(Long id) {
 
-        final Much project = muchRepository.findByIdAndType(id, MuchType.PROJECT)
+        final Project project = projectRepository.findByIdAndType(id, MuchType.PROJECT)
                 .orElseThrow(() -> new MuchException(Code.PROJECT_NOT_FOUND, String.format("프로젝트 없음 [%s] ", id)));
 
         final User projectWriter = project.getWriter();
 
         // 스킬 잘라내기
         final String skills = project.getSkills();
-        List<MuchDetail.SkillDetail> skillDetails = new ArrayList<>();
+        List<ProjectDetail.SkillDetail> skillDetails = new ArrayList<>();
 
         Arrays.stream(skills.split(","))
-                .forEach(s -> skillDetails.add(MuchDetail.SkillDetail.builder()
+                .forEach(s -> skillDetails.add(ProjectDetail.SkillDetail.builder()
                         .name(s)
                         .imageUrl("") // TODO 추후 이미지 URL 설정
                         .build()));
@@ -121,10 +121,10 @@ public class MuchService {
 
         // 최종 조립 후 반환
         return Envelope.ok(
-                MuchDetail.builder()
+                ProjectDetail.builder()
                         .id(project.getId())
                         .title(project.getTitle())
-                        .writer(MuchDetail.WriterDetail.builder()
+                        .writer(ProjectDetail.WriterDetail.builder()
                                 .id(projectWriter.getId())
                                 .nickname(projectWriter.getNickname())
                                 .pictureUrl(projectWriter.getPictureUrl())

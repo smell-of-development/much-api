@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class MuchRegistration {
+public class ProjectCreation {
 
     private String title;
 

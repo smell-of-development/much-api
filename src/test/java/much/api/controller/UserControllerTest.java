@@ -1,7 +1,7 @@
 package much.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import much.api.dto.request.JoinInformation;
+import much.api.dto.request.UserCreation;
 import much.api.entity.SmsCertificationHist;
 import much.api.entity.User;
 import much.api.repository.SmsCertificationHistRepository;
@@ -58,7 +58,7 @@ class UserControllerTest {
         @Override
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
-            return JoinInformation.builder()
+            return UserCreation.builder()
                     .loginId(accessor.getString(0))
                     .password(accessor.getString(1))
                     .nickname(accessor.getString(2))
@@ -74,7 +74,7 @@ class UserControllerTest {
             "testId1, testPassword1, test1, 01012341234, 백엔드",
             "muchTest, muchTest, much, 01011112222,"
     })
-    void user_join_test1(@AggregateWith(JoinRequestAggregator.class) JoinInformation information) throws Exception {
+    void user_join_test1(@AggregateWith(JoinRequestAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
         smsCertificationHistRepository.save(
@@ -122,7 +122,7 @@ class UserControllerTest {
             "muchTest, testPassword, much, '', 백엔드",
             "muchTest, testPassword, much, 010-1111-2222, 백엔드",
     })
-    void user_join_test2(@AggregateWith(JoinRequestAggregator.class) JoinInformation information) throws Exception {
+    void user_join_test2(@AggregateWith(JoinRequestAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
 

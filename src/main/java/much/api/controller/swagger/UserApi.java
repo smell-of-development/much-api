@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.dto.response.WebToken;
-import much.api.dto.request.JoinInformation;
+import much.api.dto.request.UserCreation;
 import much.api.dto.request.SocialUserLinking;
 import much.api.dto.response.Envelope;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,7 @@ public interface UserApi {
                     - 휴대폰번호 형식이 아님
                     """,
             requestBody = @RequestBody(required = true, description = "사용자 id, 패스워드, 닉네임, 휴대폰번호, 포지션"))
-    ResponseEntity<Envelope<WebToken>> registerUser(JoinInformation request);
+    ResponseEntity<Envelope<WebToken>> createUser(UserCreation request);
 
     @Operation(summary = "사용자 소셜 연동처리",
             description = """

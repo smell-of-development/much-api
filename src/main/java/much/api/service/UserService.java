@@ -6,7 +6,7 @@ import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
 import much.api.dto.MuchValid;
-import much.api.dto.request.JoinInformation;
+import much.api.dto.request.UserCreation;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.WebToken;
 import much.api.entity.SmsCertificationHist;
@@ -39,15 +39,15 @@ public class UserService {
 
 
     @Transactional
-    public Envelope<WebToken> registerUser(@MuchValid JoinInformation joinInformation) {
+    public Envelope<WebToken> registerUser(@MuchValid UserCreation userCreation) {
 
         // 로그인 ID 중복체크
-        checkDuplicatedLoginId(joinInformation.getLoginId());
+        checkDuplicatedLoginId(userCreation.getLoginId());
 
         // 닉네임 중복체크
-        checkDuplicatedNickname(joinInformation.getNickname());
+        checkDuplicatedNickname(userCreation.getNickname());
 
-        final String phoneNumber = joinInformation.getPhoneNumber();
+        final String phoneNumber = userCreation.getPhoneNumber();
 
         // 이미 가입된 휴대폰번호인지 검사
         if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
@@ -76,12 +76,12 @@ public class UserService {
 
         // 유저 등록
         User user = User.builder()
-                .loginId(joinInformation.getLoginId())
-                .password(passwordEncoder.encode(joinInformation.getPassword()))
-                .nickname(joinInformation.getNickname())
+                .loginId(userCreation.getLoginId())
+                .password(passwordEncoder.encode(userCreation.getPassword()))
+                .nickname(userCreation.getNickname())
                 .phoneNumber(phoneNumber)
                 .role(Role.ROLE_USER)
-                .position(joinInformation.getPosition())
+                .position(userCreation.getPosition())
                 .refreshable(true)
                 .build();
 
