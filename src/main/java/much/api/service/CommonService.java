@@ -1,5 +1,13 @@
 package much.api.service;
 
-public interface CommonService {
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CommonService {
+
 
 }
