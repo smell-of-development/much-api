@@ -79,6 +79,6 @@ public interface CommonApiV1 {
                     ### 응답값
                     - 이미지 리소스
                     """)
-    ResponseEntity<Resource> retrieveImage(String storedFilename) throws IOException;
+    ResponseEntity<Resource> getLocalImage(String storedFilename) throws IOException;
 
 }

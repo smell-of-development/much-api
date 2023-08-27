@@ -17,6 +17,11 @@ public class ContextUtils {
     private static boolean smsPass;
 
 
+    public static boolean isLocalMode() {
+
+        return runMode == LOCAL;
+    }
+
     public static boolean isDevMode() {
 
         return runMode == DEV;
@@ -45,7 +50,8 @@ public class ContextUtils {
 
     public static boolean isSmsPass() {
 
-        return ContextUtils.getRunMode().equals(DEV) && smsPass;
+        return (getRunMode() == LOCAL || getRunMode() == DEV)
+                && smsPass;
     }
 
 

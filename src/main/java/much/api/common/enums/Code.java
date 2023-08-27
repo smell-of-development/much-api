@@ -22,6 +22,7 @@ public enum Code {
     USER_NOT_FOUND(2000, "사용자를 찾을 수 없습니다."),
     PHONE_NUMBER_NOT_FOUND(2000, "전화번호에 해당하는 사용자를 찾을 수 없습니다."),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없습니다."),
+    FILE_NOT_FOUND(2000, "파일을 찾을 수 없습니다."),
 
     INVALID_NICKNAME(2000, "닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있습니다."),
     INVALID_LOGIN_ID(2000, "ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있습니다."),
@@ -49,10 +50,10 @@ public enum Code {
     // 서버
     HANDLER_NOT_FOUND(9000, "처리 가능한 핸들러를 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(9000, "허용된 메서드가 아닙니다."),
+
     FILE_PROCESS_ERROR(9000, "파일 처리중 오류"),
 
     INTERNAL_SERVER_ERROR(9999, "확인되지 않은 예외");
-
 
     private final Integer code;
 
