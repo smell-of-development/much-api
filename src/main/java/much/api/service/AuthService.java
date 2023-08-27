@@ -30,7 +30,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static java.time.LocalDateTime.now;
 import static much.api.common.properties.OAuth2Properties.*;
-import static much.api.dto.response.Envelope.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Slf4j
@@ -54,7 +53,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public Envelope<WebToken> login(Login loginRequest) {
+    public WebToken login(Login loginRequest) {
 
         final String requestId = loginRequest.getLoginId();
         final String requestPassword = loginRequest.getPassword();
@@ -66,8 +65,9 @@ public class AuthService {
             throw new IncorrectLoginInfo(Long.valueOf(requestId));
         }
 
-        TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(user.getId(), user.getRole());
-        return Envelope.ok(WebToken.ofJwt(jwt));
+        return WebToken.ofJwt(
+                tokenProvider.createTokenResponse(user.getId(), user.getRole())
+        );
     }
 
 
@@ -78,7 +78,7 @@ public class AuthService {
      * @param refreshToken 정상 리프레시 토큰
      * @return 재발급 된 액세스 토큰 응답
      */
-    public Envelope<WebToken> refreshAccessToken(final String accessToken,
+    public WebToken refreshAccessToken(final String accessToken,
                                                  final String refreshToken) {
 
         final Long userId = tokenProvider.getSubject(accessToken);
@@ -92,8 +92,9 @@ public class AuthService {
             throw new TokenRefreshBlocked(userId);
         }
 
-        TokenProvider.Jwt jwt = tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole());
-        return ok(WebToken.ofJwt(jwt));
+        return WebToken.ofJwt(
+                tokenProvider.checkRefreshableAndCreateToken(accessToken, refreshToken, foundUser.getRole())
+        );
     }
 
 
@@ -125,7 +126,9 @@ public class AuthService {
      * @return 성공시, 응답객체
      */
     @Transactional
-    public Envelope<SmsCertification> sendCertificationNumber(String phoneNumber) {
+    public SmsCertification sendCertificationNumber(String phoneNumber) {
+
+        final int expirationTimeInMinutes = smsProperties.getExpirationTimeInMinutes();
 
         // 휴대폰번호 형식 검사
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
@@ -133,11 +136,11 @@ public class AuthService {
         }
         // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
         if (ContextUtils.isSmsPass()) {
-            return Envelope.ok(new SmsCertification(phoneNumber, smsProperties.getExpirationTimeInMinutes()));
-        }
-        // 이미 가입된 휴대폰번호인지 검사
-        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new DuplicatedPhoneNumber(phoneNumber);
+
+            return SmsCertification.builder()
+                    .phoneNumber(phoneNumber)
+                    .remainTimeInMinutes(expirationTimeInMinutes)
+                    .build();
         }
 
         // 하루 최대 전송횟수 초과 검사
@@ -169,7 +172,10 @@ public class AuthService {
 
             smsCertificationHistRepository.save(hist);
 
-            return ok(new SmsCertification(phoneNumber, smsProperties.getExpirationTimeInMinutes()));
+            return SmsCertification.builder()
+                    .phoneNumber(phoneNumber)
+                    .remainTimeInMinutes(expirationTimeInMinutes)
+                    .build();
         }
 
         throw new MessageSendingFail(phoneNumber);

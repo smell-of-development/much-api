@@ -6,7 +6,7 @@ import much.api.common.enums.ImageResizeType;
 import much.api.common.enums.Skill;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.FileStore;
-import much.api.controller.swagger.CommonApi;
+import much.api.controller.swagger.CommonApiV1;
 import much.api.dto.response.Envelope;
 import much.api.service.CommonService;
 import much.api.service.UserService;
@@ -28,8 +28,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/common")
-public class CommonController implements CommonApi {
+@RequestMapping("/api/v1/common")
+public class CommonControllerV1 implements CommonApiV1 {
 
     private final CommonService commonService;
 

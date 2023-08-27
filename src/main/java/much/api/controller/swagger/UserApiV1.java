@@ -10,7 +10,7 @@ import much.api.dto.response.Envelope;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "유저 API", description = "유저 관련 API")
-public interface UserApi {
+public interface UserApiV1 {
 
 
     @Operation(summary = "사용자등록 및 로그인처리",

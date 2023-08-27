@@ -8,7 +8,7 @@ import much.api.dto.response.ProjectDetail;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "프로젝트 관련 API")
-public interface ProjectApi {
+public interface ProjectApiV1 {
 
     @Operation(summary = "프로젝트 등록 API",
             description = """

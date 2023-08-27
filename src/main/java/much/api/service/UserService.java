@@ -7,7 +7,6 @@ import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
 import much.api.dto.MuchValid;
 import much.api.dto.request.UserCreation;
-import much.api.dto.response.Envelope;
 import much.api.dto.response.WebToken;
 import much.api.entity.SmsCertificationHist;
 import much.api.entity.User;
@@ -20,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static much.api.dto.response.Envelope.ok;
 
 
 @Service
@@ -39,7 +36,7 @@ public class UserService {
 
 
     @Transactional
-    public Envelope<WebToken> registerUser(@MuchValid UserCreation userCreation) {
+    public WebToken registerUser(@MuchValid UserCreation userCreation) {
 
         // 로그인 ID 중복체크
         checkDuplicatedLoginId(userCreation.getLoginId());
@@ -88,12 +85,12 @@ public class UserService {
         userRepository.save(user);
 
         TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(user.getId(), user.getRole());
-        return ok(WebToken.ofJwt(jwt));
+        return WebToken.ofJwt(jwt);
     }
 
 
     @Transactional
-    public Envelope<WebToken> linkUser(String targetPhoneNumber, Long toDeletedId) {
+    public WebToken linkUser(String targetPhoneNumber, Long toDeletedId) {
 
         // 사용자 확인
         final User toBeDeletedUser = userRepository.findById(toDeletedId)

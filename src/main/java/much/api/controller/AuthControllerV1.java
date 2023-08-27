@@ -7,7 +7,7 @@ import much.api.common.enums.Code;
 import much.api.common.enums.Role;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
-import much.api.controller.swagger.AuthApi;
+import much.api.controller.swagger.AuthApiV1;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
@@ -25,11 +25,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static org.springframework.http.ResponseEntity.*;
+
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class AuthController implements AuthApi {
+@RequestMapping("/api/v1")
+public class AuthControllerV1 implements AuthApiV1 {
 
     private final AuthService authService;
 
@@ -48,14 +51,18 @@ public class AuthController implements AuthApi {
         TokenProvider.Jwt jwt = tokenProvider.createTokenResponse(id, Role.ROLE_USER);
 
         WebToken token = WebToken.ofJwt(jwt);
-        return ResponseEntity.ok(Envelope.ok(token));
+        return ok(
+                Envelope.ok(token)
+        );
     }
 
     @Override
     @PostMapping("/login")
     public ResponseEntity<Envelope<WebToken>> login(@RequestBody @Valid Login request) {
 
-        return ResponseEntity.ok(authService.login(request));
+        return ok(
+                Envelope.ok(authService.login(request))
+        );
     }
 
 //    @Override
@@ -91,7 +98,9 @@ public class AuthController implements AuthApi {
         final String accessToken = request.getAccessToken();
         final String refreshToken = request.getRefreshToken();
 
-        return ResponseEntity.ok(authService.refreshAccessToken(accessToken, refreshToken));
+        return ok(
+                Envelope.ok(authService.refreshAccessToken(accessToken, refreshToken))
+        );
     }
 
 
@@ -100,7 +109,9 @@ public class AuthController implements AuthApi {
     public ResponseEntity<Envelope<Long>> checkToken() {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ResponseEntity.ok(Envelope.ok(Long.parseLong(principal.getUsername())));
+        return ok(
+                Envelope.ok(Long.parseLong(principal.getUsername()))
+        );
     }
 
 
@@ -113,8 +124,9 @@ public class AuthController implements AuthApi {
             throw new MuchException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
         }
 
-        Envelope<SmsCertification> response = authService.sendCertificationNumber(phoneNumber);
-        return ResponseEntity.ok(response);
+        return ok(
+                Envelope.ok(authService.sendCertificationNumber(phoneNumber))
+        );
     }
 
 
@@ -126,9 +138,10 @@ public class AuthController implements AuthApi {
         final String certificationNumber = request.getCertificationNumber();
 
         authService.verifyCertificationNumber(phoneNumber, certificationNumber);
-        return ResponseEntity.ok(Envelope.empty());
+        return ok(
+                Envelope.empty()
+        );
     }
-
 
 
 }

@@ -2,7 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.MuchType;
-import much.api.controller.swagger.ProjectApi;
+import much.api.controller.swagger.ProjectApiV1;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.ProjectDetail;
@@ -10,9 +10,12 @@ import much.api.service.ProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.ResponseEntity.*;
+
 @RestController
 @RequiredArgsConstructor
-public class ProjectController implements ProjectApi {
+@RequestMapping("/api/v1")
+public class ProjectControllerV1 implements ProjectApiV1 {
 
     private final ProjectService projectService;
 
@@ -20,7 +23,9 @@ public class ProjectController implements ProjectApi {
     @PostMapping("/project")
     public ResponseEntity<Envelope<Long>> createProject(@RequestBody ProjectCreation request) {
 
-        return ResponseEntity.ok(projectService.createProject(request, MuchType.PROJECT));
+        return ok(
+                Envelope.ok(projectService.createProject(request, MuchType.PROJECT))
+        );
     }
 
 
@@ -28,7 +33,9 @@ public class ProjectController implements ProjectApi {
     @GetMapping("/project/{id}")
     public ResponseEntity<Envelope<ProjectDetail>> getProject(@PathVariable Long id) {
 
-        return ResponseEntity.ok(projectService.getProject(id));
+        return ok(
+                Envelope.ok(projectService.getProject(id))
+        );
     }
 
 }

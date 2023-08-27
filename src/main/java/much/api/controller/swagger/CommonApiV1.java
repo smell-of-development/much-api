@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Tag(name = "공통 API")
-public interface CommonApi {
+public interface CommonApiV1 {
 
     @Operation(summary = "코드 목록 조회",
             description = """

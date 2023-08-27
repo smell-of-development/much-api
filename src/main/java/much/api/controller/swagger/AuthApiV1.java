@@ -12,7 +12,7 @@ import much.api.dto.response.SmsCertification;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "인증 API", description = "인증 관련 API")
-public interface AuthApi {
+public interface AuthApiV1 {
 
     @Operation(summary = "Swagger 테스트용 토큰 발급받기",
             description = """
