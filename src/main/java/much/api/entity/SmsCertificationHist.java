@@ -8,11 +8,9 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
-@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(
         name = "TB_SMS_CERTIFICATION_HIST",
         indexes = {@Index(name = "IDX__PHONE_NUMBER", columnList = "phoneNumber")}
@@ -36,4 +34,10 @@ public class SmsCertificationHist extends BaseTimeEntity {
         certified = true;
     }
 
+    @Builder
+    private SmsCertificationHist(String phoneNumber, String number, boolean certified) {
+        this.phoneNumber = phoneNumber;
+        this.number = number;
+        this.certified = certified;
+    }
 }

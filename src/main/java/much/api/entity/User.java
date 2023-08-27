@@ -9,11 +9,9 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
-@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "TB_USER")
 public class User extends BaseTimeEntity {
 
@@ -37,10 +35,6 @@ public class User extends BaseTimeEntity {
     @Setter
     private String phoneNumber;
 
-    @Setter
-    @ColumnDefault("0")
-    private boolean phoneVerificationCompleted;
-
     private String email;
 
     private String name;
@@ -52,6 +46,34 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ColumnDefault("1")
     private boolean refreshable;
 
+    @Builder
+    private User(String kakaoId,
+                String googleId,
+                String loginId,
+                String password,
+                String pictureUrl,
+                String phoneNumber,
+                String email,
+                String name,
+                String nickname,
+                String position,
+                Role role,
+                boolean refreshable) {
+
+        this.kakaoId = kakaoId;
+        this.googleId = googleId;
+        this.loginId = loginId;
+        this.password = password;
+        this.pictureUrl = pictureUrl;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.name = name;
+        this.nickname = nickname;
+        this.position = position;
+        this.role = role;
+        this.refreshable = refreshable;
+    }
 }

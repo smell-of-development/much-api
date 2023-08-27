@@ -10,11 +10,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "TB_PROJECT")
 public class Project extends BaseTimeEntity {
 
@@ -57,4 +55,37 @@ public class Project extends BaseTimeEntity {
     // 에디터 이미지 관리용
     private String ImageFileIds;
 
+    @Builder
+    private Project(User writer,
+                   MuchType type,
+                   String title,
+                   String imageUrl,
+                   boolean isOnline,
+                   String location,
+                   LocalDateTime deadline,
+                   LocalDateTime startDate,
+                   LocalDateTime endDate,
+                   String schedule,
+                   String target,
+                   Integer maximumPeople,
+                   String skills,
+                   String introduction,
+                   String imageFileIds) {
+
+        this.writer = writer;
+        this.type = type;
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.isOnline = isOnline;
+        this.location = location;
+        this.deadline = deadline;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.schedule = schedule;
+        this.target = target;
+        this.maximumPeople = maximumPeople;
+        this.skills = skills;
+        this.introduction = introduction;
+        ImageFileIds = imageFileIds;
+    }
 }
