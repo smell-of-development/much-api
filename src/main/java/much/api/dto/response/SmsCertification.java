@@ -1,14 +1,19 @@
 package much.api.dto.response;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class SmsCertification {
 
-    private final String phoneNumber;
+    private String phoneNumber;
 
-    private final int remainTimeInMinutes;
+    private int remainTimeInMinutes;
+
+    @Builder
+    private SmsCertification(String phoneNumber, int remainTimeInMinutes) {
+        this.phoneNumber = phoneNumber;
+        this.remainTimeInMinutes = remainTimeInMinutes;
+    }
 
 }

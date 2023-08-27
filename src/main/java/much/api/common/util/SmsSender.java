@@ -40,8 +40,16 @@ public class SmsSender {
             SmsRequest request = SmsRequest.of(smsProperties.getFrom(), content, messages);
             SmsResponse smsResponse = callApi(request);
 
-            return "202".equals(smsResponse.getStatusCode());
+            String statusCode = smsResponse.getStatusCode();
+            boolean is202status = "202".equals(statusCode);
+
+            if (!is202status) {
+                log.error("문자 전송 실패 - 응답코드: [{}]", statusCode);
+                return false;
+            }
+            return true;
         } catch (Exception e) {
+            log.error("문자 전송 실패", e);
             return false;
         }
     }
