@@ -35,17 +35,13 @@ public class Community extends BaseTimeEntity {
 
     private String content;
 
-    private String tags;
-
     @Builder
     private Community(User author,
                       CommunityCategory category,
-                      String content,
-                      String tags) {
+                      String content) {
 
         this.author = author;
         this.category = category;
         this.content = content;
-        this.tags = tags;
     }
 }

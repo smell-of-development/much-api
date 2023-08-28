@@ -52,13 +52,10 @@ public class CommunityService {
         final String requestContent = postCreation.getContent();
         final List<String> requestTags = postCreation.getTags();
 
-        String tags = String.join(",", requestTags);
-
         Community post = Community.builder()
                 .author(user)
                 .category(category)
                 .content(requestContent)
-                .tags(tags)
                 .build();
         communityRepository.save(post);
 
