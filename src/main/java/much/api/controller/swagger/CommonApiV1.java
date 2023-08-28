@@ -2,6 +2,7 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.common.enums.ImageResizeType;
 import much.api.dto.response.Envelope;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -51,16 +52,16 @@ public interface CommonApiV1 {
             description = """
                     이미지를 업로드합니다.
                     ### 요청
-                    - POST /common/image?type=thumbnail
-                    - (multipart/form-data) image
-                    - type 파라미터 종류 : thumbnail, profile, none
+                    - POST /common/image?type=PROFILE
+                    - (multipart/form-data) key: image
+                    - type 파라미터 종류 : THUMBNAIL, PROFILE, NONE(기본값)
                     - type 파라미터 종류에 따라서 이미지 리사이징하여 저장
                     ### 응답값 설명
                     - code 200  : "result": string(이미지 주소)
                     - code 2000 : 이미지 파일이 아닙니다.
                     - code 9000 : 파일 처리중 오류
                     """)
-    ResponseEntity<Envelope<String>> uploadImage(MultipartFile file, String type);
+    ResponseEntity<Envelope<String>> uploadImage(MultipartFile image, ImageResizeType type);
 
     @Operation(summary = "이미지 획득",
             description = """

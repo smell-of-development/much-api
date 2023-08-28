@@ -31,7 +31,10 @@ public class TagHelperService {
                                    Long relationId,
                                    List<String> tags) {
 
-        // 이미 등록된 태그들 조회
+        // 기존 태그관계정보 삭제
+        tagRelationRepository.deleteExistingRelation(relationType, relationId);
+
+        // 이미 등록된 태그정보 조회
         List<Tag> existingTags = tagRepository.findAllByNameIn(tags);
 
         // Set<태그이름> 형태로 변경
@@ -39,14 +42,14 @@ public class TagHelperService {
                 .map(Tag::getName)
                 .collect(Collectors.toSet());
 
-        // 미등록된 태그 추출
+        // 미등록된 태그 추출하여 저장
         List<Tag> nonexistentTag = tagRepository.saveAll(
                 tags.stream()
                         .filter(not(registeredTag::contains))
                         .map(Tag::ofName)
                         .toList());
 
-        // 태그 관계 저장
+        // 글과 태그관계 저장
         Stream.of(existingTags, nonexistentTag)
                 .flatMap(Collection::stream)
                 .forEach(tag ->

@@ -2,6 +2,7 @@ package much.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import much.api.WithUser;
+import much.api.common.enums.CommunityCategory;
 import much.api.common.util.EditorUtils;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.entity.File;
@@ -68,7 +69,7 @@ class CommunityControllerV1Test {
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
             return CommunityPostCreation.builder()
-                    .category(accessor.getString(0))
+                    .category(CommunityCategory.valueOf(accessor.getString(0)))
                     .tags(List.of(accessor.getString(1).split("\\|")))
                     .content(accessor.getString(2))
                     .build();
@@ -111,7 +112,7 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.requires").isEmpty())
                 .andExpect(jsonPath("$.result.id").isNumber())
                 .andExpect(jsonPath("$.result.editable").value(true))
-                .andExpect(jsonPath("$.result.category").value(information.getCategory()))
+                .andExpect(jsonPath("$.result.category").value(information.getCategory().name()))
                 .andExpect(jsonPath("$.result.tags.length()").value(information.getTags().size()))
                 .andExpect(jsonPath("$.result.content").value(information.getContent()))
                 .andExpect(jsonPath("$.result.authorId").value(userId))

@@ -1,6 +1,7 @@
 package much.api.service;
 
 import much.api.WithUser;
+import much.api.common.enums.CommunityCategory;
 import much.api.common.util.EditorUtils;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.response.CommunityPostDetail;
@@ -24,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
 import static java.lang.String.join;
-import static much.api.common.enums.CommunityCategory.valueOf;
 import static much.api.common.enums.MuchType.COMMUNITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,7 +64,7 @@ class CommunityServiceTest {
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
             return CommunityPostCreation.builder()
-                    .category(accessor.getString(0))
+                    .category(CommunityCategory.valueOf(accessor.getString(0)))
                     .tags(List.of(accessor.getString(1).split("\\|")))
                     .content(accessor.getString(2))
                     .build();
@@ -121,7 +121,7 @@ class CommunityServiceTest {
         assertEquals(1L, communityRepository.findAll().size());
         assertEquals(userId, postDetail.getAuthorId());
         assertTrue(postDetail.isEditable());
-        assertEquals(valueOf(postCreation.getCategory()), postDetail.getCategory());
+        assertEquals(postCreation.getCategory(), postDetail.getCategory());
         assertEquals(join("|", postCreation.getTags()), join("|", postDetail.getTags()));
         assertEquals(postCreation.getContent(), postDetail.getContent());
     }

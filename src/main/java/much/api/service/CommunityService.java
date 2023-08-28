@@ -5,24 +5,26 @@ import much.api.common.enums.CommunityCategory;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.EditorUtils;
 import much.api.dto.request.CommunityPostCreation;
+import much.api.dto.request.CommunityPostModification;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.entity.Community;
 import much.api.entity.User;
-import much.api.exception.MuchException;
-import much.api.exception.UserNotFound;
-import much.api.repository.*;
+import much.api.repository.CommunityRepository;
+import much.api.repository.FileRepository;
+import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static much.api.common.enums.Code.DEV_MESSAGE;
 import static much.api.common.enums.MuchType.COMMUNITY;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommunityService {
+
+    private final CommonService commonService;
 
     private final UserRepository userRepository;
 
@@ -37,18 +39,10 @@ public class CommunityService {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFound(userId));
-
-        // 카테고리 확인
-        CommunityCategory category;
-        try {
-            category = CommunityCategory.valueOf(postCreation.getCategory().toUpperCase());
-        } catch (Exception e) {
-            throw new MuchException(DEV_MESSAGE, "category 값이 잘못되었습니다.");
-        }
+        User user = commonService.getUserOrThrowException(userId);
 
         // 글 저장
+        final CommunityCategory category = postCreation.getCategory();
         final String requestContent = postCreation.getContent();
         final List<String> requestTags = postCreation.getTags();
 
@@ -63,7 +57,7 @@ public class CommunityService {
         List<String> imageFilenames = EditorUtils.extractImageFilenamesAtHtml(requestContent);
         fileRepository.updateRelationInformation(COMMUNITY, post.getId(), imageFilenames);
 
-        // 태그정보 반영
+        // 태그정보, 관계정보 반영
         tagHelperService.saveTagInformation(COMMUNITY, post.getId(), requestTags);
 
         // 응답
@@ -79,4 +73,9 @@ public class CommunityService {
                 .build();
     }
 
+
+    public CommunityPostDetail modifyPost(CommunityPostModification postModification) {
+
+        return null;
+    }
 }

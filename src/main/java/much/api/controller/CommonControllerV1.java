@@ -80,12 +80,12 @@ public class CommonControllerV1 implements CommonApiV1 {
     }
 
     @Override
-    @PostMapping(value = "/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image,
-                                                        @RequestParam(defaultValue = "NONE") String type) {
+                                                        @RequestParam(defaultValue = "NONE") ImageResizeType type) {
 
         return ok(
-                Envelope.ok(fileService.uploadImage(image, ImageResizeType.valueOf(type.toUpperCase())))
+                Envelope.ok(fileService.uploadImage(image, type))
         );
     }
 
