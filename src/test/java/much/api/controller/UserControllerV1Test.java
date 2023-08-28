@@ -49,6 +49,7 @@ class UserControllerV1Test {
     @BeforeEach
     void clean() {
         userRepository.deleteAll();
+        smsCertificationHistRepository.deleteAll();
     }
 
     static class JoinRequestAggregator implements ArgumentsAggregator {

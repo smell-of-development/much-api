@@ -1,6 +1,5 @@
 package much.api.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import much.api.dto.request.UserCreation;
 import much.api.dto.response.WebToken;
 import much.api.entity.SmsCertificationHist;
@@ -28,9 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -46,6 +42,7 @@ class UserServiceTest {
     @BeforeEach
     void clean() {
         userRepository.deleteAll();
+        smsCertificationHistRepository.deleteAll();
     }
 
     static class JoinRequestAggregator implements ArgumentsAggregator {
@@ -82,6 +79,9 @@ class UserServiceTest {
         // then
         User user = userRepository.findByLoginId(userCreation.getLoginId()).get();
 
+        assertEquals(user.getId(), webToken.getId());
+        assertNotNull(webToken.getAccessToken());
+        assertNotNull(webToken.getRefreshToken());
         assertEquals(userCreation.getLoginId(), user.getLoginId());
         assertTrue(passwordEncoder.matches(userCreation.getPassword(), user.getPassword()));
         assertEquals(userCreation.getNickname(), user.getNickname());
