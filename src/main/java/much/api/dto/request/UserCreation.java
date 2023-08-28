@@ -3,7 +3,7 @@ package much.api.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import much.api.dto.Check;
+import much.api.common.aop.Check;
 
 @Getter
 public class UserCreation {

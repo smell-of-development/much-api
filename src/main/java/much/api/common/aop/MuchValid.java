@@ -1,4 +1,4 @@
-package much.api.dto;
+package much.api.common.aop;
 
 import java.lang.annotation.*;
 

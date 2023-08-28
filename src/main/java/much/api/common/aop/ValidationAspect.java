@@ -1,7 +1,6 @@
 package much.api.common.aop;
 
 import much.api.common.util.ValidationChecker;
-import much.api.dto.Check;
 import much.api.common.exception.MuchException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +17,7 @@ import static much.api.common.enums.Code.INTERNAL_SERVER_ERROR;
 @Component
 public class ValidationAspect {
 
-    @Before("execution(* *(.., @much.api.dto.MuchValid (*), ..))")
+    @Before("execution(* *(.., @much.api.common.aop.MuchValid (*), ..))")
     public void validate(JoinPoint joinPoint) {
 
         Object[] args = joinPoint.getArgs();
