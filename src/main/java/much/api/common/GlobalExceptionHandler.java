@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ServletRequestBindingException.class)
     protected ResponseEntity<Envelope<Void>> handleServletRequestBindingException(ServletRequestBindingException e) {
-        log.error("bindingException", e);
+        log.error("handleServletRequestBindingException", e);
 
         Envelope<Void> response = Envelope.error(DEV_INVALID_PARAM_NAME);
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<Envelope<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("bindingException", e);
+        log.error("handleMethodArgumentTypeMismatchException", e);
 
         Envelope<Void> response = Envelope.error(DEV_INVALID_PARAM_VALUE);
 
@@ -158,7 +158,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MuchException.class)
     protected ResponseEntity<Envelope<Void>> handleBusinessException(MuchException e) {
-        log.error("handleBusinessException", e);
+        log.error("handleMuchException", e);
 
         Envelope<Void> response = Envelope.error(e.getCode(), e.getMessage());
 
