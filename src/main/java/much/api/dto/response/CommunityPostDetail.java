@@ -11,6 +11,8 @@ public class CommunityPostDetail {
 
     private final Long id;
 
+    private final boolean editable;
+
     private final CommunityCategory category;
 
     private final List<String> tags;
@@ -26,6 +28,7 @@ public class CommunityPostDetail {
 
     @Builder
     private CommunityPostDetail(Long id,
+                                boolean editable,
                                 CommunityCategory category,
                                 List<String> tags,
                                 String content,
@@ -34,6 +37,7 @@ public class CommunityPostDetail {
                                 String authorImageUrl) {
 
         this.id = id;
+        this.editable = editable;
         this.category = category;
         this.tags = tags;
         this.content = content;

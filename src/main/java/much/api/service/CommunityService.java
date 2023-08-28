@@ -69,6 +69,7 @@ public class CommunityService {
         // 응답
         return CommunityPostDetail.builder()
                 .id(post.getId())
+                .editable(true)
                 .category(category)
                 .tags(requestTags)
                 .content(requestContent)

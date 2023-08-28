@@ -110,6 +110,7 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.message").isEmpty())
                 .andExpect(jsonPath("$.requires").isEmpty())
                 .andExpect(jsonPath("$.result.id").isNumber())
+                .andExpect(jsonPath("$.result.editable").value(true))
                 .andExpect(jsonPath("$.result.category").value(information.getCategory()))
                 .andExpect(jsonPath("$.result.tags.length()").value(information.getTags().size()))
                 .andExpect(jsonPath("$.result.content").value(information.getContent()))

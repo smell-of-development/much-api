@@ -19,6 +19,7 @@ import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
@@ -115,7 +116,11 @@ class CommunityServiceTest {
         });
 
         // 리턴객체 정상 확인
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
         assertEquals(1L, communityRepository.findAll().size());
+        assertEquals(userId, postDetail.getAuthorId());
+        assertTrue(postDetail.isEditable());
         assertEquals(valueOf(postCreation.getCategory()), postDetail.getCategory());
         assertEquals(join("|", postCreation.getTags()), join("|", postDetail.getTags()));
         assertEquals(postCreation.getContent(), postDetail.getContent());
