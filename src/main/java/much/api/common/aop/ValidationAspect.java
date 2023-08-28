@@ -2,7 +2,7 @@ package much.api.common.aop;
 
 import much.api.common.util.ValidationChecker;
 import much.api.dto.Check;
-import much.api.exception.MuchException;
+import much.api.common.exception.MuchException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

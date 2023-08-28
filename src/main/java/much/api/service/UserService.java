@@ -2,6 +2,8 @@ package much.api.service;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Role;
+import much.api.common.exception.CertificationNeeded;
+import much.api.common.exception.InvalidPhoneNumber;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
@@ -10,7 +12,6 @@ import much.api.dto.request.UserCreation;
 import much.api.dto.response.WebToken;
 import much.api.entity.SmsCertificationHist;
 import much.api.entity.User;
-import much.api.exception.*;
 import much.api.repository.SmsCertificationHistRepository;
 import much.api.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;

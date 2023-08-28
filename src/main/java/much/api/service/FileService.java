@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import much.api.common.enums.ImageResizeType;
 import much.api.common.util.FileStore;
 import much.api.entity.File;
-import much.api.exception.FileProcessError;
+import much.api.common.exception.FileProcessError;
 import much.api.repository.FileRepository;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

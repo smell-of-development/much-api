@@ -1,4 +1,4 @@
-package much.api.exception;
+package much.api.common.exception;
 
 import static java.lang.String.format;
 import static much.api.common.enums.Code.INVALID_NICKNAME;

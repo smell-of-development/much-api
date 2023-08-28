@@ -8,7 +8,7 @@ import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.ProjectDetail;
 import much.api.entity.Project;
 import much.api.entity.User;
-import much.api.exception.MuchException;
+import much.api.common.exception.MuchException;
 import much.api.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package much.api.exception;
+package much.api.common.exception;
 
 import static java.lang.String.*;
 import static much.api.common.enums.Code.FILE_NOT_FOUND;

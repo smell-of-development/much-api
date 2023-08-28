@@ -2,10 +2,10 @@ package much.api.service;
 
 import lombok.RequiredArgsConstructor;
 import much.api.entity.User;
-import much.api.exception.DuplicatedLoginID;
-import much.api.exception.DuplicatedNickname;
-import much.api.exception.DuplicatedPhoneNumber;
-import much.api.exception.UserNotFound;
+import much.api.common.exception.DuplicatedLoginID;
+import much.api.common.exception.DuplicatedNickname;
+import much.api.common.exception.DuplicatedPhoneNumber;
+import much.api.common.exception.UserNotFound;
 import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

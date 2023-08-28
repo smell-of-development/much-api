@@ -2,9 +2,9 @@ package much.api.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.ImageResizeType;
-import much.api.exception.FileProcessError;
-import much.api.exception.MuchException;
-import much.api.exception.NotImageFile;
+import much.api.common.exception.FileProcessError;
+import much.api.common.exception.MuchException;
+import much.api.common.exception.NotImageFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

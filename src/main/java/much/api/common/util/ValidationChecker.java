@@ -2,10 +2,10 @@ package much.api.common.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import much.api.exception.InvalidLoginID;
-import much.api.exception.InvalidNickname;
-import much.api.exception.InvalidPassword;
-import much.api.exception.InvalidPhoneNumber;
+import much.api.common.exception.InvalidLoginID;
+import much.api.common.exception.InvalidNickname;
+import much.api.common.exception.InvalidPassword;
+import much.api.common.exception.InvalidPhoneNumber;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;

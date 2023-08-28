@@ -3,7 +3,7 @@ package much.api.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.dto.response.Envelope;
-import much.api.exception.MuchException;
+import much.api.common.exception.MuchException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
