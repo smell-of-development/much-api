@@ -13,9 +13,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "TB_TAG",
+        name = "tb_tag",
         indexes = {
-                @Index(name = "IDX__NAME", columnList = "name", unique = true),
+                @Index(name = "tb_tag_idx1", columnList = "name", unique = true),
         }
 )
 public class Tag {

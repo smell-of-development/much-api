@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TB_PROJECT")
+@Table(name = "tb_project")
 public class Project extends BaseTimeEntity {
 
     @Id

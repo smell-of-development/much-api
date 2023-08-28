@@ -12,7 +12,14 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "TB_USER")
+@Table(
+        name = "tb_user",
+        indexes = {
+                @Index(name = "tb_user_idx1", columnList = "loginId"),
+                @Index(name = "tb_user_idx2", columnList = "kakaoId"),
+                @Index(name = "tb_user_idx3", columnList = "googleId"),
+        }
+)
 public class User extends BaseTimeEntity {
 
     @Id

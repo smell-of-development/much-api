@@ -15,9 +15,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "TB_COMMUNITY",
+        name = "tb_community",
         indexes = {
-                @Index(name = "IDX__CATEGORY", columnList = "category"),
+                @Index(name = "tb_community_idx1", columnList = "category"),
         }
 )
 public class Community extends BaseTimeEntity {

@@ -14,10 +14,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "TB_TAG_RELATION",
+        name = "tb_tag_relation",
         indexes = {
-                @Index(name = "IDX__RELATION", columnList = "relationType, relationId"),
-                @Index(name = "IDX__TAG_ID", columnList = "tag"),
+                @Index(name = "tb_tag_relation_idx1", columnList = "relationType, relationId"),
+                @Index(name = "tb_tag_relation_idx2", columnList = "tag_id"),
         }
 )
 public class TagRelation {

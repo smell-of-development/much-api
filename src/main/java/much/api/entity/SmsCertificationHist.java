@@ -12,8 +12,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "TB_SMS_CERTIFICATION_HIST",
-        indexes = {@Index(name = "IDX__PHONE_NUMBER", columnList = "phoneNumber")}
+        name = "tb_sms_certification_hist",
+        indexes = {
+                @Index(name = "tb_sms_certification_hist_idx1", columnList = "phoneNumber")
+        }
 )
 public class SmsCertificationHist extends BaseTimeEntity {
 

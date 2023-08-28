@@ -11,17 +11,16 @@ import much.api.common.enums.MuchType;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-
 @Getter
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "TB_FILE",
+        name = "tb_file",
         indexes = {
-                @Index(name = "IDX__STORED_FILENAME", columnList = "storedFilename"),
-                @Index(name = "IDX__RELATION", columnList = "relationType, relationId"),
+                @Index(name = "tb_file_idx1", columnList = "relationType, relationId"),
+                @Index(name = "tb_file_idx2", columnList = "storedFilename"),
         }
 )
 public class File extends BaseTimeEntity {
@@ -70,4 +69,5 @@ public class File extends BaseTimeEntity {
         this.url = url;
     }
 }
+
 
