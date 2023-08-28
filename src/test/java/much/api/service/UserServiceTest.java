@@ -45,7 +45,7 @@ class UserServiceTest {
         smsCertificationHistRepository.deleteAll();
     }
 
-    static class JoinRequestAggregator implements ArgumentsAggregator {
+    static class UserCreationAggregator implements ArgumentsAggregator {
         @Override
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
@@ -65,7 +65,7 @@ class UserServiceTest {
             "testId1, testPassword1, test1, 01012341234, 백엔드",
             "muchTest, muchTest, much, 01011112222,"
     })
-    void user_join_test1(@AggregateWith(JoinRequestAggregator.class) UserCreation userCreation) {
+    void user_join_test1(@AggregateWith(UserCreationAggregator.class) UserCreation userCreation) {
         // given
         smsCertificationHistRepository.save(
                 SmsCertificationHist.builder()
@@ -104,7 +104,7 @@ class UserServiceTest {
             "muchTest, testPassword, much, '', 백엔드",
             "muchTest, testPassword, much, 010-1111-2222, 백엔드",
     })
-    void user_join_test2(@AggregateWith(JoinRequestAggregator.class) UserCreation userCreation) {
+    void user_join_test2(@AggregateWith(UserCreationAggregator.class) UserCreation userCreation) {
         // expected
         assertThrows(MuchException.class, () -> userService.createUser(userCreation));
     }
@@ -115,7 +115,7 @@ class UserServiceTest {
             "testId1, testPassword1, test1, 01012341234, 백엔드",
             "muchTest, muchTest, much, 01011112222,"
     })
-    void user_join_test3(@AggregateWith(JoinRequestAggregator.class) UserCreation userCreation) {
+    void user_join_test3(@AggregateWith(UserCreationAggregator.class) UserCreation userCreation) {
         // expected
         assertThrows(CertificationNeeded.class, () -> userService.createUser(userCreation));
     }

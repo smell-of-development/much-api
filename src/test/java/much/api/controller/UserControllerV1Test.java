@@ -52,7 +52,7 @@ class UserControllerV1Test {
         smsCertificationHistRepository.deleteAll();
     }
 
-    static class JoinRequestAggregator implements ArgumentsAggregator {
+    static class UserCreationAggregator implements ArgumentsAggregator {
         @Override
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
@@ -72,7 +72,7 @@ class UserControllerV1Test {
             "testId1, testPassword1, test1, 01012341234, 백엔드",
             "muchTest, muchTest, much, 01011112222,"
     })
-    void user_join_test1(@AggregateWith(JoinRequestAggregator.class) UserCreation information) throws Exception {
+    void user_join_test1(@AggregateWith(UserCreationAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
         smsCertificationHistRepository.save(
@@ -112,7 +112,7 @@ class UserControllerV1Test {
             "muchTest, testPassword, much, '', 백엔드",
             "muchTest, testPassword, much, 010-1111-2222, 백엔드",
     })
-    void user_join_test2(@AggregateWith(JoinRequestAggregator.class) UserCreation information) throws Exception {
+    void user_join_test2(@AggregateWith(UserCreationAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
 
@@ -136,7 +136,7 @@ class UserControllerV1Test {
             "testId1, testPassword1, test1, 01012341234, 백엔드",
             "muchTest, muchTest, much, 01011112222,"
     })
-    void user_join_test3(@AggregateWith(JoinRequestAggregator.class) UserCreation information) throws Exception {
+    void user_join_test3(@AggregateWith(UserCreationAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
 
