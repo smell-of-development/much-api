@@ -85,7 +85,7 @@ class UserControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        post("/user")
+                        post("/api/v1/user")
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -128,7 +128,7 @@ class UserControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        post("/user")
+                        post("/api/v1/user")
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
