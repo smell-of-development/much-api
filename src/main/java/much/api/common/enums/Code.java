@@ -36,7 +36,8 @@ public enum Code {
     MESSAGE_SENDING_FAIL(2000, "메세지 발송에 실패하였습니다."),
     CERTIFICATION_MESSAGE_SENDING_COUNT_EXCEEDED(2000, "하루 최대 전송횟수를 초과했습니다."),
     CERTIFICATION_NUMBER_NOT_MATCHED(2000, "인증번호가 일치하지 않습니다."),
-    CERTIFICATION_MESSAGE_SENDING_NEEDED(2000, "인증번호 전송하기를 눌러주세요."),
+    CERTIFICATION_NUMBER_SENDING_NEEDED(2000, "인증번호 전송이 필요합니다."),
+    CERTIFICATION_NEEDED(2000, "SMS 인증이 필요합니다."),
 
     NOT_IMAGE_FILE(2000, "이미지 파일이 아닙니다."),
 

@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Skill {
+public enum SkillTag {
 
     JAVA("Java", "자바"),
     JAVASCRIPT("JavaScript", "자바스크립트"),
     TYPESCRIPT("TypeScript", "타입스크립트"),
-    C("C", "씨언어"),
+    C_LANG("C", "씨언어"),
     C_PP("C++", "씨쁠쁠"),
     C_SHARP("C#", "씨샾"),
     PHP("PHP", "피에이치피"),

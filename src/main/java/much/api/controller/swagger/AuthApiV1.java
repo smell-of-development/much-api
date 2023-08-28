@@ -85,8 +85,7 @@ public interface AuthApiV1 {
                     ### 요청값
                     - (Header) Authorization : Bearer {accessToken}
                     ### 응답값
-                    - code 200  : 정상토큰 => ex) result(number): 1 (사용자의 id)
-                    - code 4001 : 토큰이 없거나 비정상
+                    - ex) result(number): 1 (로그인 사용자의 id)
                     """)
     ResponseEntity<Envelope<Long>> checkToken();
 
@@ -98,7 +97,7 @@ public interface AuthApiV1 {
                     ### 요청값
                     - phoneNumber : 010####@@@@ 형식이어야 합니다.
                     ### 응답값
-                    - code 200  : phoneNumber - 휴대폰번호, remainTimeInMinutes - 남은시간(분)
+                    - code 200 : phoneNumber - 휴대폰번호, remainTimeInMinutes - 남은시간(분)
                     - code 2000
                     - 휴대폰 번호 중복
                     - 휴대폰번호 형식이 아님

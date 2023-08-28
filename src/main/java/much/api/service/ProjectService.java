@@ -19,17 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProjectService {
-
-    private static final String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
-
-    private static final Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
 
     private final ProjectRepository projectRepository;
 
@@ -44,16 +38,6 @@ public class ProjectService {
         final String skills = String.join(",", registration.getSkills());
         final String introduction = registration.getIntroduction();
 
-        // TODO 업로드 된 이미지 DB 저장
-        Matcher imageTagMatcher = IMAGE_TAG_PATTERN.matcher(introduction);
-        while (imageTagMatcher.find()) {
-            String imageUrl = imageTagMatcher.group("imageUrl");
-            String[] hostAndFilename = imageUrl.split("image/");
-
-            if (hostAndFilename.length != 2) continue;
-            String storedFilename = hostAndFilename[1];
-
-        }
 
         long userId = ContextUtils.getUserId();
         User user = userRepository.findById(userId)
@@ -125,7 +109,7 @@ public class ProjectService {
                 .writer(ProjectDetail.WriterDetail.builder()
                         .id(projectWriter.getId())
                         .nickname(projectWriter.getNickname())
-                        .pictureUrl(projectWriter.getPictureUrl())
+                        .pictureUrl(projectWriter.getImageUrl())
                         .build())
                 .imageUrl(project.getImageUrl())
                 .isOnline(project.isOnline())

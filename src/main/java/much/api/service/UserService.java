@@ -36,7 +36,7 @@ public class UserService {
 
 
     @Transactional
-    public WebToken registerUser(@MuchValid UserCreation userCreation) {
+    public WebToken createUser(@MuchValid UserCreation userCreation) {
 
         // 로그인 ID 중복체크
         checkDuplicatedLoginId(userCreation.getLoginId());
@@ -68,7 +68,7 @@ public class UserService {
         }
 
         if (!certificationCompleted) {
-            throw new CertificationMessageSendingNeeded(phoneNumber);
+            throw new CertificationNeeded(phoneNumber);
         }
 
         // 유저 등록
@@ -97,9 +97,9 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFound(toDeletedId));
 
         // 휴대폰 인증이 완료된 다른 멀쩡한 사용자와 연동되는것 방지
-        if (toBeDeletedUser.isPhoneVerificationCompleted()) {
-
-        }
+//        if (toBeDeletedUser.isPhoneVerificationCompleted()) {
+//
+//        }
 
         // 휴대폰번호 형식 검사
         if (!PhoneNumberUtils.isOnlyDigitsPattern(targetPhoneNumber)) {

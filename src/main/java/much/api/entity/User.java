@@ -30,7 +30,7 @@ public class User extends BaseTimeEntity {
     private String password;
 
     @Setter
-    private String pictureUrl;
+    private String imageUrl;
 
     @Setter
     private String phoneNumber;
@@ -54,7 +54,7 @@ public class User extends BaseTimeEntity {
                 String googleId,
                 String loginId,
                 String password,
-                String pictureUrl,
+                String imageUrl,
                 String phoneNumber,
                 String email,
                 String name,
@@ -67,7 +67,7 @@ public class User extends BaseTimeEntity {
         this.googleId = googleId;
         this.loginId = loginId;
         this.password = password;
-        this.pictureUrl = pictureUrl;
+        this.imageUrl = imageUrl;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.name = name;

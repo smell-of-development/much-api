@@ -21,6 +21,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toStaticResources;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -61,15 +63,15 @@ public class SecurityConfig {
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(SWAGGER_URL_ARRAY).permitAll()
-//                        .requestMatchers("/common/**").permitAll()
+                        .requestMatchers("/api/v1/common/**").permitAll()
 //                        .requestMatchers("/oauth2/**").permitAll()
-//                        .requestMatchers("/auth/refresh").permitAll()
-//                        .requestMatchers("/sms/**").permitAll()
-//                        .requestMatchers("/login").permitAll()
-//                        .requestMatchers("/testToken").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/project/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/sms/**").permitAll()
+                        .requestMatchers("/api/v1/login").permitAll()
+                        .requestMatchers("/api/v1/testToken").permitAll()
+                        .requestMatchers(POST, "/api/v1/user").permitAll()
+                        .requestMatchers(GET, "/api/v1/community/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(configurer -> configurer
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)

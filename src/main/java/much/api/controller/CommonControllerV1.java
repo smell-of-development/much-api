@@ -1,9 +1,8 @@
 package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
 import much.api.common.enums.ImageResizeType;
-import much.api.common.enums.Skill;
+import much.api.common.enums.SkillTag;
 import much.api.controller.swagger.CommonApiV1;
 import much.api.dto.response.Envelope;
 import much.api.service.CommonService;
@@ -12,11 +11,13 @@ import much.api.service.UserService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.ResponseEntity.ok;
@@ -35,17 +36,8 @@ public class CommonControllerV1 implements CommonApiV1 {
 
 
     @Override
-    @GetMapping("/codes")
-    public ResponseEntity<Envelope<Code[]>> retrieveCodes() {
-
-        return ok(
-                Envelope.ok(Code.values())
-        );
-    }
-
-    @Override
     @GetMapping("/id-validation")
-    public ResponseEntity<Envelope<Void>> retrieveDuplicatedLoginId(@RequestParam String id) {
+    public ResponseEntity<Envelope<Void>> checkDuplicatedLoginId(@RequestParam String id) {
 
         userService.checkDuplicatedLoginId(id);
         return ok(
@@ -55,7 +47,7 @@ public class CommonControllerV1 implements CommonApiV1 {
 
     @Override
     @GetMapping("/name-validation")
-    public ResponseEntity<Envelope<Void>> retrieveDuplicatedNickname(@RequestParam String nickname) {
+    public ResponseEntity<Envelope<Void>> checkDuplicatedNickname(@RequestParam String nickname) {
 
         userService.checkDuplicatedNickname(nickname);
         return ok(
@@ -64,19 +56,29 @@ public class CommonControllerV1 implements CommonApiV1 {
     }
 
     @Override
-    @GetMapping("/skills")
-    public ResponseEntity<Envelope<List<String>>> retrieveSkills(@RequestParam String name) {
+    @GetMapping("/skill-tags")
+    public ResponseEntity<Envelope<Map<String, String>>> getSkillTags(@RequestParam(required = false) String name) {
+
+        Map<String, String> response = new HashMap<>();
+
+        if (StringUtils.hasText(name)) {
+
+            Arrays.stream(SkillTag.values())
+                    .filter(skillTag -> {
+
+                        String skill = skillTag.getEnglishName().toLowerCase().replace(" ", "");
+                        String searchWord = name.toLowerCase().replace(" ", "");
+
+                        return skill.contains(searchWord) || skillTag.getKoreanName().contains(searchWord);
+                    })
+                    .forEach(skillTag -> response.put(skillTag.name(), skillTag.getEnglishName()));
+        } else {
+            Arrays.stream(SkillTag.values())
+                    .forEach(skillTag -> response.put(skillTag.name(), skillTag.getEnglishName()));
+        }
 
         return ok(
-                Envelope.ok(
-                        Arrays.stream(Skill.values())
-                                .filter(skill -> skill.getEnglishName()
-                                        .replace(" ", "")
-                                        .toLowerCase()
-                                        .contains(name.toLowerCase().replace(" ", ""))
-                                        || skill.getKoreanName().contains(name))
-                                .map(Skill::getEnglishName)
-                                .toList())
+                Envelope.ok(response)
         );
     }
 

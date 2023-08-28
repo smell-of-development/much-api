@@ -29,7 +29,7 @@ public class UserControllerV1 implements UserApiV1 {
     public ResponseEntity<Envelope<WebToken>> createUser(@RequestBody @Valid UserCreation request) {
 
         return ok(
-                Envelope.ok(userService.registerUser(request))
+                Envelope.ok(userService.createUser(request))
         );
     }
 

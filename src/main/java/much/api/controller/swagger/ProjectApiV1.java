@@ -31,7 +31,6 @@ public interface ProjectApiV1 {
                     - work         : 포지션별 모집인원([{"position": "string", "needs": number}, ...])
                     ### 응답값
                     - code 200  : 등록 성공, 고유 ID 반환 ex. {..., "result": 1}
-                    - code 1100 : 요청필드 누락 등 잘못된 형식
                     - code 2000 : 등록요청 사용자 미존재
                     """)
     ResponseEntity<Envelope<Long>> createProject(ProjectCreation request);

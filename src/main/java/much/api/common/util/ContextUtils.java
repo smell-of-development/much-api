@@ -32,9 +32,9 @@ public class ContextUtils {
         return runMode == PROD;
     }
 
-    public static long getUserId() {
+    public static Long getUserId() {
 
-        return Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
     public static RunMode getRunMode() {

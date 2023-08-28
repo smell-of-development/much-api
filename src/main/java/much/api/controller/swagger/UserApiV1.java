@@ -16,12 +16,12 @@ public interface UserApiV1 {
     @Operation(summary = "사용자등록 및 로그인처리",
             description = """
                     유저를 등록하고, 로그인 토큰을 발급받습니다.
-                    ### 요청값(모두 필수)
-                    - id             : 사용자의 로그인 id
-                    - password       : 로그인 패스워드
-                    - nickname       : 닉네임
-                    - phoneNumber    : 휴대폰번호
-                    - position       : 포지션
+                    ### 요청값 (모두 필수, 모두 String)
+                    - id           : 사용자의 로그인 id
+                    - password     : 로그인 패스워드
+                    - nickname     : 닉네임
+                    - phoneNumber  : 휴대폰번호
+                    - position     : 포지션
                     ### 응답값
                     - code 200  : 설정 성공, 토큰 발급 (id, accessToken, refreshToken)
                     
@@ -33,6 +33,7 @@ public interface UserApiV1 {
                     - 비밀번호는 공백을 제외한 8글자 이상 20글자 이하만 가능합니다.
                     - 휴대폰 번호 중복
                     - 휴대폰번호 형식이 아님
+                    - SMS 인증이 필요합니다.
                     """,
             requestBody = @RequestBody(required = true, description = "사용자 id, 패스워드, 닉네임, 휴대폰번호, 포지션"))
     ResponseEntity<Envelope<WebToken>> createUser(UserCreation request);
@@ -48,10 +49,10 @@ public interface UserApiV1 {
                     - targetPhoneNumber : 연동이 될 사용자의 휴대폰번호
                     ### 응답값
                     - code 200  : 설정 성공, 토큰 발급 (id, accessToken, refreshToken)
-                    - code 1000 : 필수값 미존재
-                    - code 2000 : 사용자를 찾을 수 없음 (현재 로그인 시도 id)
-                    - code 2004 : 전화번호에 해당하는 사용자를 찾을 수 없음
-                    - code 8001 : 휴대폰번호 형태가 아님
+                    - code 2000
+                    - 사용자를 찾을 수 없음 (현재 로그인 시도 id)
+                    - 전화번호에 해당하는 사용자를 찾을 수 없음
+                    - 휴대폰번호 형태가 아님
                     """,
             requestBody = @RequestBody(required = true, description = "현재 id, 연동 대상 휴대폰 번호"))
     ResponseEntity<Envelope<WebToken>> linkSocialUser(SocialUserLinking request);

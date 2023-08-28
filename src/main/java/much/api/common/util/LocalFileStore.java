@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.ImageResizeType;
 import much.api.exception.FileProcessError;
 import much.api.exception.MuchException;
+import much.api.exception.NotImageFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static much.api.common.enums.Code.DEV_MESSAGE;
-import static much.api.common.enums.Code.NOT_IMAGE_FILE;
 
 @Slf4j
 @Component
@@ -79,7 +79,7 @@ public class LocalFileStore implements FileStore {
                 .extension(extension)
                 .originalFilename(originalFilename)
                 .storedFilename(storedFilename)
-                .url(ContextUtils.getHost() + "/common/image/" + storedFilename)
+                .url(ContextUtils.getHost() + "/api/v1/common/image/" + storedFilename)
                 .build();
     }
 
@@ -127,7 +127,7 @@ public class LocalFileStore implements FileStore {
         final String contentType = image.getContentType();
 
         if (contentType == null || !contentType.startsWith("image")) {
-            throw new MuchException(NOT_IMAGE_FILE, String.format("이미지 형식이 아님[%s]", contentType));
+            throw new NotImageFile(contentType);
         }
     }
 

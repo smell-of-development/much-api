@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import much.api.common.enums.FileType;
 import much.api.common.enums.ImageResizeType;
+import much.api.common.enums.MuchType;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
 
 @Getter
 @Entity
@@ -17,7 +19,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "TB_FILE",
-        indexes = {@Index(name = "IDX__STORED_FILENAME", columnList = "storedFilename")}
+        indexes = {
+                @Index(name = "IDX__STORED_FILENAME", columnList = "storedFilename"),
+                @Index(name = "IDX__RELATION", columnList = "relationType, relationId"),
+        }
 )
 public class File extends BaseTimeEntity {
 
@@ -31,8 +36,11 @@ public class File extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ImageResizeType imageResizeType;
 
-    // 게시글 타입-ID 형태 ex) PROJECT-1 / STUDY-1 / COMMUNITY-1
-    private String relationInfo;
+    // 에디터 업로드 후 미등록 및 삭제 파일에 대한 관리용
+    @Enumerated(EnumType.STRING)
+    private MuchType relationType;
+
+    private Long relationId;
 
     private String extension;
 
@@ -45,7 +53,8 @@ public class File extends BaseTimeEntity {
     @Builder
     private File(FileType type,
                  ImageResizeType imageResizeType,
-                 String relationInfo,
+                 MuchType relationType,
+                 Long relationId,
                  String extension,
                  String originalFilename,
                  String storedFilename,
@@ -53,10 +62,12 @@ public class File extends BaseTimeEntity {
 
         this.type = type;
         this.imageResizeType = imageResizeType;
-        this.relationInfo = relationInfo;
+        this.relationType = relationType;
+        this.relationId = relationId;
         this.extension = extension;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
         this.url = url;
     }
 }
+

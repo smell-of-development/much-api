@@ -30,10 +30,10 @@ public class UserCreation {
     }
 
     @Builder
-    public UserCreation(@NotNull String loginId,
-                        @NotNull String password,
-                        @NotNull String nickname,
-                        @NotNull String phoneNumber,
+    public UserCreation(String loginId,
+                        String password,
+                        String nickname,
+                        String phoneNumber,
                         String position) {
 
         this.loginId = loginId;

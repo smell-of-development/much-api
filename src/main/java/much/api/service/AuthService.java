@@ -167,7 +167,7 @@ public class AuthService {
 
             SmsCertificationHist hist = SmsCertificationHist.builder()
                     .phoneNumber(phoneNumber)
-                    .number(content)
+                    .number(randomToString)
                     .build();
 
             smsCertificationHistRepository.save(hist);
@@ -203,9 +203,9 @@ public class AuthService {
         LocalDateTime after = now().minusMinutes(smsProperties.getExpirationTimeInMinutes());
 
         SmsCertificationHist hist = smsCertificationHistRepository.findLatestSent(phoneNumber, after)
-                .orElseThrow(() -> new CertificationMessageSendingNeeded(phoneNumber));
+                .orElseThrow(() -> new CertificationNumberSendingNeeded(phoneNumber));
 
-        String savedCertificationNumber = hist.getPhoneNumber();
+        String savedCertificationNumber = hist.getNumber();
 
         log.info("휴대폰번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
 
