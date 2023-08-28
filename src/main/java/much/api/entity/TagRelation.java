@@ -31,7 +31,7 @@ public class TagRelation {
 
     private Long relationId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 

@@ -50,6 +50,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
 }
 
 ext {
