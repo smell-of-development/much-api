@@ -79,7 +79,7 @@ public class AuthService {
      * @return 재발급 된 액세스 토큰 응답
      */
     public WebToken refreshAccessToken(final String accessToken,
-                                                 final String refreshToken) {
+                                       final String refreshToken) {
 
         final Long userId = tokenProvider.getSubject(accessToken);
 

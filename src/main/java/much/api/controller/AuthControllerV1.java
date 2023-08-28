@@ -44,7 +44,7 @@ public class AuthControllerV1 implements AuthApiV1 {
     @GetMapping("/testToken")
     public ResponseEntity<Envelope<WebToken>> testToken(@RequestParam long id) {
 
-        if (!ContextUtils.isProdMode()) {
+        if (ContextUtils.isProdMode()) {
             throw new AccessDeniedException("개발모드가 아님");
         }
 
