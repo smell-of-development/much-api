@@ -1,4 +1,4 @@
-package much.api.controller;
+package much.api.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

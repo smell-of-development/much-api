@@ -1,8 +1,8 @@
 package much.api.common.config;
 
 import lombok.RequiredArgsConstructor;
-import much.api.controller.JwtAccessDeniedHandler;
-import much.api.controller.JwtAuthenticationEntryPoint;
+import much.api.common.JwtAccessDeniedHandler;
+import much.api.common.JwtAuthenticationEntryPoint;
 import much.api.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

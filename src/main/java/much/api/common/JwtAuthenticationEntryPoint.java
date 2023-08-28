@@ -1,4 +1,4 @@
-package much.api.controller;
+package much.api.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
