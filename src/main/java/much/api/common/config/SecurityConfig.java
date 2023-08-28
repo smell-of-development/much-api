@@ -3,7 +3,7 @@ package much.api.common.config;
 import lombok.RequiredArgsConstructor;
 import much.api.common.JwtAccessDeniedHandler;
 import much.api.common.JwtAuthenticationEntryPoint;
-import much.api.filter.JwtFilter;
+import much.api.common.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;

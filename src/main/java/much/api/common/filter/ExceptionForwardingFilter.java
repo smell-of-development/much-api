@@ -1,4 +1,4 @@
-package much.api.filter;
+package much.api.common.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
