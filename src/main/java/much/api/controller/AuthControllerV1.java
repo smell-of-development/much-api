@@ -3,7 +3,6 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import much.api.common.enums.Code;
 import much.api.common.enums.Role;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
@@ -13,19 +12,14 @@ import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
 import much.api.dto.response.SmsCertification;
 import much.api.dto.response.WebToken;
-import much.api.entity.User;
-import much.api.exception.MuchException;
 import much.api.service.AuthService;
-import much.api.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.ok;
 
 
 @Slf4j
@@ -35,8 +29,6 @@ import static org.springframework.http.ResponseEntity.*;
 public class AuthControllerV1 implements AuthApiV1 {
 
     private final AuthService authService;
-
-    private final UserService userService;
 
     private final TokenProvider tokenProvider;
 
@@ -118,11 +110,6 @@ public class AuthControllerV1 implements AuthApiV1 {
     @Override
     @PostMapping("/sms/join-certification")
     public ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(@RequestParam String phoneNumber) {
-
-        Optional<User> userByPhoneNumber = userService.findUserByPhoneNumber(phoneNumber);
-        if (userByPhoneNumber.isPresent()) {
-            throw new MuchException(Code.DUPLICATED_PHONE_NUMBER, String.format("휴대폰번호 중복. [%s]", phoneNumber));
-        }
 
         return ok(
                 Envelope.ok(authService.sendCertificationNumber(phoneNumber))

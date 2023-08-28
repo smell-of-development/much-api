@@ -40,6 +40,8 @@ public class AuthService {
 
     private final WebClient webClient;
 
+    private final CommonService commonService;
+
     private final UserRepository userRepository;
 
     private final SmsCertificationHistRepository smsCertificationHistRepository;
@@ -84,8 +86,7 @@ public class AuthService {
         final Long userId = tokenProvider.getSubject(accessToken);
 
         // 사용자 조회
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFound(userId));
+        User foundUser = commonService.getUserOrThrowException(userId);
 
         // 사용자의 리프레시 가능 여부
         if (!foundUser.isRefreshable()) {

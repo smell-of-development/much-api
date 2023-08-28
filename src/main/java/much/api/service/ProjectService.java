@@ -4,15 +4,12 @@ import lombok.RequiredArgsConstructor;
 import much.api.common.enums.Code;
 import much.api.common.enums.MuchType;
 import much.api.common.util.ContextUtils;
-import much.api.common.util.FileStore;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.ProjectDetail;
 import much.api.entity.Project;
 import much.api.entity.User;
 import much.api.exception.MuchException;
-import much.api.exception.UserNotFound;
 import much.api.repository.ProjectRepository;
-import much.api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,11 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectService {
 
+    private final CommonService commonService;
+
     private final ProjectRepository projectRepository;
-
-    private final UserRepository userRepository;
-
-    private final FileStore fileStore;
 
 
     @Transactional
@@ -40,8 +35,7 @@ public class ProjectService {
 
 
         long userId = ContextUtils.getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFound(userId));
+        User user = commonService.getUserOrThrowException(userId);
 
         Project project = Project.builder()
                 .writer(user)

@@ -26,6 +26,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserService {
 
+    private final CommonService commonService;
+
     private final UserRepository userRepository;
 
     private final SmsCertificationHistRepository smsCertificationHistRepository;
@@ -39,17 +41,12 @@ public class UserService {
     public WebToken createUser(@MuchValid UserCreation userCreation) {
 
         // 로그인 ID 중복체크
-        checkDuplicatedLoginId(userCreation.getLoginId());
-
+        commonService.checkDuplicatedLoginId(userCreation.getLoginId());
         // 닉네임 중복체크
-        checkDuplicatedNickname(userCreation.getNickname());
-
-        final String phoneNumber = userCreation.getPhoneNumber();
-
+        commonService.checkDuplicatedNickname(userCreation.getNickname());
         // 이미 가입된 휴대폰번호인지 검사
-        if (userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new DuplicatedPhoneNumber(phoneNumber);
-        }
+        final String phoneNumber = userCreation.getPhoneNumber();
+        commonService.checkDuplicatedPhoneNumber(phoneNumber);
 
         // 휴대폰인증 SELECT - 1시간 이내
         LocalDateTime after = LocalDateTime.now().minusHours(1L);
@@ -93,8 +90,7 @@ public class UserService {
     public WebToken linkUser(String targetPhoneNumber, Long toDeletedId) {
 
         // 사용자 확인
-        final User toBeDeletedUser = userRepository.findById(toDeletedId)
-                .orElseThrow(() -> new UserNotFound(toDeletedId));
+        final User toBeDeletedUser = commonService.getUserOrThrowException(toDeletedId);
 
         // 휴대폰 인증이 완료된 다른 멀쩡한 사용자와 연동되는것 방지
 //        if (toBeDeletedUser.isPhoneVerificationCompleted()) {
@@ -113,30 +109,6 @@ public class UserService {
         // 기존 휴대폰번호 사용자의 최초 소셜 연결을 확인하여 다른 소셜도 연결
 
         return null;
-    }
-
-
-    public Optional<User> findUserByPhoneNumber(String phoneNumber) {
-
-        return userRepository.findByPhoneNumber(phoneNumber);
-    }
-
-
-
-    public void checkDuplicatedLoginId(String loginId) {
-
-        if (userRepository.existsByLoginId(loginId)) {
-            throw new DuplicatedLoginID(loginId);
-        }
-    }
-
-
-    public void checkDuplicatedNickname(String nickname) {
-
-        if (userRepository.existsByNickname(nickname)) {
-            throw new DuplicatedNickname(nickname);
-        }
-
     }
 
 }

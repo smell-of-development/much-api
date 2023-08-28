@@ -7,7 +7,6 @@ import much.api.controller.swagger.CommonApiV1;
 import much.api.dto.response.Envelope;
 import much.api.service.CommonService;
 import much.api.service.FileService;
-import much.api.service.UserService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,6 @@ public class CommonControllerV1 implements CommonApiV1 {
 
     private final CommonService commonService;
 
-    private final UserService userService;
-
     private final FileService fileService;
 
 
@@ -39,7 +36,7 @@ public class CommonControllerV1 implements CommonApiV1 {
     @GetMapping("/id-validation")
     public ResponseEntity<Envelope<Void>> checkDuplicatedLoginId(@RequestParam String id) {
 
-        userService.checkDuplicatedLoginId(id);
+        commonService.checkDuplicatedLoginId(id);
         return ok(
                 Envelope.empty()
         );
@@ -49,7 +46,7 @@ public class CommonControllerV1 implements CommonApiV1 {
     @GetMapping("/name-validation")
     public ResponseEntity<Envelope<Void>> checkDuplicatedNickname(@RequestParam String nickname) {
 
-        userService.checkDuplicatedNickname(nickname);
+        commonService.checkDuplicatedNickname(nickname);
         return ok(
                 Envelope.empty()
         );
