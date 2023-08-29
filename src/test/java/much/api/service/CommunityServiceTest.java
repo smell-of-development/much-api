@@ -1,5 +1,6 @@
 package much.api.service;
 
+import lombok.extern.slf4j.Slf4j;
 import much.api.WithUser;
 import much.api.common.enums.CommunityCategory;
 import much.api.common.util.EditorUtils;
@@ -29,6 +30,7 @@ import static much.api.common.enums.MuchType.COMMUNITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 @SpringBootTest
 class CommunityServiceTest {
 
@@ -92,7 +94,9 @@ class CommunityServiceTest {
         );
 
         // when
+        log.info("시작 =========================================================");
         CommunityPostDetail postDetail = communityService.createPost(postCreation);
+        log.info("종료 =========================================================");
 
         // then
         // 이미지 파일 관계정보 정상반영 확인

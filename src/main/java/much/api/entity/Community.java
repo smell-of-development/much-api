@@ -26,12 +26,12 @@ public class Community extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    private CommunityCategory category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User author;
-
-    @Enumerated(EnumType.STRING)
-    private CommunityCategory category;
 
     private String content;
 

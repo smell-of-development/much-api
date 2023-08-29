@@ -9,13 +9,12 @@ import much.api.repository.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toSet;
+import static org.springframework.transaction.annotation.Propagation.MANDATORY;
 
 @Service
 @RequiredArgsConstructor
@@ -26,37 +25,34 @@ public class TagHelperService {
 
     private final TagRelationRepository tagRelationRepository;
 
-    @Transactional
-    public void saveTagInformation(MuchType relationType,
-                                   Long relationId,
-                                   List<String> tags) {
+    @Transactional(propagation = MANDATORY)
+    public void handleTagInformation(MuchType relationType,
+                                     Long relationId,
+                                     List<String> tags) {
 
-        // 기존 태그관계정보 삭제
-        tagRelationRepository.deleteExistingRelation(relationType, relationId);
-
-        // 이미 등록된 태그정보 조회
+        // 태그이름으로 정보조회
         List<Tag> existingTags = tagRepository.findAllByNameIn(tags);
-
-        // Set<태그이름> 형태로 변경
-        Set<String> registeredTag = existingTags.stream()
+        // toSet
+        Set<String> tagInfos = existingTags.stream()
                 .map(Tag::getName)
-                .collect(Collectors.toSet());
-
-        // 미등록된 태그 추출하여 저장
-        List<Tag> nonexistentTag = tagRepository.saveAll(
+                .collect(toSet());
+        // 태그정보가 없다면 등록
+        List<Tag> saved = tagRepository.saveAll(
                 tags.stream()
-                        .filter(not(registeredTag::contains))
+                        .filter(not(tagInfos::contains))
                         .map(Tag::ofName)
                         .toList());
 
-        // 글과 태그관계 저장
-        Stream.of(existingTags, nonexistentTag)
-                .flatMap(Collection::stream)
-                .forEach(tag ->
-                        tagRelationRepository.save(
-                                TagRelation.ofTypeAndId(relationType, relationId, tag)
-                        )
-                );
+        // 등록될 게시글의 태그 = 조회된 태그정보 + 없어서 등록한 태그정보
+        existingTags.addAll(saved);
+        // 기존 태그관계정보 삭제
+        tagRelationRepository.deleteByTagNotIn(relationType, relationId, existingTags);
+
+        // 새로운 태그정보 등록
+        tagRelationRepository.saveAll(
+                existingTags.stream()
+                        .map(tag -> TagRelation.ofTypeAndId(relationType, relationId, tag))
+                        .toList());
     }
 
 }
