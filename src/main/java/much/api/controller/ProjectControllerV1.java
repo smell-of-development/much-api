@@ -20,7 +20,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     private final ProjectService projectService;
 
     @Override
-    @PostMapping("/project")
+    @PostMapping("/projects")
     public ResponseEntity<Envelope<Long>> createProject(@RequestBody ProjectCreation request) {
 
         return ok(
@@ -30,7 +30,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @GetMapping("/project/{id}")
+    @GetMapping("/projects/{id}")
     public ResponseEntity<Envelope<ProjectDetail>> getProject(@PathVariable Long id) {
 
         return ok(

@@ -25,7 +25,7 @@ public class UserControllerV1 implements UserApiV1 {
     private final UserService userService;
 
     @Override
-    @PostMapping("/user")
+    @PostMapping("/users")
     public ResponseEntity<Envelope<WebToken>> createUser(@RequestBody @Valid UserCreation request) {
 
         return ok(

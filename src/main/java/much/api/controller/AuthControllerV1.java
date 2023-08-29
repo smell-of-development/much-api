@@ -108,7 +108,7 @@ public class AuthControllerV1 implements AuthApiV1 {
 
 
     @Override
-    @PostMapping("/sms/join-certification")
+    @PostMapping("/sms/certification")
     public ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(@RequestParam String phoneNumber) {
 
         return ok(
@@ -118,7 +118,7 @@ public class AuthControllerV1 implements AuthApiV1 {
 
 
     @Override
-    @PostMapping("/sms/join-verification")
+    @PostMapping("/sms/verification")
     public ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(@RequestBody @Valid SmsVerification request) {
 
         final String phoneNumber = request.getPhoneNumber();

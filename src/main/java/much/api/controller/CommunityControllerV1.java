@@ -21,7 +21,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
     private final CommunityService communityService;
 
     @Override
-    @PostMapping("/community")
+    @PostMapping("/communities")
     public ResponseEntity<Envelope<CommunityPostDetail>> createCommunityPost(@RequestBody @Valid CommunityPostCreation request) {
 
         return ok(
@@ -31,7 +31,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
-    @PutMapping("/community")
+    @PutMapping("/communities")
     public ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(CommunityPostModification request) {
 
         return ok(

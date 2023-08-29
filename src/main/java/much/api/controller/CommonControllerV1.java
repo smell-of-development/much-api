@@ -80,7 +80,7 @@ public class CommonControllerV1 implements CommonApiV1 {
     }
 
     @Override
-    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Envelope<String>> uploadImage(@RequestPart MultipartFile image,
                                                         @RequestParam(defaultValue = "NONE") ImageResizeType type) {
 
@@ -90,7 +90,7 @@ public class CommonControllerV1 implements CommonApiV1 {
     }
 
     @Override
-    @GetMapping("/image/{storedFilename}")
+    @GetMapping("/images/{storedFilename}")
     public ResponseEntity<Resource> getLocalImage(@PathVariable String storedFilename) {
 
         FileService.LocalImage localImage = fileService.getLocalImage(storedFilename);
