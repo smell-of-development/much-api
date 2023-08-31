@@ -21,6 +21,7 @@ public enum Code {
 
     USER_NOT_FOUND(2000, "사용자를 찾을 수 없습니다."),
     PHONE_NUMBER_NOT_FOUND(2000, "전화번호에 해당하는 사용자를 찾을 수 없습니다."),
+    POST_NOT_FOUND(2000, "게시글을 찾을 수 없습니다."),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없습니다."),
     FILE_NOT_FOUND(2000, "파일을 찾을 수 없습니다."),
 
@@ -44,7 +45,6 @@ public enum Code {
     TOKEN_REFRESH_BLOCKED(4000, "토큰 리프레시가 차단된 사용자입니다."),
     UNAUTHORIZED(4001, "정상적인 로그인 정보가 없습니다."),
     FORBIDDEN(4003, "권한이 없습니다."),
-
 
     FILE_UPLOAD_SIZE_EXCEEDED(5000, "최대 업로드 크기를 초과합니다."),
 

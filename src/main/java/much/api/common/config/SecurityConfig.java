@@ -69,8 +69,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/sms/**").permitAll()
                                 .requestMatchers("/api/v1/login").permitAll()
                                 .requestMatchers("/api/v1/testToken").permitAll()
-                                .requestMatchers(POST, "/api/v1/user").permitAll()
-                                .requestMatchers(GET, "/api/v1/community/**").permitAll()
+                                .requestMatchers(POST, "/api/v1/users").permitAll()
+                                .requestMatchers(GET, "/api/v1/communities/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(configurer -> configurer

@@ -8,19 +8,27 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<File, Long> {
 
-    Optional<File> findByStoredFilename(String storedFilename);
-
     @Query("UPDATE File f " +
             "SET f.relationType = :relationType" +
-            "  , f.relationId = :relationId " +
+            "  , f.relationId   = :relationId " +
             "WHERE f.storedFilename IN (:storedFilenames)")
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    void updateRelationInformation(@Param("relationType") MuchType relationType,
-                                   @Param("relationId") Long relationId,
-                                   @Param("storedFilenames") List<String> storedFilenames);
+    void setRelationByFilenames(@Param("relationType") MuchType relationType,
+                                @Param("relationId") Long relationId,
+                                @Param("storedFilenames") List<String> storedFilenames);
+
+    @Query("UPDATE File f " +
+            "SET f.relationType = null " +
+            "  , f.relationId   = null " +
+            "WHERE f.relationType = :relationType " +
+            "AND   f.relationId   = :relationId " +
+            "AND   f.storedFilename NOT IN (:storedFilenames)")
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    void releaseRelationByFilenamesNotIn(@Param("relationType") MuchType relationType,
+                                         @Param("relationId") Long relationId,
+                                         @Param("storedFilenames") List<String> storedFilenames);
 
 }

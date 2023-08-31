@@ -5,33 +5,29 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import much.api.common.enums.CommunityCategory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommunityPostModification {
 
     @NotNull
-    private String category;
+    private CommunityCategory category;
 
-    @NotNull
-    private Long id;
-
-    private List<String> tags = new ArrayList<>();
+    private Set<String> tags = new HashSet<>();
 
     private String content;
 
 
     @Builder
-    private CommunityPostModification(String category,
-                                      Long id,
-                                      List<String> tags,
+    private CommunityPostModification(CommunityCategory category,
+                                      Set<String> tags,
                                       String content) {
 
         this.category = category;
-        this.id = id;
         this.tags = tags;
         this.content = content;
     }

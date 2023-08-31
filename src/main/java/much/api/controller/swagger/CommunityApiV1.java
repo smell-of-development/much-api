@@ -2,6 +2,7 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
@@ -14,8 +15,9 @@ public interface CommunityApiV1 {
 
     @Operation(
             summary = "커뮤니티 글 등록 API",
+            security = @SecurityRequirement(name = "jwt-token"),
             description = """
-                    - 커뮤니티 글을 등록합니다.
+                    커뮤니티 글을 등록합니다.
                     - 로그인이 되어있어야 합니다.
                     ### 요청값
                     - category (String)   : (필수) QNA, FREE, TECH_SHARE 중 하나
@@ -32,14 +34,16 @@ public interface CommunityApiV1 {
 
     @Operation(
             summary = "커뮤니티 글 수정 API",
+            security = @SecurityRequirement(name = "jwt-token"),
             description = """
-                    - 커뮤니티 글을 수정합니다.
+                    커뮤니티 글을 수정합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
+                    - 요청예시 PUT /api/v1/communities/1
                     ### 요청값
-                    - id       (Number)   : (필수) 글 ID
-                    - category (String)   : (필수) QNA, FREE, TECH_SHARE 중 하나
-                    - tags     (String[]) : 태그 배열
-                    - content  (String)   : 에디터 내용
+                    - 쿼리스트링(id) - Number   : (필수) 글 ID
+                    - body(category) - String   : (필수) QNA, FREE, TECH_SHARE 중 하나 (수정 데이터)
+                    - body(tags)     - String[] : 태그 배열 (수정 데이터)
+                    - body(content)  - String   : 에디터 내용 (수정 데이터)
                     ### 응답값
                     - code 200
                     - 글 ID, 본인글여부, 카테고리, 태그배열, 글 내용, 작성자 ID, 작성자 닉네임, 작성자 프로필 이미지 url
@@ -48,6 +52,7 @@ public interface CommunityApiV1 {
                     - 본인글이 아닌경우
                     """,
             requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
-    ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(CommunityPostModification request);
+    ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(Long postId,
+                                                                      CommunityPostModification request);
 
 }

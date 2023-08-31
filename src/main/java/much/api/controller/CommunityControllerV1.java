@@ -11,7 +11,7 @@ import much.api.service.CommunityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,11 +31,12 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
-    @PutMapping("/communities")
-    public ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(CommunityPostModification request) {
+    @PutMapping("/communities/{postId}")
+    public ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(@PathVariable Long postId,
+                                                                             @RequestBody @Valid CommunityPostModification request) {
 
         return ok(
-                Envelope.ok(communityService.modifyPost(request))
+                Envelope.ok(communityService.modifyPost(postId, request))
         );
     }
 

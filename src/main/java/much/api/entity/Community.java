@@ -1,10 +1,7 @@
 package much.api.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import much.api.common.enums.CommunityCategory;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -43,5 +40,15 @@ public class Community extends BaseTimeEntity {
         this.author = author;
         this.category = category;
         this.content = content;
+    }
+
+    public void modify(String content) {
+
+        this.content = content;
+    }
+
+    public boolean isAuthor(Long userId) {
+
+        return author.getId().equals(userId);
     }
 }

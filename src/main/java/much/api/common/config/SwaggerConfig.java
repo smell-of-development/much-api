@@ -15,7 +15,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
 
-        final String securitySchemeName = "bearerAuth";
+        final String securitySchemeName = "jwt-token";
 
         Info info = new Info().title("Much API Docs").version("1.0.0")
                 .description("Much 웹 API Docs 입니다.")

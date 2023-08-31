@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.ImageResizeType;
+import much.api.common.enums.MuchType;
+import much.api.common.exception.FileProcessError;
+import much.api.common.util.EditorUtils;
 import much.api.common.util.FileStore;
 import much.api.entity.File;
-import much.api.common.exception.FileProcessError;
 import much.api.repository.FileRepository;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static much.api.common.enums.FileType.IMAGE;
 
@@ -46,6 +49,19 @@ public class FileService {
         );
 
         return uploadResult.getUrl();
+    }
+
+
+    public void handleEditorImage(MuchType relationType, Long relationId, String htmlContent) {
+
+        // 에디터 내 이미지이름 추출
+        List<String> imageFilenamesInEditor = EditorUtils.extractImageFilenamesAtHtml(htmlContent);
+
+        // 에디터에 업로드 된 이미지들의 관리정보 설정
+        fileRepository.setRelationByFilenames(relationType, relationId, imageFilenamesInEditor);
+
+        // 에디터에서 삭제 된 이미지들의 관리정보 해제
+        fileRepository.releaseRelationByFilenamesNotIn(relationType, relationId, imageFilenamesInEditor);
     }
 
 

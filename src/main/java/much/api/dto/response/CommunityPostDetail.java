@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.CommunityCategory;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 public class CommunityPostDetail {
@@ -15,7 +15,7 @@ public class CommunityPostDetail {
 
     private final CommunityCategory category;
 
-    private final List<String> tags;
+    private final Set<String> tags;
 
     private final String content;
 
@@ -30,7 +30,7 @@ public class CommunityPostDetail {
     private CommunityPostDetail(Long id,
                                 boolean editable,
                                 CommunityCategory category,
-                                List<String> tags,
+                                Set<String> tags,
                                 String content,
                                 Long authorId,
                                 String authorNickname,
