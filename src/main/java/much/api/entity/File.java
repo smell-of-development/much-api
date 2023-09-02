@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import much.api.common.enums.FileType;
 import much.api.common.enums.ImageResizeType;
 import much.api.common.enums.MuchType;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -41,6 +42,9 @@ public class File extends BaseTimeEntity {
 
     private Long relationId;
 
+    @ColumnDefault("1")
+    private boolean released;
+
     private String extension;
 
     private String originalFilename;
@@ -54,6 +58,7 @@ public class File extends BaseTimeEntity {
                  ImageResizeType imageResizeType,
                  MuchType relationType,
                  Long relationId,
+                 boolean released,
                  String extension,
                  String originalFilename,
                  String storedFilename,
@@ -63,6 +68,7 @@ public class File extends BaseTimeEntity {
         this.imageResizeType = imageResizeType;
         this.relationType = relationType;
         this.relationId = relationId;
+        this.released = released;
         this.extension = extension;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;

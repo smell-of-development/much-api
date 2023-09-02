@@ -2,7 +2,6 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
@@ -15,7 +14,6 @@ public interface CommunityApiV1 {
 
     @Operation(
             summary = "커뮤니티 글 등록 API",
-            security = @SecurityRequirement(name = "jwt-token"),
             description = """
                     커뮤니티 글을 등록합니다.
                     - 로그인이 되어있어야 합니다.
@@ -34,7 +32,6 @@ public interface CommunityApiV1 {
 
     @Operation(
             summary = "커뮤니티 글 수정 API",
-            security = @SecurityRequirement(name = "jwt-token"),
             description = """
                     커뮤니티 글을 수정합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
@@ -55,4 +52,19 @@ public interface CommunityApiV1 {
     ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(Long postId,
                                                                       CommunityPostModification request);
 
+    @Operation(
+            summary = "커뮤니티 글 삭제 API",
+            description = """
+                    커뮤니티 글을 삭제합니다.
+                    - 로그인 사용자와 등록자가 같아야합니다.
+                    - 요청예시 DELETE /api/v1/communities/1
+                    ### 응답값
+                    - code 200
+                    - 삭제 성공
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 본인글이 아닌경우
+                    """,
+            requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
+    ResponseEntity<Envelope<Void>> deleteCommunityPost(Long postId);
 }

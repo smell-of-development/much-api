@@ -27,9 +27,9 @@ public class TagHelperService {
     private final TagRelationRepository tagRelationRepository;
 
     @Transactional(propagation = MANDATORY)
-    public void handleTagInformation(MuchType relationType,
-                                     Long relationId,
-                                     Set<String> tags) {
+    public void handleTagRelation(MuchType relationType,
+                                  Long relationId,
+                                  Set<String> tags) {
 
         // 태그이름 저장
         Set<Tag> tagInfos = saveTagInfo(tags);
@@ -53,6 +53,13 @@ public class TagHelperService {
                 .map(tag -> ofTypeAndId(relationType, relationId, tag))
                 .toList();
         tagRelationRepository.saveAll(toBeSaved);
+    }
+
+
+    void deleteTagRelation(MuchType relationType,
+                           Long relationId) {
+
+        tagRelationRepository.deleteAllByRelation(relationType, relationId);
     }
 
 

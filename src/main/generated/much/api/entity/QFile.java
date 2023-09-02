@@ -36,6 +36,8 @@ public class QFile extends EntityPathBase<File> {
 
     public final EnumPath<much.api.common.enums.MuchType> relationType = createEnum("relationType", much.api.common.enums.MuchType.class);
 
+    public final BooleanPath released = createBoolean("released");
+
     public final StringPath storedFilename = createString("storedFilename");
 
     public final EnumPath<much.api.common.enums.FileType> type = createEnum("type", much.api.common.enums.FileType.class);

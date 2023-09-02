@@ -40,4 +40,15 @@ public class CommunityControllerV1 implements CommunityApiV1 {
         );
     }
 
+
+    @Override
+    @DeleteMapping("/communities/{postId}")
+    public ResponseEntity<Envelope<Void>> deleteCommunityPost(@PathVariable Long postId) {
+
+        communityService.deletePost(postId);
+        return ok(
+                Envelope.empty()
+        );
+    }
+
 }

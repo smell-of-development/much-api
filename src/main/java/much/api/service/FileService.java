@@ -65,6 +65,12 @@ public class FileService {
     }
 
 
+    public void releaseEditorImage(MuchType relationType, Long relationId) {
+
+        fileRepository.releaseAllByRelation(relationType, relationId);
+    }
+
+
     public LocalImage getLocalImage(String storedFilename) {
 
         String fullPath = fileStore.getImagePath() + java.io.File.separator + storedFilename;

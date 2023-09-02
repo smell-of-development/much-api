@@ -14,15 +14,16 @@ public interface FileRepository extends JpaRepository<File, Long> {
     @Query("UPDATE File f " +
             "SET f.relationType = :relationType" +
             "  , f.relationId   = :relationId " +
+            "  , f.released     = false " +
             "WHERE f.storedFilename IN (:storedFilenames)")
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void setRelationByFilenames(@Param("relationType") MuchType relationType,
                                 @Param("relationId") Long relationId,
                                 @Param("storedFilenames") List<String> storedFilenames);
 
+
     @Query("UPDATE File f " +
-            "SET f.relationType = null " +
-            "  , f.relationId   = null " +
+            "SET f.released = true " +
             "WHERE f.relationType = :relationType " +
             "AND   f.relationId   = :relationId " +
             "AND   f.storedFilename NOT IN (:storedFilenames)")
@@ -30,5 +31,14 @@ public interface FileRepository extends JpaRepository<File, Long> {
     void releaseRelationByFilenamesNotIn(@Param("relationType") MuchType relationType,
                                          @Param("relationId") Long relationId,
                                          @Param("storedFilenames") List<String> storedFilenames);
+
+
+    @Query("UPDATE File f " +
+            "SET f.released = true " +
+            "WHERE f.relationType = :relationType " +
+            "AND   f.relationId   = :relationId")
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    void releaseAllByRelation(@Param("relationType") MuchType relationType,
+                              @Param("relationId") Long relationId);
 
 }

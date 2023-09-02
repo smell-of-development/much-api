@@ -1,6 +1,5 @@
 package much.api.repository;
 
-import much.api.common.enums.CommunityCategory;
 import much.api.entity.Community;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,9 +12,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("SELECT c " +
             "FROM Community c " +
             "JOIN FETCH c.author " +
-            "WHERE c.id = :id " +
-            "AND   c.category = :category")
-    Optional<Community> findPostWithUser(@Param("id") Long id,
-                                         @Param("category") CommunityCategory category);
+            "WHERE c.id = :id ")
+    Optional<Community> findPostWithUser(@Param("id") Long id);
 
 }

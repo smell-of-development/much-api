@@ -54,7 +54,7 @@ public class CommunityService {
         fileService.handleEditorImage(COMMUNITY, post.getId(), requestContent);
 
         // 태그정보, 관계정보 반영
-        tagHelperService.handleTagInformation(COMMUNITY, post.getId(), requestTags);
+        tagHelperService.handleTagRelation(COMMUNITY, post.getId(), requestTags);
 
         // 응답
         return CommunityPostDetail.builder()
@@ -74,13 +74,16 @@ public class CommunityService {
     public CommunityPostDetail modifyPost(Long postId,
                                           CommunityPostModification postModification) {
 
+        // 사용자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
         final CommunityCategory category = postModification.getCategory();
 
         // 기존글 조회
-        Community post = communityRepository.findPostWithUser(postId, category)
+        Community post = communityRepository.findPostWithUser(postId)
                 .orElseThrow(() -> new PostNotFound(category.name(), postId));
 
-        Long userId = ContextUtils.getUserId();
         if (!post.isAuthor(userId)) {
             throw new NoAuthority("게시글 수정");
         }
@@ -92,7 +95,7 @@ public class CommunityService {
         post.modify(modifiedContent);
 
         // 태그정보 수정
-        tagHelperService.handleTagInformation(COMMUNITY, postId, tags);
+        tagHelperService.handleTagRelation(COMMUNITY, postId, tags);
 
         // 에디터 파일정보 수정
         fileService.handleEditorImage(COMMUNITY, postId, modifiedContent);
@@ -107,5 +110,31 @@ public class CommunityService {
                 .authorNickname(post.getAuthor().getNickname())
                 .authorImageUrl(post.getAuthor().getImageUrl())
                 .build();
+    }
+
+
+    @Transactional
+    public void deletePost(Long postId) {
+
+        // 사용자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
+        // 기존글 조회
+        Community post = communityRepository.findPostWithUser(postId)
+                .orElseThrow(() -> new PostNotFound(postId));
+
+        if (!post.isAuthor(userId)) {
+            throw new NoAuthority("게시글 수정");
+        }
+
+        // 태그정보 삭제
+        tagHelperService.deleteTagRelation(COMMUNITY, postId);
+
+        // 파일정보 관리
+        fileService.releaseEditorImage(COMMUNITY, postId);
+
+        // 글 삭제
+        communityRepository.deleteById(postId);
     }
 }

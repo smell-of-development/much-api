@@ -2,7 +2,6 @@ package much.api.service;
 
 import lombok.extern.slf4j.Slf4j;
 import much.api.WithUser;
-import much.api.common.enums.CommunityCategory;
 import much.api.common.exception.NoAuthority;
 import much.api.common.exception.PostNotFound;
 import much.api.dto.request.CommunityPostCreation;
@@ -12,6 +11,7 @@ import much.api.entity.*;
 import much.api.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
@@ -26,6 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.Set;
 
+import static much.api.common.enums.CommunityCategory.FREE;
+import static much.api.common.enums.CommunityCategory.valueOf;
 import static much.api.common.enums.MuchType.COMMUNITY;
 import static much.api.common.util.EditorUtils.extractImageFilenamesAtHtml;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,13 +69,13 @@ class CommunityServiceTest {
 
             return "POST".equals(accessor.getString(0)) ?
                     CommunityPostCreation.builder()
-                            .category(CommunityCategory.valueOf(accessor.getString(1)))
+                            .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
                             .content(accessor.getString(3))
                             .build()
                     :
                     CommunityPostModification.builder()
-                            .category(CommunityCategory.valueOf(accessor.getString(1)))
+                            .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
                             .content(accessor.getString(3))
                             .build();
@@ -98,6 +100,7 @@ class CommunityServiceTest {
                 fileRepository.save(
                         File.builder()
                                 .storedFilename(name)
+                                .released(true)
                                 .build())
         );
 
@@ -160,9 +163,11 @@ class CommunityServiceTest {
         // 기존 게시글의 이미지파일 관리정보
         File storedImageFile0 = File.builder()
                 .storedFilename("storedImageFile0")
+                .released(true)
                 .build();
         File storedImageFile1 = File.builder()
                 .storedFilename("storedImageFile1")
+                .released(true)
                 .build();
         fileRepository.saveAll(List.of(storedImageFile0, storedImageFile1));
 
@@ -170,6 +175,7 @@ class CommunityServiceTest {
         fileRepository.save(
                 File.builder()
                         .storedFilename("storedImageFile2")
+                        .released(true)
                         .build());
 
         CommunityPostDetail saved = communityService.createPost(creation);
@@ -188,7 +194,7 @@ class CommunityServiceTest {
 
         files.forEach(file -> {
             // 삭제된 이미지 관리정보 정상변경 확인
-            if (file.getRelationType() == null && file.getRelationId() == null) {
+            if (file.isReleased()) {
                 assertEquals(file.getStoredFilename(), storedImageFile0.getStoredFilename());
             } else {
                 // 새로 업로드된 이미지파일 관리정보 정상변경 확인
@@ -260,4 +266,42 @@ class CommunityServiceTest {
         assertThrows(PostNotFound.class, () -> communityService.modifyPost(0L, information));
     }
 
+
+    @Test
+    @DisplayName("커뮤니티 글 삭제 성공")
+    @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
+    void community_delete_test1() {
+        // given
+
+        // 기존 게시글 준비
+        CommunityPostCreation creation = CommunityPostCreation.builder()
+                .category(FREE)
+                .tags(Set.of("JPA", "Adobe XD", "Node", "Java", "C++"))
+                .content("<img src='image/storedImageFile0'> <img src='image/storedImageFile1'>")
+                .build();
+
+        // 기존 게시글의 이미지파일 관리정보
+        File storedImageFile0 = File.builder()
+                .storedFilename("storedImageFile0")
+                .released(true)
+                .build();
+        File storedImageFile1 = File.builder()
+                .storedFilename("storedImageFile1")
+                .released(true)
+                .build();
+        fileRepository.saveAll(List.of(storedImageFile0, storedImageFile1));
+
+        CommunityPostDetail saved = communityService.createPost(creation);
+
+        // when
+        log.info("시작 =========================================================");
+        communityService.deletePost(saved.getId());
+        log.info("종료 =========================================================");
+
+        // then
+        assertTrue(communityRepository.findAll().isEmpty());
+        assertTrue(tagRelationRepository.findAll().isEmpty());
+        fileRepository.findAll()
+                .forEach(file -> assertTrue(file.isReleased()));
+    }
 }

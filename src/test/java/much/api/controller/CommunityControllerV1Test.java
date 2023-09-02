@@ -14,6 +14,7 @@ import much.api.repository.*;
 import much.api.service.CommunityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
@@ -30,9 +31,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
+import static much.api.common.enums.CommunityCategory.FREE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -136,6 +137,7 @@ class CommunityControllerV1Test {
                 fileRepository.save(
                         File.builder()
                                 .storedFilename(name)
+                                .released(true)
                                 .build())
         );
 
@@ -184,9 +186,11 @@ class CommunityControllerV1Test {
         // 기존 게시글의 이미지파일 관리정보
         File storedImageFile0 = File.builder()
                 .storedFilename("storedImageFile0")
+                .released(true)
                 .build();
         File storedImageFile1 = File.builder()
                 .storedFilename("storedImageFile1")
+                .released(true)
                 .build();
         fileRepository.saveAll(List.of(storedImageFile0, storedImageFile1));
 
@@ -194,6 +198,7 @@ class CommunityControllerV1Test {
         fileRepository.save(
                 File.builder()
                         .storedFilename("storedImageFile2")
+                        .released(true)
                         .build());
 
         CommunityPostDetail saved = communityService.createPost(creation);
@@ -316,4 +321,42 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.result").isEmpty());
     }
 
+
+    @Test
+    @DisplayName("커뮤니티 글 삭제 성공")
+    @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
+    void community_delete_test1() throws Exception {
+        // given
+
+        // 기존 게시글 준비
+        CommunityPostCreation creation = CommunityPostCreation.builder()
+                .category(FREE)
+                .tags(Set.of("JPA", "Adobe XD", "Node", "Java", "C++"))
+                .content("<img src='image/storedImageFile0'> <img src='image/storedImageFile1'>")
+                .build();
+
+        // 기존 게시글의 이미지파일 관리정보
+        File storedImageFile0 = File.builder()
+                .storedFilename("storedImageFile0")
+                .released(true)
+                .build();
+        File storedImageFile1 = File.builder()
+                .storedFilename("storedImageFile1")
+                .released(true)
+                .build();
+        fileRepository.saveAll(List.of(storedImageFile0, storedImageFile1));
+
+        CommunityPostDetail saved = communityService.createPost(creation);
+
+        // expected
+        mockMvc.perform(
+                        delete("/api/v1/communities/{postId}", saved.getId())
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").isEmpty())
+                .andExpect(jsonPath("$.requires").isEmpty())
+                .andExpect(jsonPath("$.result").isEmpty());
+    }
 }
