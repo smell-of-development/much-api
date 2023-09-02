@@ -35,6 +35,8 @@ public class QCommunity extends EntityPathBase<Community> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath title = createString("title");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 

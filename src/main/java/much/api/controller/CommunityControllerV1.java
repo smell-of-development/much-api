@@ -6,7 +6,9 @@ import much.api.controller.swagger.CommunityApiV1;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
 import much.api.dto.response.CommunityPostDetail;
+import much.api.dto.response.CommunityPostSummary;
 import much.api.dto.response.Envelope;
+import much.api.dto.response.PagedResult;
 import much.api.service.CommunityService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,11 @@ import static org.springframework.http.ResponseEntity.ok;
 public class CommunityControllerV1 implements CommunityApiV1 {
 
     private final CommunityService communityService;
+
+    @Override
+    public ResponseEntity<Envelope<PagedResult<CommunityPostSummary>>> getPosts() {
+        return null;
+    }
 
     @Override
     @PostMapping("/communities")

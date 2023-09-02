@@ -40,15 +40,18 @@ public class CommunityService {
 
         // 글 저장
         final CommunityCategory category = postCreation.getCategory();
+        final String requestTitle = postCreation.getTitle();
         final String requestContent = postCreation.getContent();
         final Set<String> requestTags = postCreation.getTags();
 
         Community post = Community.builder()
                 .author(user)
                 .category(category)
+                .title(requestTitle)
                 .content(requestContent)
                 .build();
-        communityRepository.save(post);
+
+        Community saved = communityRepository.save(post);
 
         // 에디터로 업로드 된 파일 관리정보 업데이트
         fileService.handleEditorImage(COMMUNITY, post.getId(), requestContent);
@@ -58,12 +61,13 @@ public class CommunityService {
 
         // 응답
         return CommunityPostDetail.builder()
-                .id(post.getId())
+                .id(saved.getId())
                 .editable(true)
-                .category(category)
+                .category(saved.getCategory())
                 .tags(requestTags)
-                .content(requestContent)
-                .authorId(userId)
+                .title(saved.getTitle())
+                .content(saved.getContent())
+                .authorId(user.getId())
                 .authorNickname(user.getNickname())
                 .authorImageUrl(user.getImageUrl())
                 .build();
@@ -76,7 +80,7 @@ public class CommunityService {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
-        commonService.getUserOrThrowException(userId);
+        User user = commonService.getUserOrThrowException(userId);
 
         final CommunityCategory category = postModification.getCategory();
 
@@ -88,11 +92,12 @@ public class CommunityService {
             throw new NoAuthority("게시글 수정");
         }
 
+        final String modifiedTitle = postModification.getTitle();
         final String modifiedContent = postModification.getContent();
         final Set<String> tags = postModification.getTags();
 
         // 내용수정
-        post.modify(modifiedContent);
+        post.modify(modifiedTitle, modifiedContent);
 
         // 태그정보 수정
         tagHelperService.handleTagRelation(COMMUNITY, postId, tags);
@@ -101,14 +106,15 @@ public class CommunityService {
         fileService.handleEditorImage(COMMUNITY, postId, modifiedContent);
 
         return CommunityPostDetail.builder()
-                .id(postId)
+                .id(post.getId())
                 .editable(true)
-                .category(category)
+                .category(post.getCategory())
                 .tags(tags)
-                .content(modifiedContent)
-                .authorId(post.getAuthor().getId())
-                .authorNickname(post.getAuthor().getNickname())
-                .authorImageUrl(post.getAuthor().getImageUrl())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .authorId(user.getId())
+                .authorNickname(user.getNickname())
+                .authorImageUrl(user.getImageUrl())
                 .build();
     }
 

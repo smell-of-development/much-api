@@ -64,6 +64,7 @@ class CommunityServiceTest {
     }
 
     static class PostAggregator implements ArgumentsAggregator {
+
         @Override
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
@@ -71,24 +72,26 @@ class CommunityServiceTest {
                     CommunityPostCreation.builder()
                             .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
-                            .content(accessor.getString(3))
+                            .title(accessor.getString(3))
+                            .content(accessor.getString(4))
                             .build()
                     :
                     CommunityPostModification.builder()
                             .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
-                            .content(accessor.getString(3))
+                            .title(accessor.getString(3))
+                            .content(accessor.getString(4))
                             .build();
         }
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 등록 성공")
     @CsvSource({
-            "POST, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_create_test1(@AggregateWith(PostAggregator.class) CommunityPostCreation postCreation) {
@@ -136,18 +139,19 @@ class CommunityServiceTest {
         assertEquals(1L, communityRepository.findAll().size());
         assertEquals(userId, postDetail.getAuthorId());
         assertTrue(postDetail.isEditable());
+        assertEquals(postCreation.getTags().size(), postDetail.getTags().size());
         assertEquals(postCreation.getCategory(), postDetail.getCategory());
-        assertEquals(postCreation.getCategory(), postDetail.getCategory());
+        assertEquals(postCreation.getTitle(), postDetail.getTitle());
         assertEquals(postCreation.getContent(), postDetail.getContent());
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 성공")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test1(@AggregateWith(PostAggregator.class) CommunityPostModification information) {
@@ -157,6 +161,7 @@ class CommunityServiceTest {
         CommunityPostCreation creation = CommunityPostCreation.builder()
                 .category(information.getCategory())
                 .tags(Set.of("JPA", "Adobe XD", "Node", "Java", "C++"))
+                .title("test")
                 .content("<img src='image/storedImageFile0'> <img src='image/storedImageFile1'>")
                 .build();
 
@@ -218,18 +223,19 @@ class CommunityServiceTest {
         assertEquals(1L, communityRepository.findAll().size());
         assertEquals(userId, postDetail.getAuthorId());
         assertTrue(postDetail.isEditable());
-        assertEquals(information.getCategory(), postDetail.getCategory());
         assertEquals(information.getTags().size(), postDetail.getTags().size());
+        assertEquals(information.getCategory(), postDetail.getCategory());
+        assertEquals(information.getTitle(), postDetail.getTitle());
         assertEquals(information.getContent(), postDetail.getContent());
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 실패 - 작성자가 아님")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test2(@AggregateWith(PostAggregator.class) CommunityPostModification information) {
@@ -252,12 +258,12 @@ class CommunityServiceTest {
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 실패 - 없는 게시글")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test3(@AggregateWith(PostAggregator.class) CommunityPostModification information) {
@@ -277,6 +283,7 @@ class CommunityServiceTest {
         CommunityPostCreation creation = CommunityPostCreation.builder()
                 .category(FREE)
                 .tags(Set.of("JPA", "Adobe XD", "Node", "Java", "C++"))
+                .title("test")
                 .content("<img src='image/storedImageFile0'> <img src='image/storedImageFile1'>")
                 .build();
 

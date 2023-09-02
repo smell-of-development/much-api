@@ -17,6 +17,8 @@ public class CommunityPostDetail {
 
     private final Set<String> tags;
 
+    private final String title;
+
     private final String content;
 
     private final Long authorId;
@@ -31,6 +33,7 @@ public class CommunityPostDetail {
                                 boolean editable,
                                 CommunityCategory category,
                                 Set<String> tags,
+                                String title,
                                 String content,
                                 Long authorId,
                                 String authorNickname,
@@ -40,6 +43,7 @@ public class CommunityPostDetail {
         this.editable = editable;
         this.category = category;
         this.tags = tags;
+        this.title = title;
         this.content = content;
         this.authorId = authorId;
         this.authorNickname = authorNickname;

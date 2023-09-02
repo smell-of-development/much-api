@@ -19,16 +19,20 @@ public class CommunityPostModification {
 
     private Set<String> tags = new HashSet<>();
 
+    private String title;
+
     private String content;
 
 
     @Builder
     private CommunityPostModification(CommunityCategory category,
                                       Set<String> tags,
+                                      String title,
                                       String content) {
 
         this.category = category;
         this.tags = tags;
+        this.title = title;
         this.content = content;
     }
 }

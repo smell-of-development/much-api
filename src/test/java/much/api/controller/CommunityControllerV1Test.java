@@ -2,7 +2,6 @@ package much.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import much.api.WithUser;
-import much.api.common.enums.CommunityCategory;
 import much.api.common.util.EditorUtils;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import static much.api.common.enums.CommunityCategory.FREE;
+import static much.api.common.enums.CommunityCategory.valueOf;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,55 +76,34 @@ class CommunityControllerV1Test {
     }
 
     static class PostAggregator implements ArgumentsAggregator {
+
         @Override
         public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
 
             return "POST".equals(accessor.getString(0)) ?
                     CommunityPostCreation.builder()
-                            .category(CommunityCategory.valueOf(accessor.getString(1)))
+                            .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
-                            .content(accessor.getString(3))
+                            .title(accessor.getString(3))
+                            .content(accessor.getString(4))
                             .build()
                     :
                     CommunityPostModification.builder()
-                            .category(CommunityCategory.valueOf(accessor.getString(1)))
+                            .category(valueOf(accessor.getString(1)))
                             .tags(Set.of(accessor.getString(2).split("\\|")))
-                            .content(accessor.getString(3))
+                            .title(accessor.getString(3))
+                            .content(accessor.getString(4))
                             .build();
         }
     }
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
-    @DisplayName("커뮤니티 글 등록 실패 - 비로그인")
-    @CsvSource({
-            "POST, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-    })
-    void community_create_test2(@AggregateWith(PostAggregator.class) CommunityPostCreation information) throws Exception {
-        // given
-        String request = objectMapper.writeValueAsString(information);
 
-        mockMvc.perform(
-                        post("/api/v1/communities")
-                                .contentType(APPLICATION_JSON)
-                                .content(request)
-                )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(4001))
-                .andExpect(jsonPath("$.message").isNotEmpty())
-                .andExpect(jsonPath("$.requires").isEmpty())
-                .andExpect(jsonPath("$.result").isEmpty());
-    }
-
-
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 등록 성공")
     @CsvSource({
-            "POST, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "POST, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_create_test1(@AggregateWith(PostAggregator.class) CommunityPostCreation information) throws Exception {
@@ -165,12 +144,12 @@ class CommunityControllerV1Test {
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 성공")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test1(@AggregateWith(PostAggregator.class) CommunityPostModification information) throws Exception {
@@ -180,6 +159,7 @@ class CommunityControllerV1Test {
         CommunityPostCreation creation = CommunityPostCreation.builder()
                 .category(information.getCategory())
                 .tags(Set.of("JPA", "Adobe XD", "Node", "Java", "C++"))
+                .title("test")
                 .content("<img src='image/storedImageFile0'> <img src='image/storedImageFile1'>")
                 .build();
 
@@ -222,6 +202,7 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.result.editable").value(true))
                 .andExpect(jsonPath("$.result.category").value(information.getCategory().name()))
                 .andExpect(jsonPath("$.result.tags.length()").value(information.getTags().size()))
+                .andExpect(jsonPath("$.result.title").value(information.getTitle()))
                 .andExpect(jsonPath("$.result.content").value(information.getContent()))
                 .andExpect(jsonPath("$.result.authorId").value(userId))
                 .andExpect(jsonPath("$.result.authorNickname").isNotEmpty())
@@ -229,12 +210,37 @@ class CommunityControllerV1Test {
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
+    @DisplayName("커뮤니티 글 등록 실패 - 비로그인")
+    @CsvSource({
+            "POST, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "POST, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+    })
+    void community_create_test2(@AggregateWith(PostAggregator.class) CommunityPostCreation information) throws Exception {
+        // given
+        String request = objectMapper.writeValueAsString(information);
+
+        mockMvc.perform(
+                        post("/api/v1/communities")
+                                .contentType(APPLICATION_JSON)
+                                .content(request)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(4001))
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.requires").isEmpty())
+                .andExpect(jsonPath("$.result").isEmpty());
+    }
+
+
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 실패 - 비로그인")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     void community_modify_test2(@AggregateWith(PostAggregator.class) CommunityPostModification information) throws Exception {
         // given
@@ -255,12 +261,12 @@ class CommunityControllerV1Test {
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 실패 - 작성자가 아님")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test3(@AggregateWith(PostAggregator.class) CommunityPostModification information) throws Exception {
@@ -295,12 +301,12 @@ class CommunityControllerV1Test {
     }
 
 
-    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 내용: {3}")
+    @ParameterizedTest(name = "[{index}] 카테고리: {1}, 태그: {2}, 제목: {3}, 내용: {4}")
     @DisplayName("커뮤니티 글 수정 실패 - 없는 게시글")
     @CsvSource({
-            "PUT, QNA, Spring Boot|Spring|Java, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, FREE, JPA|Java|Spring|React, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
-            "PUT, TECH_SHARE, Vue|Node|Python, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, QNA, Spring Boot|Spring|Java, 제목1, <tag><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, FREE, JPA|Java|Spring|React, 제목2, <src><img><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
+            "PUT, TECH_SHARE, Vue|Node|Python, 제목3, <img><src><img src='image/storedImageFile1'><><tag><img><img src='image/storedImageFile2'>",
     })
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void community_modify_test4(@AggregateWith(PostAggregator.class) CommunityPostModification information) throws Exception {

@@ -30,20 +30,26 @@ public class Community extends BaseTimeEntity {
     @JoinColumn(name = "author_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User author;
 
+    private String title;
+
     private String content;
 
     @Builder
     private Community(User author,
                       CommunityCategory category,
+                      String title,
                       String content) {
 
         this.author = author;
         this.category = category;
+        this.title = title;
         this.content = content;
     }
 
-    public void modify(String content) {
+    public void modify(String title,
+                       String content) {
 
+        this.title = title;
         this.content = content;
     }
 
