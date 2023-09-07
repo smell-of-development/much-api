@@ -17,7 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
         name = "tb_tag_relation",
         indexes = {
                 @Index(name = "tb_tag_relation_idx1", columnList = "relationType, relationId"),
-                @Index(name = "tb_tag_relation_idx2", columnList = "tag_id"),
+                @Index(name = "tb_tag_relation_idx2", columnList = "tagName"),
         }
 )
 public class TagRelation {
@@ -31,26 +31,24 @@ public class TagRelation {
 
     private Long relationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
-    private Tag tag;
+    private String tagName;
 
 
     private TagRelation(MuchType relationType,
                         Long relationId,
-                        Tag tag) {
+                        String tagName) {
 
         this.relationType = relationType;
         this.relationId = relationId;
-        this.tag = tag;
+        this.tagName = tagName;
     }
 
 
     public static TagRelation ofTypeAndId(MuchType relationType,
                                           Long relationId,
-                                          Tag tag) {
+                                          String tagName) {
 
-        return new TagRelation(relationType, relationId, tag);
+        return new TagRelation(relationType, relationId, tagName);
     }
 
 }

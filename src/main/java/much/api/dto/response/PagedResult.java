@@ -1,25 +1,30 @@
 package much.api.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
 
 @Getter
 public class PagedResult<T> {
 
-    private List<T> content;
+    private List<?> elements;
 
     // 현재 페이지
-    private int page;
+    private Integer page;
 
-    // 페이지 사이즈
-    private int size;
+    // 현재 페이지에 존재하는 요소의 수
+    private Integer numberOfElements;
 
     // 전체 페이지
-    private int totalPages;
-
-    // 전체 페이지에 존재하는 요소의 개수
-    private int totalElements;
+    @JsonInclude(NON_NULL)
+    private Integer totalPages;
 
     // 첫번째 페이지인지
     private boolean first;
@@ -27,26 +32,65 @@ public class PagedResult<T> {
     // 마지막 페이지인지
     private boolean last;
 
-    // 리스트가 비어있는지
+    // 페이지 리스트가 비어있는지
     private boolean empty;
 
 
-    public PagedResult(List<T> content,
-                       int page,
-                       int size,
-                       int totalPages,
-                       int totalElements,
-                       boolean first,
-                       boolean last,
-                       boolean empty) {
+    @Builder(access = AccessLevel.PRIVATE)
+    private PagedResult(List<?> elements,
+                        Integer page,
+                        Integer numberOfElements,
+                        Integer totalPages,
+                        boolean first,
+                        boolean last,
+                        boolean empty) {
 
-        this.content = content;
-        this.page = page;
-        this.size = size;
+        this.elements = elements;
+        this.page = page + 1;
+        this.numberOfElements = numberOfElements;
         this.totalPages = totalPages;
-        this.totalElements = totalElements;
         this.first = first;
         this.last = last;
         this.empty = empty;
+    }
+
+
+    public static PagedResult<?> ofPage(Page<? extends PageElement<?>> page) {
+
+        return pageBuilder(page)
+                .elements(page.getContent()
+                        .stream()
+                        .map(PageElement::toResponseDto)
+                        .toList())
+                .build();
+    }
+
+
+    public static PagedResult<?> ofSlice(Slice<? extends PageElement<?>> slice) {
+
+        return sliceBuilder(slice)
+                .elements(slice.getContent()
+                        .stream()
+                        .map(PageElement::toResponseDto)
+                        .toList())
+                .build();
+    }
+
+
+    public static PagedResultBuilder<?> pageBuilder(Page<? extends PageElement<?>> page) {
+
+        return sliceBuilder(page)
+                .totalPages(page.getTotalPages());
+    }
+
+
+    public static PagedResultBuilder<?> sliceBuilder(Slice<? extends PageElement<?>> slice) {
+
+        return PagedResult.builder()
+                .page(slice.getNumber())
+                .numberOfElements(slice.getNumberOfElements())
+                .first(slice.isFirst())
+                .last(slice.isLast())
+                .empty(slice.isEmpty());
     }
 }

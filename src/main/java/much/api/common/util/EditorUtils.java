@@ -9,7 +9,18 @@ public class EditorUtils {
 
     private static final String IMAGE_TAG_REGEX = "<img[^>]*src=[\"']?(?<imageUrl>[^>\"']+)[\"']?[^>]*>";
 
+    private static final String HTML_TAG_REGEX = "<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>";
+
     private static final Pattern IMAGE_TAG_PATTERN = Pattern.compile(IMAGE_TAG_REGEX);
+
+
+    public static String removeHtmlTags(String html) {
+
+        return html
+                .replaceAll(HTML_TAG_REGEX, "")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
 
 
     public static List<String> extractImageFilenamesAtHtml(String html) {

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.CommunityApiV1;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
+import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.dto.response.CommunityPostSummary;
 import much.api.dto.response.Envelope;
@@ -22,10 +23,16 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
     private final CommunityService communityService;
 
+
     @Override
-    public ResponseEntity<Envelope<PagedResult<CommunityPostSummary>>> getPosts() {
-        return null;
+    @GetMapping("/communities")
+    public ResponseEntity<Envelope<PagedResult<CommunityPostSummary>>> getPosts(@ModelAttribute @Valid CommunitySearch searchCondition) {
+
+        return ok(
+                Envelope.ok(communityService.getPosts(searchCondition))
+        );
     }
+
 
     @Override
     @PostMapping("/communities")

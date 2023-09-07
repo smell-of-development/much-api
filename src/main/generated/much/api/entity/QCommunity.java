@@ -30,6 +30,8 @@ public class QCommunity extends EntityPathBase<Community> {
 
     public final StringPath content = createString("content");
 
+    public final StringPath contentWithoutHtmlTags = createString("contentWithoutHtmlTags");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -39,6 +41,8 @@ public class QCommunity extends EntityPathBase<Community> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<Long> viewCount = createNumber("viewCount", Long.class);
 
     public QCommunity(String variable) {
         this(Community.class, forVariable(variable), INITS);

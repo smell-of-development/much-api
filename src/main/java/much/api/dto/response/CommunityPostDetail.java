@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.CommunityCategory;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -27,6 +28,8 @@ public class CommunityPostDetail {
 
     private final String authorImageUrl;
 
+    private final LocalDateTime createdAt;
+
 
     @Builder
     private CommunityPostDetail(Long id,
@@ -37,7 +40,8 @@ public class CommunityPostDetail {
                                 String content,
                                 Long authorId,
                                 String authorNickname,
-                                String authorImageUrl) {
+                                String authorImageUrl,
+                                LocalDateTime createdAt) {
 
         this.id = id;
         this.editable = editable;
@@ -48,6 +52,7 @@ public class CommunityPostDetail {
         this.authorId = authorId;
         this.authorNickname = authorNickname;
         this.authorImageUrl = authorImageUrl;
+        this.createdAt = createdAt;
     }
 
 }

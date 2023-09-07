@@ -49,9 +49,6 @@ class CommunityServiceTest {
     FileRepository fileRepository;
 
     @Autowired
-    TagRepository tagRepository;
-
-    @Autowired
     TagRelationRepository tagRelationRepository;
 
     @BeforeEach
@@ -60,7 +57,6 @@ class CommunityServiceTest {
         fileRepository.deleteAll();
         userRepository.deleteAll();
         tagRelationRepository.deleteAll();
-        tagRepository.deleteAll();
     }
 
     static class PostAggregator implements ArgumentsAggregator {
@@ -123,9 +119,6 @@ class CommunityServiceTest {
         });
 
         // 태그정보 정상반영 확인
-        List<Tag> tags = tagRepository.findAll();
-        assertEquals(postCreation.getTags().size(), tags.size());
-
         List<TagRelation> tagRelations = tagRelationRepository.findAll();
         assertEquals(postCreation.getTags().size(), tagRelations.size());
         tagRelations.forEach(tl -> {

@@ -58,9 +58,6 @@ class CommunityControllerV1Test {
     FileRepository fileRepository;
 
     @Autowired
-    TagRepository tagRepository;
-
-    @Autowired
     TagRelationRepository tagRelationRepository;
 
     @Autowired
@@ -72,7 +69,6 @@ class CommunityControllerV1Test {
         fileRepository.deleteAll();
         userRepository.deleteAll();
         tagRelationRepository.deleteAll();
-        tagRepository.deleteAll();
     }
 
     static class PostAggregator implements ArgumentsAggregator {

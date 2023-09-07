@@ -3,6 +3,7 @@ package much.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import much.api.common.enums.CommunityCategory;
+import much.api.common.util.EditorUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -32,7 +33,14 @@ public class Community extends BaseTimeEntity {
 
     private String title;
 
+    @Column(columnDefinition = "text")
     private String content;
+
+    @Column(columnDefinition = "text")
+    private String contentWithoutHtmlTags;
+
+    // TODO
+    private Long viewCount;
 
     @Builder
     private Community(User author,
@@ -44,6 +52,7 @@ public class Community extends BaseTimeEntity {
         this.category = category;
         this.title = title;
         this.content = content;
+        this.contentWithoutHtmlTags = EditorUtils.removeHtmlTags(content);
     }
 
     public void modify(String title,

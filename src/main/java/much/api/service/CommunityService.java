@@ -7,10 +7,15 @@ import much.api.common.exception.PostNotFound;
 import much.api.common.util.ContextUtils;
 import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunityPostModification;
+import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
+import much.api.dto.response.CommunityPostSummary;
+import much.api.dto.response.PagedResult;
 import much.api.entity.Community;
 import much.api.entity.User;
 import much.api.repository.CommunityRepository;
+import much.api.repository.CommunitySearchRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +32,20 @@ public class CommunityService {
 
     private final FileService fileService;
 
+    private final TagHelperService tagHelperService;
+
+    private final CommunitySearchRepository communitySearchRepository;
+
     private final CommunityRepository communityRepository;
 
-    private final TagHelperService tagHelperService;
+
+    public PagedResult<CommunityPostSummary> getPosts(CommunitySearch searchCondition) {
+
+        Page<CommunitySearchRepository.CommunitySearchDto> page = communitySearchRepository.searchCommunityPosts(searchCondition);
+        // noinspection unchecked
+        return (PagedResult<CommunityPostSummary>) PagedResult.ofPage(page);
+    }
+
 
     @Transactional
     public CommunityPostDetail createPost(CommunityPostCreation postCreation) {

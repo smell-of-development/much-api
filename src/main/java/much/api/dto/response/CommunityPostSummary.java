@@ -1,11 +1,16 @@
 package much.api.dto.response;
 
-import lombok.Getter;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommunityPostSummary {
+
+    private Long id;
 
     private String category;
 
@@ -15,4 +20,17 @@ public class CommunityPostSummary {
 
     private List<String> tags;
 
+    private Long authorId;
+
+    private String authorNickname;
+
+    private String authorImageUrl;
+
+    // TODO
+    private Long viewCount;
+
+    // TODO
+    private Long commentCount;
+
+    private LocalDateTime createdAt;
 }
