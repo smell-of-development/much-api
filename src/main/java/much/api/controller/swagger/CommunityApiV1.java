@@ -13,10 +13,11 @@ import org.springframework.http.ResponseEntity;
 public interface CommunityApiV1 {
 
     @Operation(
-            summary = "커뮤니티 글 조회 API",
+            summary = "커뮤니티 글 다건조회 API",
             description = """
-                    커뮤니티 글을 조회합니다.
+                    커뮤니티 글을 다건 조회합니다.
                     - 페이지 결과를 얻습니다.
+                    - 내용은 50자까지 미리보기
                     - 요청예시 GET /api/v1/communities?category=QNA&search=제목또는내용&page=1&size=10
                     ### 정확도순 정렬시(byRecent=false) 우선순위
                     - search + tags 모두 존재   : 1) 태그 일치 개수, 2) 검색어 정확도, 3) 등록순서

@@ -1,13 +1,13 @@
 package much.api.service;
 
 import lombok.RequiredArgsConstructor;
+import much.api.common.aop.MuchValid;
 import much.api.common.enums.Role;
 import much.api.common.exception.CertificationNeeded;
 import much.api.common.exception.InvalidPhoneNumber;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
-import much.api.common.aop.MuchValid;
 import much.api.dto.request.UserCreation;
 import much.api.dto.response.WebToken;
 import much.api.entity.SmsCertificationHist;
@@ -53,8 +53,12 @@ public class UserService {
         LocalDateTime after = LocalDateTime.now().minusHours(1L);
         Optional<SmsCertificationHist> histOptional = smsCertificationHistRepository.findLatestSent(phoneNumber, after);
 
-        // 개발환경 + 프로파일 smsPass 가 true 라면 인증검사 패스
-        boolean certificationCompleted = ContextUtils.isSmsPass();
+        // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
+        boolean certificationCompleted = false;
+
+        if (ContextUtils.isDevMode()) {
+            certificationCompleted = true;
+        }
 
         // 인증이 완료된 번호인지 확인
         if (!certificationCompleted && histOptional.isPresent()) {

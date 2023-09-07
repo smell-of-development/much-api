@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.exception.*;
 import much.api.common.properties.SmsProperties;
-import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.SmsSender;
 import much.api.common.util.TokenProvider;
@@ -135,8 +134,8 @@ public class AuthService {
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);
         }
-        // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
-        if (ContextUtils.isSmsPass()) {
+        // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
+        if (commonService.isSmsPass()) {
 
             return SmsCertification.builder()
                     .phoneNumber(phoneNumber)
@@ -195,8 +194,8 @@ public class AuthService {
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);
         }
-        // 개발환경 + 프로파일 smsPass 가 true 라면 바로 성공 응답
-        if (ContextUtils.isSmsPass()) {
+        // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
+        if (commonService.isSmsPass()) {
             return;
         }
 

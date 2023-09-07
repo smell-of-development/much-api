@@ -14,8 +14,6 @@ public class ContextUtils {
 
     private static String host;
 
-    private static boolean smsPass;
-
 
     public static boolean isLocalMode() {
 
@@ -48,13 +46,6 @@ public class ContextUtils {
     }
 
 
-    public static boolean isSmsPass() {
-
-        return (getRunMode() == LOCAL || getRunMode() == DEV)
-                && smsPass;
-    }
-
-
     @Value("${context.runMode}")
     public void setRunMode(String runMode) {
 
@@ -62,12 +53,6 @@ public class ContextUtils {
         ContextUtils.runMode = RunMode.valueOf(runMode);
     }
 
-    @Value("${context.smsPass}")
-    public void setRunMode(Boolean smsPass) {
-
-        if (smsPass == null) throw new IllegalArgumentException();
-        ContextUtils.smsPass = smsPass;
-    }
 
     @Value("${context.host}")
     public void setHost(String host) {
