@@ -10,6 +10,7 @@ import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostSummary;
 import much.api.dto.response.PageElement;
 import much.api.entity.Community;
+import much.api.entity.QCommunity;
 import much.api.entity.QTagRelation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,57 +50,92 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
         QTagRelation subTr = new QTagRelation("subTR");
         QTagRelation countTr = new QTagRelation("countTR");
+        QCommunity subC = new QCommunity("subC");
 
+        /*
+        태그검색 쿼리
+        SELECT   c.id,                       -- 게시글 PK
+                 c.author_id,                -- 작성자 PK
+                (SELECT nickname
+                 FROM   user
+                 WHERE  id = c.author_id),   -- 작성자 닉네임
+                (SELECT image_url
+                 FROM   user
+                 WHERE  id = c.author_id),   -- 작성자 사진
+                (SELECT category
+                 FROM   community
+                 WHERE  id = c.id),          -- 게시글 카테고리
+                (SELECT title
+                 FROM   community
+                 WHERE  id = c.id),          -- 게시글 제목
+                (SELECT content_without_html_tags
+                 FROM   community
+                 WHERE  id = c.id),          -- 태그가 제외된 게시글 본문
+                (SELECT created_at
+                 FROM   community
+                 WHERE  id = c.id),          -- 작성일
+                (SELECT COUNT(id)
+                 FROM   tag_relation
+                 WHERE  relation_type = 'COMMUNITY'
+                 AND    relation_id = c.id
+                 AND    tag_name IN (?...)), -- 검색한 태그가 포함된 수 TODO 포함수/게시글태그수(비율)?
+                 GROUP_CONCAT(c.id)          -- 구분자 ','으로 이어진 게시글의 전체 태그
+        FROM     tag_relation tr
+        JOIN     community c
+        ON       tr.relation_type = 'COMMUNITY' AND tr.relation_id = c.id AND c.category = ?
+        WHERE    EXISTS (SELECT 1
+                         FROM   tag_relation sub_tr
+                         WHERE  sub_tr.relation_type = 'COMMUNITY'
+                         AND    sub_tr.relation_id   = c.id
+                         AND    sub_tr.tag_name     IN (?...))
+        GROUP BY c.id, c.author_id
+        ORDER BY 9 DESC, c.id DESC
+         */
         return applyPagination(pageRequest,
                 qf -> select(Projections.constructor(CommunitySearchDto.class,
                         community.id,
-                        community.category,
-                        community.title,
-                        community.contentWithoutHtmlTags,
-                        community.createdAt,
                         community.author.id,
-                        JPAExpressions
-                                .select(user.nickname)
-                                .from(user)
-                                .where(user.id.eq(community.author.id)),
-                        JPAExpressions
-                                .select(user.imageUrl)
-                                .from(user)
-                                .where(user.id.eq(community.author.id)),
+                        JPAExpressions.select(user.nickname).from(user).where(user.id.eq(community.author.id)),
+                        JPAExpressions.select(user.imageUrl).from(user).where(user.id.eq(community.author.id)),
+                        JPAExpressions.select(subC.category).from(subC).where(subC.id.eq(community.id)),
+                        JPAExpressions.select(subC.title).from(subC).where(subC.id.eq(community.id)),
+                        JPAExpressions.select(subC.contentWithoutHtmlTags).from(subC).where(subC.id.eq(community.id)),
+                        JPAExpressions.select(subC.createdAt).from(subC).where(subC.id.eq(community.id)),
                         as(JPAExpressions
                                 .select(countTr.count())
                                 .from(countTr)
                                 .where(countTr.relationType.eq(COMMUNITY)
-                                        .and(countTr.relationId.eq(tagRelation.relationId))
+                                        .and(countTr.relationId.eq(community.id))
                                         .and(countTr.tagName.in(searchCondition.getTags()))), "tagHitCount"),
                         stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
                 )
                         .from(tagRelation)
                         .join(community)
                         .on(tagRelation.relationType.eq(COMMUNITY)
-                                .and(community.category.eq(searchCondition.getCategory()))
-                                .and(tagRelation.relationId.eq(community.id)))
+                                .and(tagRelation.relationId.eq(community.id))
+                                .and(community.category.eq(searchCondition.getCategory())))
                         .where(JPAExpressions
                                 .selectFrom(subTr)
                                 .where(subTr.relationType.eq(COMMUNITY)
-                                        .and(subTr.relationId.eq(tagRelation.relationId))
+                                        .and(subTr.relationId.eq(community.id))
                                         .and(subTr.tagName.in(searchCondition.getTags()))).exists())
-                        .groupBy(community.id, community.category, community.title, community.author.id, community.createdAt)
+                        .groupBy(community.id, community.author.id)
                         .orderBy(orderSpecifiers(searchCondition.isByRecent()))
                 ,
+
+                // 페이징을 위한 COUNT 쿼리
                 qf -> select(tagRelation.relationId)
                         .from(tagRelation)
                         .join(community)
                         .on(tagRelation.relationType.eq(COMMUNITY)
-                                .and(community.category.eq(searchCondition.getCategory()))
-                                .and(tagRelation.relationId.eq(community.id)))
-                        .join(community.author, user)
+                                .and(tagRelation.relationId.eq(community.id))
+                                .and(community.category.eq(searchCondition.getCategory())))
                         .where(JPAExpressions
                                 .selectFrom(subTr)
                                 .where(subTr.relationType.eq(COMMUNITY)
-                                        .and(subTr.relationId.eq(tagRelation.relationId))
+                                        .and(subTr.relationId.eq(community.id))
                                         .and(subTr.tagName.in(searchCondition.getTags()))).exists())
-                        .groupBy(community.id)
+                        .groupBy(community.id, community.author.id)
         );
     }
 
@@ -123,6 +159,12 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
         private Long id;
 
+        private Long authorId;
+
+        private String authorNickname;
+
+        private String authorImageUrl;
+
         private CommunityCategory category;
 
         private String title;
@@ -130,12 +172,6 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
         private String content;
 
         private String tags;
-
-        private Long authorId;
-
-        private String authorNickname;
-
-        private String authorImageUrl;
 
         // TODO
         private Long viewCount;
@@ -149,25 +185,25 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
 
         public CommunitySearchDto(Long id,
+                                  Long authorId,
+                                  String authorNickname,
+                                  String authorImageUrl,
                                   CommunityCategory category,
                                   String title,
                                   String content,
                                   LocalDateTime createdAt,
-                                  Long authorId,
-                                  String authorNickname,
-                                  String authorImageUrl,
                                   Long tagHitCount,
                                   String tags) {
 
             this.id = id;
+            this.authorId = authorId;
+            this.authorNickname = authorNickname;
+            this.authorImageUrl = authorImageUrl;
             this.category = category;
             this.title = title;
             this.content = (content != null && content.length() >= MAX_CONTENT_LENGTH) ?
                     content.substring(0, MAX_CONTENT_LENGTH) + "..." : content;
             this.tags = tags;
-            this.authorId = authorId;
-            this.authorNickname = authorNickname;
-            this.authorImageUrl = authorImageUrl;
             this.createdAt = createdAt;
             this.tagHitCount = tagHitCount;
         }

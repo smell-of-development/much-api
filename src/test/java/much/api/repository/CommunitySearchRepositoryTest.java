@@ -37,7 +37,7 @@ class CommunitySearchRepositoryTest {
                 .category(CommunityCategory.QNA)
                 .title("test1")
                 .content("test1")
-                .tags(Set.of("Spring Boot", "JPA", "React"))
+                .tags(Set.of("Spring Boot", "JPA", "React", "JAVA"))
                 .build();
 
         CommunityPostCreation p2 = CommunityPostCreation.builder()
@@ -54,9 +54,9 @@ class CommunitySearchRepositoryTest {
                 .tags(Set.of("JAVA", "React"))
                 .build();
 
-        communityService.createPost(p1);
+        CommunityPostDetail postDetail1 = communityService.createPost(p1);
         communityService.createPost(p2);
-        CommunityPostDetail postDetail3 = communityService.createPost(p3);
+        communityService.createPost(p3);
 
         Page<CommunitySearchRepository.CommunitySearchDto> communitySearchDtos = communitySearchRepository.searchCommunityPosts(
                 CommunitySearch.builder()
@@ -74,11 +74,11 @@ class CommunitySearchRepositoryTest {
         assertEquals(2, communitySearchDtos.getTotalPages());
 
         List<CommunitySearchRepository.CommunitySearchDto> content = communitySearchDtos.getContent();
-        assertEquals(postDetail3.getId(), content.get(0).getId());
-        assertEquals(postDetail3.getTags(), Set.of(content.get(0).getTags().split(",")));
-        assertEquals(postDetail3.getCategory(), content.get(0).getCategory());
-        assertEquals(postDetail3.getTitle(), content.get(0).getTitle());
-        assertEquals(postDetail3.getContent(), content.get(0).getContent());
+        assertEquals(postDetail1.getId(), content.get(0).getId());
+        assertEquals(postDetail1.getTags(), Set.of(content.get(0).getTags().split(",")));
+        assertEquals(postDetail1.getCategory(), content.get(0).getCategory());
+        assertEquals(postDetail1.getTitle(), content.get(0).getTitle());
+        assertEquals(postDetail1.getContent(), content.get(0).getContent());
         assertEquals("테스트", content.get(0).getAuthorNickname());
     }
 
