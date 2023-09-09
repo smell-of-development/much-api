@@ -243,6 +243,8 @@ class CommunityServiceTest {
         Community saved = communityRepository.save(
                 Community.builder()
                         .category(information.getCategory())
+                        .title(information.getTitle())
+                        .content(information.getContent())
                         .author(otherUser)
                         .build());
 

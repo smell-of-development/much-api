@@ -277,6 +277,8 @@ class CommunityControllerV1Test {
         Community saved = communityRepository.save(
                 Community.builder()
                         .category(information.getCategory())
+                        .title(information.getTitle())
+                        .content(information.getContent())
                         .author(otherUser)
                         .build());
 

@@ -5,7 +5,6 @@ import much.api.common.aop.MuchValid;
 import much.api.common.enums.Role;
 import much.api.common.exception.CertificationNeeded;
 import much.api.common.exception.InvalidPhoneNumber;
-import much.api.common.util.ContextUtils;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
 import much.api.dto.request.UserCreation;
@@ -54,11 +53,7 @@ public class UserService {
         Optional<SmsCertificationHist> histOptional = smsCertificationHistRepository.findLatestSent(phoneNumber, after);
 
         // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
-        boolean certificationCompleted = false;
-
-        if (ContextUtils.isDevMode()) {
-            certificationCompleted = true;
-        }
+        boolean certificationCompleted = commonService.isSmsPass();
 
         // 인증이 완료된 번호인지 확인
         if (!certificationCompleted && histOptional.isPresent()) {

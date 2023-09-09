@@ -39,6 +39,7 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
 
 
+    // TODO GET POSTS 테스트 작성, 단건조회 구현
     public PagedResult<CommunityPostSummary> getPosts(CommunitySearch searchCondition) {
 
         Page<CommunitySearchRepository.CommunitySearchDto> page = communitySearchRepository.searchCommunityPosts(searchCondition);
