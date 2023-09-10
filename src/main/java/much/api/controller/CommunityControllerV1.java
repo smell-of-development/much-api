@@ -25,6 +25,15 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
+    @GetMapping("/communities/{postId}")
+    public ResponseEntity<Envelope<CommunityPostDetail>> getPost(@PathVariable Long postId) {
+
+        return ok(
+                Envelope.ok(communityService.getPost(postId))
+        );
+    }
+
+    @Override
     @GetMapping("/communities")
     public ResponseEntity<Envelope<PagedResult<CommunityPostSummary>>> getPosts(@ModelAttribute @Valid CommunitySearch searchCondition) {
 

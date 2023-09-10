@@ -32,7 +32,11 @@ public class ContextUtils {
 
     public static Long getUserId() {
 
-        return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        try {
+            return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public static RunMode getRunMode() {

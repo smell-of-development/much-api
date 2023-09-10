@@ -13,6 +13,18 @@ import org.springframework.http.ResponseEntity;
 public interface CommunityApiV1 {
 
     @Operation(
+            summary = "커뮤니티 글 단건조회 API",
+            description = """
+                    커뮤니티 글 ID로 단건조회합니다.
+                    - 요청예시 GET /api/v1/communities/1
+                    ### 요청값
+                    - 경로변수(postId) : (필수) 게시글 ID
+                    ### 응답값
+                    - code 200 : 정상조회
+                    """)
+    ResponseEntity<Envelope<CommunityPostDetail>> getPost(Long id);
+
+    @Operation(
             summary = "커뮤니티 글 다건조회 API",
             description = """
                     커뮤니티 글을 다건 조회합니다.

@@ -3,6 +3,7 @@ package much.api.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.CommunityCategory;
+import much.api.entity.Community;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -30,6 +31,8 @@ public class CommunityPostDetail {
 
     private final LocalDateTime createdAt;
 
+    private final Long viewCount;
+
 
     @Builder
     private CommunityPostDetail(Long id,
@@ -41,7 +44,8 @@ public class CommunityPostDetail {
                                 Long authorId,
                                 String authorNickname,
                                 String authorImageUrl,
-                                LocalDateTime createdAt) {
+                                LocalDateTime createdAt,
+                                Long viewCount) {
 
         this.id = id;
         this.editable = editable;
@@ -53,6 +57,25 @@ public class CommunityPostDetail {
         this.authorNickname = authorNickname;
         this.authorImageUrl = authorImageUrl;
         this.createdAt = createdAt;
+        this.viewCount = viewCount;
+    }
+
+
+    public static CommunityPostDetail ofEntity(Community community, Set<String> tags) {
+
+        return CommunityPostDetail.builder()
+                .id(community.getId())
+                .editable(community.isAuthor())
+                .category(community.getCategory())
+                .tags(tags)
+                .title(community.getTitle())
+                .content(community.getContent())
+                .authorId(community.getAuthor().getId())
+                .authorNickname(community.getAuthor().getNickname())
+                .authorImageUrl(community.getAuthor().getImageUrl())
+                .createdAt(community.getCreatedAt())
+                .viewCount(community.getViewCount())
+                .build();
     }
 
 }

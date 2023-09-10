@@ -50,10 +50,20 @@ public class TagHelperService {
     }
 
 
-    void deleteTagRelation(MuchType relationType,
-                           Long relationId) {
+    public void deleteTagRelation(MuchType relationType,
+                                  Long relationId) {
 
         tagRelationRepository.deleteAllByRelation(relationType, relationId);
+    }
+
+
+    public Set<String> getTags(MuchType relationType,
+                                Long relationId) {
+
+        return tagRelationRepository.findAllByRelation(relationType, relationId)
+                .stream()
+                .map(TagRelation::getTagName)
+                .collect(toSet());
     }
 
 }

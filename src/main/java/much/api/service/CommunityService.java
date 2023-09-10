@@ -39,7 +39,20 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
 
 
-    // TODO GET POSTS 테스트 작성, 단건조회 구현
+    @Transactional
+    public CommunityPostDetail getPost(Long postId) {
+
+        Community community = communityRepository.findPostWithUser(postId)
+                .orElseThrow(() -> new PostNotFound(postId));
+
+        Set<String> tags = tagHelperService.getTags(COMMUNITY, postId);
+
+        community.increaseViewCount();
+        return CommunityPostDetail.ofEntity(community, tags);
+    }
+
+
+    // TODO GET POSTS 테스트 작성
     public PagedResult<CommunityPostSummary> getPosts(CommunitySearch searchCondition) {
 
         Page<CommunitySearchRepository.CommunitySearchDto> page = communitySearchRepository.searchCommunityPosts(searchCondition);
@@ -77,17 +90,7 @@ public class CommunityService {
         tagHelperService.handleTagRelation(COMMUNITY, post.getId(), requestTags);
 
         // 응답
-        return CommunityPostDetail.builder()
-                .id(saved.getId())
-                .editable(true)
-                .category(saved.getCategory())
-                .tags(requestTags)
-                .title(saved.getTitle())
-                .content(saved.getContent())
-                .authorId(user.getId())
-                .authorNickname(user.getNickname())
-                .authorImageUrl(user.getImageUrl())
-                .build();
+        return CommunityPostDetail.ofEntity(saved, requestTags);
     }
 
 
@@ -105,10 +108,6 @@ public class CommunityService {
         Community post = communityRepository.findPostWithUser(postId)
                 .orElseThrow(() -> new PostNotFound(category.name(), postId));
 
-        if (!post.isAuthor(userId)) {
-            throw new NoAuthority("게시글 수정");
-        }
-
         final String modifiedTitle = postModification.getTitle();
         final String modifiedContent = postModification.getContent();
         final Set<String> tags = postModification.getTags();
@@ -122,17 +121,7 @@ public class CommunityService {
         // 에디터 파일정보 수정
         fileService.handleEditorImage(COMMUNITY, postId, modifiedContent);
 
-        return CommunityPostDetail.builder()
-                .id(post.getId())
-                .editable(true)
-                .category(post.getCategory())
-                .tags(tags)
-                .title(post.getTitle())
-                .content(post.getContent())
-                .authorId(user.getId())
-                .authorNickname(user.getNickname())
-                .authorImageUrl(user.getImageUrl())
-                .build();
+        return CommunityPostDetail.ofEntity(post, tags);
     }
 
 
@@ -147,8 +136,8 @@ public class CommunityService {
         Community post = communityRepository.findPostWithUser(postId)
                 .orElseThrow(() -> new PostNotFound(postId));
 
-        if (!post.isAuthor(userId)) {
-            throw new NoAuthority("게시글 수정");
+        if (!post.isAuthor()) {
+            throw new NoAuthority("게시글 삭제");
         }
 
         // 태그정보 삭제
@@ -160,4 +149,6 @@ public class CommunityService {
         // 글 삭제
         communityRepository.deleteById(postId);
     }
+
+
 }

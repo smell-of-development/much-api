@@ -26,7 +26,6 @@ public class CommunityPostSummary {
 
     private String authorImageUrl;
 
-    // TODO
     private Long viewCount;
 
     // TODO

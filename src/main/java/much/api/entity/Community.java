@@ -1,8 +1,13 @@
 package much.api.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import much.api.common.enums.CommunityCategory;
+import much.api.common.exception.NoAuthority;
+import much.api.common.util.ContextUtils;
 import much.api.common.util.EditorUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -40,7 +45,7 @@ public class Community extends BaseTimeEntity {
     private String contentWithoutHtmlTags;
 
     // TODO
-    private Long viewCount;
+    private long viewCount;
 
     @Builder
     private Community(User author,
@@ -58,12 +63,23 @@ public class Community extends BaseTimeEntity {
     public void modify(String title,
                        String content) {
 
+        if (!isAuthor()) {
+            throw new NoAuthority("게시글 수정");
+        }
         this.title = title;
         this.content = content;
     }
 
-    public boolean isAuthor(Long userId) {
+    public boolean isAuthor() {
 
-        return author.getId().equals(userId);
+        Long contextUserId = ContextUtils.getUserId();
+        return author.getId().equals(contextUserId);
     }
+
+
+    public void increaseViewCount() {
+
+        ++viewCount;
+    }
+
 }

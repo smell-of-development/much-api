@@ -2,6 +2,7 @@ package much.api.repository;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,6 @@ import much.api.entity.QTagRelation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,21 +37,45 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
     public Page<CommunitySearchDto> searchCommunityPosts(CommunitySearch searchCondition) {
 
-        if (!StringUtils.hasText(searchCondition.getSearch()) && searchCondition.getTags().isEmpty()) {
-            return Page.empty();
-        }
-
-        // TODO 제목 및 내용검색 - 인메모리 DB 에서 MySQL FULLTEXT 미지원
-        if (StringUtils.hasText(searchCondition.getSearch())) {
-            return Page.empty();
-        }
-
         PageRequest pageRequest = PageRequest.of(searchCondition.getPage(), searchCondition.getSize());
 
+        // TODO 검색어 및 검색태그 없음 => 전체글 검색
+        // TODO 제목 및 내용으로만 검색 - 인메모리 DB 에서 MySQL FULLTEXT 미지원
+        if (searchCondition.getTags().isEmpty()) {
+            return applyPagination(pageRequest,
+                    qf -> select(Projections.constructor(CommunitySearchDto.class,
+                                    community.id,
+                                    user.id,
+                                    user.nickname,
+                                    user.imageUrl,
+                                    community.category,
+                                    community.title,
+                                    community.contentWithoutHtmlTags,
+                                    community.createdAt,
+                                    Expressions.asNumber(0L),
+                                    JPAExpressions
+                                            .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
+                                            .from(tagRelation)
+                                            .where(tagRelation.relationType.eq(COMMUNITY)
+                                                    .and(tagRelation.relationId.eq(community.id))),
+                                    community.viewCount
+                            )
+                    )
+                            .from(community)
+                            .leftJoin(community.author, user)
+                            .where(community.category.eq(searchCondition.getCategory()))
+                            .orderBy(community.id.desc())
+                    ,
+
+                    qf -> selectFrom(community)
+                            .where(community.category.eq(searchCondition.getCategory()))
+            );
+        }
+
+        // 태그가 포함된 검색 (태그테이블 기준 JOIN)
         QTagRelation subTr = new QTagRelation("subTR");
         QTagRelation countTr = new QTagRelation("countTR");
         QCommunity subC = new QCommunity("subC");
-
         /*
         태그검색 쿼리
         SELECT   c.id,                       -- 게시글 PK
@@ -79,7 +103,10 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                  WHERE  relation_type = 'COMMUNITY'
                  AND    relation_id = c.id
                  AND    tag_name IN (?...)), -- 검색한 태그가 포함된 수 TODO 포함수/게시글태그수(비율)?
-                 GROUP_CONCAT(c.id)          -- 구분자 ','으로 이어진 게시글의 전체 태그
+                 GROUP_CONCAT(c.id),         -- 구분자 ','으로 이어진 게시글의 전체 태그
+                (SELECT viewCount
+                 FROM   community
+                 WHERE  id = c.id)           -- 조회수
         FROM     tag_relation tr
         JOIN     community c
         ON       tr.relation_type = 'COMMUNITY' AND tr.relation_id = c.id AND c.category = ?
@@ -107,7 +134,8 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                                 .where(countTr.relationType.eq(COMMUNITY)
                                         .and(countTr.relationId.eq(community.id))
                                         .and(countTr.tagName.in(searchCondition.getTags()))), "tagHitCount"),
-                        stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
+                        stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName),
+                        JPAExpressions.select(subC.viewCount).from(subC).where(subC.id.eq(community.id)))
                 )
                         .from(tagRelation)
                         .join(community)
@@ -173,7 +201,6 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
         private String tags;
 
-        // TODO
         private Long viewCount;
 
         // TODO
@@ -193,7 +220,8 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                                   String content,
                                   LocalDateTime createdAt,
                                   Long tagHitCount,
-                                  String tags) {
+                                  String tags,
+                                  Long viewCount) {
 
             this.id = id;
             this.authorId = authorId;
@@ -206,6 +234,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
             this.tags = tags;
             this.createdAt = createdAt;
             this.tagHitCount = tagHitCount;
+            this.viewCount = viewCount;
         }
 
 
