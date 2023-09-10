@@ -1,5 +1,6 @@
 package much.api.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.CommunityCategory;
@@ -29,6 +30,7 @@ public class CommunityPostDetail {
 
     private final String authorImageUrl;
 
+    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
     private final LocalDateTime createdAt;
 
     private final Long viewCount;

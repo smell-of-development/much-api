@@ -1,5 +1,6 @@
 package much.api.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,5 +32,6 @@ public class CommunityPostSummary {
     // TODO
     private Long commentCount;
 
+    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
     private LocalDateTime createdAt;
 }
