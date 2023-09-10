@@ -7,6 +7,7 @@ import much.api.dto.request.CommunityPostCreation;
 import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.service.CommunityService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,18 @@ class CommunitySearchRepositoryTest {
 
     @Autowired
     CommunityService communityService;
+
+    @Autowired
+    CommunityRepository communityRepository;
+
+    @Autowired
+    TagRelationRepository tagRelationRepository;
+
+    @BeforeEach
+    void clean() {
+        tagRelationRepository.deleteAll();
+        communityRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("커뮤니티 태그검색 간단 테스트")
