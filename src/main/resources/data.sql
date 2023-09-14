@@ -1,25 +1,25 @@
 INSERT INTO dev_parameter(name, use_yn) VALUES('SMS_PASS', 0);
 
 INSERT INTO tb_user(login_id, password, phone_number, email,
-                    name, nickname, position, role, refreshable)
+                    nickname, position, role, refreshable)
 VALUES ('test1',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01011112222', 'test1@test.test',
-        '김테스트', '테스트닉네임1', '백엔드', 'ROLE_USER', true);
+        '테스트닉네임1', '백엔드', 'ROLE_USER', true);
 
 INSERT INTO tb_user(login_id, password, phone_number, email,
-                    name, nickname, position, role, refreshable)
+                    nickname, position, role, refreshable)
 VALUES ('test2',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01099990000', 'test2@test.test',
-        '임테스트', 'qwerty', '프론트', 'ROLE_USER', true);
+        'qwerty', '프론트', 'ROLE_USER', true);
 
 INSERT INTO tb_user(login_id, password, phone_number, email,
-                    name, nickname, position, role, refreshable)
+                    nickname, position, role, refreshable)
 VALUES ('test3',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01012345678', 'test3@test.test',
-        '테스트', '테스트', '풀스택', 'ROLE_USER', true);
+        '테스트', '풀스택', 'ROLE_USER', true);
 
 
 INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,

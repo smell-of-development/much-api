@@ -16,11 +16,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(
         name = "tb_tag_relation",
         indexes = {
-                @Index(name = "tb_tag_relation_idx1", columnList = "relationType, relationId"),
-                @Index(name = "tb_tag_relation_idx2", columnList = "tagName"),
+                @Index(name = "tb_tag_relation_idx1", columnList = "relationType, relationId")
         }
 )
-public class TagRelation {
+public class TagRelation extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -15,9 +15,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(
         name = "tb_user",
         indexes = {
-                @Index(name = "tb_user_idx1", columnList = "loginId"),
-                @Index(name = "tb_user_idx2", columnList = "kakaoId"),
-                @Index(name = "tb_user_idx3", columnList = "googleId"),
+                @Index(name = "tb_user_idx1", columnList = "loginId", unique = true),
+                @Index(name = "tb_user_idx2", columnList = "kakaoId", unique = true),
+                @Index(name = "tb_user_idx3", columnList = "googleId", unique = true),
         }
 )
 public class User extends BaseTimeEntity {
@@ -44,8 +44,6 @@ public class User extends BaseTimeEntity {
 
     private String email;
 
-    private String name;
-
     private String nickname;
 
     private String position;
@@ -64,7 +62,6 @@ public class User extends BaseTimeEntity {
                 String imageUrl,
                 String phoneNumber,
                 String email,
-                String name,
                 String nickname,
                 String position,
                 Role role,
@@ -77,7 +74,6 @@ public class User extends BaseTimeEntity {
         this.imageUrl = imageUrl;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.name = name;
         this.nickname = nickname;
         this.position = position;
         this.role = role;

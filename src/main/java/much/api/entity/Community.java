@@ -20,7 +20,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(
         name = "tb_community",
         indexes = {
-                @Index(name = "tb_community_idx1", columnList = "category"),
+                @Index(name = "tb_community_idx1", columnList = "id, category", unique = true),
         }
 )
 public class Community extends BaseTimeEntity {

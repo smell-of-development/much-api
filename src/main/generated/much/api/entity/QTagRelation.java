@@ -19,6 +19,11 @@ public class QTagRelation extends EntityPathBase<TagRelation> {
 
     public static final QTagRelation tagRelation = new QTagRelation("tagRelation");
 
+    public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final NumberPath<Long> relationId = createNumber("relationId", Long.class);
@@ -26,6 +31,9 @@ public class QTagRelation extends EntityPathBase<TagRelation> {
     public final EnumPath<much.api.common.enums.MuchType> relationType = createEnum("relationType", much.api.common.enums.MuchType.class);
 
     public final StringPath tagName = createString("tagName");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QTagRelation(String variable) {
         super(TagRelation.class, forVariable(variable));
