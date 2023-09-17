@@ -102,7 +102,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                  FROM   tag_relation
                  WHERE  relation_type = 'COMMUNITY'
                  AND    relation_id = c.id
-                 AND    tag_name IN (?...)), -- 검색한 태그가 포함된 수 TODO 포함수/게시글태그수(비율)?
+                 AND    tag_name IN (?...)), -- 검색한 태그가 포함된 수
                  GROUP_CONCAT(c.id),         -- 구분자 ','으로 이어진 게시글의 전체 태그
                 (SELECT viewCount
                  FROM   community
