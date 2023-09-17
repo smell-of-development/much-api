@@ -226,7 +226,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
             this.id = id;
             this.authorId = authorId;
             this.authorNickname = authorNickname;
-            this.authorImageUrl = authorImageUrl;
+            this.authorImageUrl = (authorImageUrl == null) ? "" : authorImageUrl;
             this.category = category;
             this.title = title;
             this.content = (content != null && content.length() >= MAX_CONTENT_LENGTH) ?
@@ -243,14 +243,15 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
 
             return CommunityPostSummary.builder()
                     .id(id)
+                    .authorId(authorId)
+                    .authorNickname(authorNickname)
+                    .authorImageUrl(authorImageUrl)
                     .category(category.name())
                     .title(title)
                     .content(content)
                     .tags(List.of(tags.split(",")))
-                    .authorId(authorId)
-                    .authorNickname(authorNickname)
-                    .authorImageUrl(authorImageUrl)
                     .createdAt(createdAt)
+                    .viewCount(viewCount)
                     .build();
         }
     }
