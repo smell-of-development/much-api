@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/testToken").permitAll()
                                 .requestMatchers(POST, "/api/v1/users").permitAll()
                                 .requestMatchers(GET, "/api/v1/communities/**").permitAll()
+                                .requestMatchers(GET, "/api/v1/projects/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(configurer -> configurer

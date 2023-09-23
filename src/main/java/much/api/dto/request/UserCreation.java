@@ -9,19 +9,19 @@ import much.api.common.aop.Check;
 public class UserCreation {
 
     @NotNull
-    @Check("isValidLoginId")
+    @Check("checkLoginId")
     private String loginId;
 
     @NotNull
-    @Check("isValidPassword")
+    @Check("checkPassword")
     private String password;
 
     @NotNull
-    @Check("isValidNickname")
+    @Check("checkNickname")
     private String nickname;
 
     @NotNull
-    @Check("isValidPhoneNumber")
+    @Check("checkPhoneNumber")
     private String phoneNumber;
 
     private String position;

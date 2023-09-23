@@ -1,21 +1,22 @@
 package much.api.service;
 
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.Code;
-import much.api.common.enums.MuchType;
+import much.api.common.aop.MuchValid;
+import much.api.common.exception.ProjectNotFound;
 import much.api.common.util.ContextUtils;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.ProjectDetail;
 import much.api.entity.Project;
+import much.api.entity.ProjectPosition;
 import much.api.entity.User;
-import much.api.common.exception.MuchException;
 import much.api.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+
+import static much.api.common.enums.MuchType.PROJECT;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,99 +27,68 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
+    private final FileService fileService;
+
+    private final TagHelperService tagHelperService;
 
     @Transactional
-    public Long createProject(ProjectCreation registration, MuchType type) {
+    public Long createProject(@MuchValid ProjectCreation projectCreation) {
 
-        final String skills = String.join(",", registration.getSkills());
-        final String introduction = registration.getIntroduction();
-
-
-        long userId = ContextUtils.getUserId();
+        Long userId = ContextUtils.getUserId();
         User user = commonService.getUserOrThrowException(userId);
 
+        // 저장
+        List<String> requestTimesPerWeek = projectCreation.getTimesPerWeek();
+
+        String timesPerWeek = requestTimesPerWeek.isEmpty() ? "협의" :
+                String.join(", ", requestTimesPerWeek);
+
+        final String requestIntroduction = projectCreation.getIntroduction();
+        final Set<String> requestTags = projectCreation.getTags();
+
+        // TODO 등록자 본인의 포지션?
         Project project = Project.builder()
                 .writer(user)
-                .type(type)
-                .title(registration.getTitle())
-                .imageUrl(registration.getImageUrl())
-                .isOnline(registration.isOnline())
-                .location(registration.getLocation())
-                .deadline(registration.getDeadline())
-                .startDate(registration.getStartDate())
-                .endDate(registration.getEndDate())
-                .schedule(registration.getSchedule())
-                .target(registration.getTarget())
-                .skills(skills)
-                .introduction(introduction)
+                .imageUrl(projectCreation.getImageUrl())
+                .online(projectCreation.getOnline())
+                .address(projectCreation.getAddress())
+                .deadline(projectCreation.getDeadline())
+                .startDate(projectCreation.getStartDate())
+                .endDate(projectCreation.getEndDate())
+                .timesPerWeek(timesPerWeek)
+                .introduction(requestIntroduction)
                 .build();
 
-        projectRepository.save(project);
+        Project saved = projectRepository.save(project);
 
-        return project.getId();
+        // 포지션정보 등록
+        projectCreation.getRecruit().stream()
+                .map(ps -> ProjectPosition.builder()
+                        .project(saved)
+                        .name(ps.getName())
+                        .needs(ps.getNeeds())
+                        .build())
+                .forEach(pp -> saved.getPositionStatus().add(pp));
+
+        // 파일 관리정보 업데이트
+        fileService.handleEditorImage(PROJECT, saved.getId(), requestIntroduction);
+
+        // 태그정보, 관계정보 반영
+        tagHelperService.handleTagRelation(PROJECT, saved.getId(), requestTags);
+
+        return saved.getId();
     }
 
 
     public ProjectDetail getProject(Long id) {
 
-        final Project project = projectRepository.findByIdAndType(id, MuchType.PROJECT)
-                .orElseThrow(() -> new MuchException(Code.PROJECT_NOT_FOUND, String.format("프로젝트 없음 [%s] ", id)));
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ProjectNotFound(id));
 
-        final User projectWriter = project.getWriter();
+        Set<String> tags = tagHelperService.getTags(PROJECT, id);
 
-        // 스킬 잘라내기
-        final String skills = project.getSkills();
-        List<ProjectDetail.SkillDetail> skillDetails = new ArrayList<>();
-
-        Arrays.stream(skills.split(","))
-                .forEach(s -> skillDetails.add(ProjectDetail.SkillDetail.builder()
-                        .name(s)
-                        .imageUrl("") // TODO 추후 이미지 URL 설정
-                        .build()));
-
-        // 포지션 상세 생성 + 포지션 총 인원 합/포지션 전체 필요 인원 합구하기 + 포지션별 인원 설정
-//        final List<WorkPosition> workPositions = project.getWorkPositions();
-//        List<MuchDetail.WorkDetail> workDetails = new ArrayList<>();
-//
-//        int currentSum = 0;
-//        int needsSum = 0;
-//        for (WorkPosition position : workPositions) {
-//            Integer current = position.getCurrent();
-//            Integer needs = position.getNeeds();
-//
-//            currentSum += current;
-//            needsSum += needs;
-//
-//            workDetails.add(MuchDetail.WorkDetail.builder()
-//                    .position(position.getPosition())
-//                    .current(current)
-//                    .needs(needs)
-//                    .build());
-//        }
-
-        // 최종 조립 후 반환
-        return ProjectDetail.builder()
-                .id(project.getId())
-                .title(project.getTitle())
-                .writer(ProjectDetail.WriterDetail.builder()
-                        .id(projectWriter.getId())
-                        .nickname(projectWriter.getNickname())
-                        .pictureUrl(projectWriter.getImageUrl())
-                        .build())
-                .imageUrl(project.getImageUrl())
-                .isOnline(project.isOnline())
-                .location(project.getLocation())
-                .deadline(project.getDeadline())
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .schedule(project.getSchedule())
-                .target(project.getTarget())
-//                        .currentTotal(currentSum)
-//                        .maximumPeople(needsSum)
-                .introduction(project.getIntroduction())
-                .skills(skillDetails)
-//                        .work(workDetails)
-                .build();
+        project.increaseViewCount();
+        return ProjectDetail.ofEntity(project, tags);
     }
 
 }

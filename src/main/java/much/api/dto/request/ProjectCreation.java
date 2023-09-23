@@ -1,46 +1,100 @@
 package much.api.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import java.time.LocalDateTime;
+import much.api.common.aop.SelfCheck;
+import much.api.common.exception.InvalidDeadLine;
+import much.api.common.exception.InvalidLength;
+import much.api.common.exception.InvalidPeriod;
+import much.api.common.exception.InvalidRecruitNeeds;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
+@SelfCheck("checkValidation")
 public class ProjectCreation {
 
+    @NotNull
     private String title;
 
     private String imageUrl;
 
-    private boolean isOnline;
+    @NotNull
+    private Boolean online;
 
-    private String location;
+    private String address;
 
-    private LocalDateTime deadline;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate deadline;
 
-    private LocalDateTime startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
 
-    private LocalDateTime endDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
-    private String schedule;
+    private List<String> timesPerWeek = new ArrayList<>();
 
-    private String target;
+    @NotEmpty
+    private List<Position> recruit;
 
-    private Integer maximumPeople;
+    private Set<String> tags = new HashSet<>();
 
     private String introduction;
 
-    private List<String> skills;
-
-    private List<Work> work;
-
-
     @Getter
-    public static class Work {
+    public static class Position {
 
-        private String position;
+        private String name;
 
         private Integer needs;
 
     }
+
+
+    private void checkValidation() {
+
+        // 제목 1~40자 이하
+        if (title.length() > 40) {
+            throw new InvalidLength("제목은", 40, title.length());
+        }
+
+        if (deadline == null) {
+            throw new InvalidDeadLine();
+        }
+
+        // 일정 협의
+        if (startDate == null && endDate == null) {
+            return;
+        }
+
+        if (startDate == null || endDate == null) {
+            throw new InvalidPeriod();
+        }
+
+        // 일정 시작 ~ 종료일 확인
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidPeriod(startDate.toString(), endDate.toString());
+        }
+
+        // 포지션 모집 인원은 1 이상
+        recruit.forEach(p -> {
+                    String name = p.name;
+                    Integer needs = p.needs;
+
+                    if (needs < 1) {
+                        throw new InvalidRecruitNeeds(name, needs);
+                    }
+                });
+
+        // TODO 사용자 입력 내용 글자수 정해서 제한
+    }
+
 
 }

@@ -226,7 +226,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
             this.id = id;
             this.authorId = authorId;
             this.authorNickname = authorNickname;
-            this.authorImageUrl = (authorImageUrl == null) ? "" : authorImageUrl;
+            this.authorImageUrl = authorImageUrl;
             this.category = category;
             this.title = title;
             this.content = (content != null && content.length() >= MAX_CONTENT_LENGTH) ?

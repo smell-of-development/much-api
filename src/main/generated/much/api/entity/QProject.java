@@ -24,41 +24,37 @@ public class QProject extends EntityPathBase<Project> {
 
     public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
+    public final StringPath address = createString("address");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final DateTimePath<java.time.LocalDateTime> deadline = createDateTime("deadline", java.time.LocalDateTime.class);
+    public final DatePath<java.time.LocalDate> deadline = createDate("deadline", java.time.LocalDate.class);
 
-    public final DateTimePath<java.time.LocalDateTime> endDate = createDateTime("endDate", java.time.LocalDateTime.class);
+    public final DatePath<java.time.LocalDate> endDate = createDate("endDate", java.time.LocalDate.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final StringPath ImageFileIds = createString("ImageFileIds");
 
     public final StringPath imageUrl = createString("imageUrl");
 
     public final StringPath introduction = createString("introduction");
 
-    public final BooleanPath isOnline = createBoolean("isOnline");
+    public final StringPath introductionWithoutHtmlTags = createString("introductionWithoutHtmlTags");
 
-    public final StringPath location = createString("location");
+    public final BooleanPath online = createBoolean("online");
 
-    public final NumberPath<Integer> maximumPeople = createNumber("maximumPeople", Integer.class);
+    public final ListPath<ProjectPosition, QProjectPosition> positionStatus = this.<ProjectPosition, QProjectPosition>createList("positionStatus", ProjectPosition.class, QProjectPosition.class, PathInits.DIRECT2);
 
-    public final StringPath schedule = createString("schedule");
+    public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
 
-    public final StringPath skills = createString("skills");
-
-    public final DateTimePath<java.time.LocalDateTime> startDate = createDateTime("startDate", java.time.LocalDateTime.class);
-
-    public final StringPath target = createString("target");
+    public final StringPath timesPerWeek = createString("timesPerWeek");
 
     public final StringPath title = createString("title");
 
-    public final EnumPath<much.api.common.enums.MuchType> type = createEnum("type", much.api.common.enums.MuchType.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<Long> viewCount = createNumber("viewCount", Long.class);
 
     public final QUser writer;
 

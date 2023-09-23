@@ -13,25 +13,24 @@ public interface ProjectApiV1 {
     @Operation(summary = "프로젝트 등록 API",
             description = """
                     프로젝트를 등록합니다.
-                    로그인이 되어있는 가입된 유저만 등록할 수 있습니다.
-                    - 일자값은 ISO 8601 형식. ex.2023-06-19T09:00:00
-                    - 자바스크립트 ISO 8601 형식 반환 : Date.toISOString()
+                    - 로그인이 되어있어야 합니다.
                     ### 요청값
-                    - title        : 제목(string)
-                    - imageUrl     : 대표 이미지 url(string)
-                    - online       : 온라인 모임여부(boolean)
-                    - location     : 모임위치(string)
-                    - deadline     : 모집 마감일(string)
-                    - startDate    : 시작일(string)
-                    - endDate      : 종료일(string)
-                    - schedule     : 모임주기(string) ex. 월목금토
-                    - target       : 모임대상(string)
-                    - introduction : 소개(string)
-                    - skills       : 스킬태그(string[]) ex. ["Java", "Spring", ...]
-                    - work         : 포지션별 모집인원([{"position": "string", "needs": number}, ...])
+                    - title (String)          : 프로젝트 제목 (40자 이하) - 필수
+                    - imageUrl (String)       : 대표 이미지 url
+                    - online (Boolean)        : 온라인 모임 여부 - 필수
+                    - address (String)        : 모임 위치 주소 / 값이 없다면 "협의"
+                    - deadline (String)       : 모집 마감일 ex) 2023-11-15 (yyyy-MM-dd) - 필수
+                    - startDate (String)      : 시작일 ex) 2023-09-10 (yyyy-MM-dd) / 시작일,종료일 모두 없어야 "협의"
+                    - endDate (String)        : 종료일 ex) 2024-01-10 (yyyy-MM-dd) / 시작일,종료일 모두 없어야 "협의"
+                    - timesPerWeek (String[]) : 모임주기 ex) ["월", "수", "금"] / 값이 없다면 "협의"
+                    - recruit (Object[])      : [{name: 포지션 이름(String), needs: 필요 인원(Number)}, ...] - 필수
+                    - tags (String[])         : 스킬태그 ex) ["Java", "Spring", ...]
+                    - introduction (String)   : 프로젝트 소개
                     ### 응답값
-                    - code 200  : 등록 성공, 고유 ID 반환 ex. {..., "result": 1}
-                    - code 2000 : 등록요청 사용자 미존재
+                    - code 200
+                    - 글 ID
+                    - code 2000
+                    - 로그인 된 사용자 미존재
                     """)
     ResponseEntity<Envelope<Long>> createProject(ProjectCreation request);
 

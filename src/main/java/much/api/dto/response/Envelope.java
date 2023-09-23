@@ -51,11 +51,17 @@ public class Envelope<R> {
         this.code = code;
     }
 
+    private Envelope(final String message) {
+
+        this.code = 2000;
+        this.message = message;
+    }
+
     private Envelope(final Code code,
-                     final String... args) {
+                     final String message) {
 
         this.code = code.getCode();
-        this.message = String.format(code.getMessage(), (Object[]) args);
+        this.message = String.format(code.getMessage(), message);
     }
 
     private Envelope(final Code code,
@@ -95,11 +101,15 @@ public class Envelope<R> {
 
 
     public static Envelope<Void> error(final Code code,
-                                       final String... args) {
+                                       final String... message) {
 
-        if (code.equals(DEV_MESSAGE)) {
-            return new Envelope<>(code, args);
+        if (code == null) {
+            return new Envelope<>(message[0]);
         }
+        if (code == DEV_MESSAGE) {
+            return new Envelope<>(code, message[0]);
+        }
+
         return new Envelope<>(code);
     }
 

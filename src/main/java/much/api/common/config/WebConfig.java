@@ -1,9 +1,17 @@
 package much.api.common.config;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.IOException;
 
 
 @Slf4j
@@ -18,6 +26,20 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowedMethods("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowCredentials(false);
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter httpMessageConverter(ObjectMapper objectMapper) {
+
+        objectMapper.getSerializerProvider()
+                .setNullValueSerializer(new JsonSerializer<>() {
+                    @Override
+                    public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                        gen.writeString("");
+                    }
+                });
+
+        return new MappingJackson2HttpMessageConverter(objectMapper);
     }
 
 }

@@ -19,8 +19,10 @@ public class CommunityPostCreation {
 
     private Set<String> tags = new HashSet<>();
 
+    @NotNull
     private String title;
 
+    @NotNull
     private String content;
 
 
