@@ -34,29 +34,27 @@ public interface ProjectApiV1 {
                     """)
     ResponseEntity<Envelope<Long>> createProject(ProjectCreation request);
 
+
     @Operation(summary = "프로젝트 상세 조회 API",
             description = """
                     id 에 해당하는 프로젝트의 상세정보를 조회합니다.
                     ### 요청
                     - 경로변수 id : 프로젝트 고유 ID
                     ### 응답값
-                    - id            : 고유 ID
-                    - title         : 제목(string)
-                    - writer        : 작성자({"id": number(고유 ID), "nickname": "string", "pictureUrl": "string"})
-                    - imageUrl      : 대표 이미지 url(string)
-                    - online        : 온라인 모임여부(boolean)
-                    - location      : 모임위치(string)
-                    - deadline      : 모집 마감일(string)
-                    - startDate     : 시작일(string)
-                    - endDate       : 종료일(string)
-                    - schedule      : 모임주기(string) ex. 월, 목, 금, 토
-                    - target        : 모임대상(string)
-                    - currentTotal  : 현재 전체 포지션 모집인원 합(number)
-                    - maximumPeople : 포지션별 모집인원 전체 총합(number)
-                    - introduction  : 소개(string)
-                    - skills        : 스킬([{"name": "string", "imageUrl": "string"}]])
-                    - work          : 포지션별 현재인원/모집인원([{"position": "string", "current": number, "needs": number}, ...])
+                    - writer        : 작성자 정보 (object)
+                    - editable      : 수정가능 여부 (boolean)
+                    - id            : 고유 ID (number)
+                    - title         : 제목 (string)
+                    - imageUrl      : 대표 이미지 url (string)
+                    - isOnline      : 온라인 모임여부 (boolean)
+                    - address       : 모임위치 (string)
+                    - schedule      : 일정 (string)
+                    - timesPerWeek  : 모임주기 (string)
+                    - deadline      : 마감일 (string)
+                    - deadlineDDay  : 마감일 D-Day (number)
+                    - recruit       : 모집정보 (object)
+                    - tags          : 태그 (string[])
+                    - introduction  : 소개 (string)
                     """)
     ResponseEntity<Envelope<ProjectDetail>> getProject(Long id);
-
 }
