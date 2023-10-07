@@ -22,7 +22,7 @@ public interface CommunityApiV1 {
                     ### 응답값
                     - code 200 : 정상조회
                     """)
-    ResponseEntity<Envelope<CommunityPostDetail>> getPost(Long id);
+    ResponseEntity<Envelope<CommunityPostDetail>> getPost(Long postId);
 
     @Operation(
             summary = "커뮤니티 글 다건조회 API",
@@ -108,7 +108,6 @@ public interface CommunityApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 본인글이 아닌경우
-                    """,
-            requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
+                    """)
     ResponseEntity<Envelope<Void>> deleteCommunityPost(Long postId);
 }

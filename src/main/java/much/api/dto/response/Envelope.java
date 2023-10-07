@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static much.api.common.enums.Code.*;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Envelope<R> {
@@ -61,7 +59,7 @@ public class Envelope<R> {
                      final String message) {
 
         this.code = code.getCode();
-        this.message = String.format(code.getMessage(), message);
+        this.message = message;
     }
 
     private Envelope(final Code code,
@@ -103,10 +101,7 @@ public class Envelope<R> {
     public static Envelope<Void> error(final Code code,
                                        final String... message) {
 
-        if (code == null) {
-            return new Envelope<>(message[0]);
-        }
-        if (code == DEV_MESSAGE) {
+        if (code.isFormatted()) {
             return new Envelope<>(code, message[0]);
         }
 

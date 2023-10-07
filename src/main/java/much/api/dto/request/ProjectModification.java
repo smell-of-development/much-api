@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Getter
 @SelfCheck("checkValidation")
-public class ProjectCreation {
+public class ProjectModification {
 
     @NotNull
     private String title;
@@ -74,6 +74,7 @@ public class ProjectCreation {
         // 본인이 포함된 포지션이 하나 체크되었는지 확인
         boolean containsMyPosition = false;
         for (Recruit.PositionStatus p : recruit.getPositionStatus()) {
+
             String name = p.getName();
             int needs = p.getNeeds();
 
@@ -112,6 +113,8 @@ public class ProjectCreation {
 
         @Getter
         public static class PositionStatus {
+
+            private Long id;
 
             private String name;
 

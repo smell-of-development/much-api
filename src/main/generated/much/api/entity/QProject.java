@@ -26,6 +26,8 @@ public class QProject extends EntityPathBase<Project> {
 
     public final StringPath address = createString("address");
 
+    public final ListPath<ProjectApplication, QProjectApplication> applications = this.<ProjectApplication, QProjectApplication>createList("applications", ProjectApplication.class, QProjectApplication.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -44,6 +46,8 @@ public class QProject extends EntityPathBase<Project> {
     public final BooleanPath online = createBoolean("online");
 
     public final ListPath<ProjectPosition, QProjectPosition> positionStatus = this.<ProjectPosition, QProjectPosition>createList("positionStatus", ProjectPosition.class, QProjectPosition.class, PathInits.DIRECT2);
+
+    public final ListPath<ProjectJoin, QProjectJoin> projectMembers = this.<ProjectJoin, QProjectJoin>createList("projectMembers", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
 
