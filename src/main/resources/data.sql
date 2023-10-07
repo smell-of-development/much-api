@@ -1,22 +1,17 @@
-INSERT INTO dev_parameter(name, use_yn) VALUES('SMS_PASS', 0);
+INSERT INTO dev_parameter(name, use_yn)
+VALUES ('SMS_PASS', 0);
 
 INSERT INTO tb_user(login_id, password, phone_number, email,
                     nickname, position, role, refreshable)
 VALUES ('test1',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01011112222', 'test1@test.test',
-        '테스트닉네임1', '백엔드', 'ROLE_USER', true);
-
-INSERT INTO tb_user(login_id, password, phone_number, email,
-                    nickname, position, role, refreshable)
-VALUES ('test2',
+        '테스트닉네임1', '백엔드', 'ROLE_USER', true),
+       ('test2',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01099990000', 'test2@test.test',
-        'qwerty', '프론트', 'ROLE_USER', true);
-
-INSERT INTO tb_user(login_id, password, phone_number, email,
-                    nickname, position, role, refreshable)
-VALUES ('test3',
+        'qwerty', '프론트', 'ROLE_USER', true),
+       ('test3',
         '$2a$10$xb/YxcPjT/LJmAjvakNmhuznMA9cDhOiOw9G5xvNjgLAzM2f.3J12', -- 123
         '01012345678', 'test3@test.test',
         '테스트', '풀스택', 'ROLE_USER', true);
@@ -25,407 +20,499 @@ VALUES ('test3',
 INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
                          view_count, created_at)
 VALUES ('QNA', 1, '테스트 QNA 게시글 - 1', '<a>내용 1</a>,', '내용 1',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 1, '테스트 QNA 게시글 - 2', '<a>내용 2</a>,', '내용 2',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 1, '테스트 QNA 게시글 - 3', '<a>내용 3</a>,', '내용 3',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 2, '테스트 QNA 게시글 - 4', '<a>내용 4</a>,', '내용 4',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 2, '테스트 QNA 게시글 - 5', '<a>내용 5</a>,', '내용 5',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 2, '테스트 QNA 게시글 - 6', '<a>내용 6</a>,', '내용 6',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 3, '테스트 QNA 게시글 - 7', '<a>내용 7</a>,', '내용 7',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 3, '테스트 QNA 게시글 - 8', '<a>내용 8</a>,', '내용 8',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 3, '테스트 QNA 게시글 - 9', '<a>내용 9</a>,', '내용 9',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 3, '테스트 QNA 게시글 - 10', '<a>내용 10</a>,', '내용 10',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('QNA', 3, '테스트 QNA 게시글 - 11', '<a>내용 11</a>,', '내용 11',
-        0, CURRENT_TIMESTAMP);
-
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 1, '테스트 자유 게시글 - 1', '<a>내용 1</a>,', '내용 1',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 1, '테스트 자유 게시글 - 2', '<a>내용 2</a>,', '내용 2',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 1, '테스트 자유 게시글 - 3', '<a>내용 3</a>,', '내용 3',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 2, '테스트 자유 게시글 - 4', '<a>내용 4</a>,', '내용 4',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 2, '테스트 자유 게시글 - 5', '<a>내용 5</a>,', '내용 5',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 2, '테스트 자유 게시글 - 6', '<a>내용 6</a>,', '내용 6',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 3, '테스트 자유 게시글 - 7', '<a>내용 7</a>,', '내용 7',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 3, '테스트 자유 게시글 - 8', '<a>내용 8</a>,', '내용 8',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 3, '테스트 자유 게시글 - 9', '<a>내용 9</a>,', '내용 9',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 3, '테스트 자유 게시글 - 10', '<a>내용 10</a>,', '내용 10',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('FREE', 3, '테스트 자유 게시글 - 11', '<a>내용 11</a>,', '내용 11',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 1, '테스트 QNA 게시글 - 2', '<a>내용 2</a>,', '내용 2',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 1, '테스트 QNA 게시글 - 3', '<a>내용 3</a>,', '내용 3',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 2, '테스트 QNA 게시글 - 4', '<a>내용 4</a>,', '내용 4',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 2, '테스트 QNA 게시글 - 5', '<a>내용 5</a>,', '내용 5',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 2, '테스트 QNA 게시글 - 6', '<a>내용 6</a>,', '내용 6',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 3, '테스트 QNA 게시글 - 7', '<a>내용 7</a>,', '내용 7',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 3, '테스트 QNA 게시글 - 8', '<a>내용 8</a>,', '내용 8',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 3, '테스트 QNA 게시글 - 9', '<a>내용 9</a>,', '내용 9',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 3, '테스트 QNA 게시글 - 10', '<a>내용 10</a>,', '내용 10',
+        0, CURRENT_TIMESTAMP),
+       ('QNA', 3, '테스트 QNA 게시글 - 11', '<a>내용 11</a>,', '내용 11',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 1, '테스트 자유 게시글 - 1', '<a>내용 1</a>,', '내용 1',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 1, '테스트 자유 게시글 - 2', '<a>내용 2</a>,', '내용 2',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 1, '테스트 자유 게시글 - 3', '<a>내용 3</a>,', '내용 3',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 2, '테스트 자유 게시글 - 4', '<a>내용 4</a>,', '내용 4',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 2, '테스트 자유 게시글 - 5', '<a>내용 5</a>,', '내용 5',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 2, '테스트 자유 게시글 - 6', '<a>내용 6</a>,', '내용 6',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 3, '테스트 자유 게시글 - 7', '<a>내용 7</a>,', '내용 7',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 3, '테스트 자유 게시글 - 8', '<a>내용 8</a>,', '내용 8',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 3, '테스트 자유 게시글 - 9', '<a>내용 9</a>,', '내용 9',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 3, '테스트 자유 게시글 - 10', '<a>내용 10</a>,', '내용 10',
+        0, CURRENT_TIMESTAMP),
+       ('FREE', 3, '테스트 자유 게시글 - 11', '<a>내용 11</a>,', '내용 11',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 1', '<a>내용 1</a>,', '내용 1',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 2', '<a>내용 2</a>,', '내용 2',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 3', '<a>내용 3</a>,', '내용 3',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 4', '<a>내용 4</a>,', '내용 4',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 5', '<a>내용 5</a>,', '내용 5',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 6', '<a>내용 6</a>,', '내용 6',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 7', '<a>내용 7</a>,', '내용 7',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 8', '<a>내용 8</a>,', '내용 8',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 9', '<a>내용 9</a>,', '내용 9',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 10', '<a>내용 10</a>,', '내용 10',
+        0, CURRENT_TIMESTAMP),
+       ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 11', '<a>내용 11</a>,', '내용 11',
         0, CURRENT_TIMESTAMP);
 
 
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 1', '<a>내용 1</a>,', '내용 1',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 2', '<a>내용 2</a>,', '내용 2',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 1, '테스트 기술공유 게시글 - 3', '<a>내용 3</a>,', '내용 3',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 4', '<a>내용 4</a>,', '내용 4',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 5', '<a>내용 5</a>,', '내용 5',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 2, '테스트 기술공유 게시글 - 6', '<a>내용 6</a>,', '내용 6',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 7', '<a>내용 7</a>,', '내용 7',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 8', '<a>내용 8</a>,', '내용 8',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 9', '<a>내용 9</a>,', '내용 9',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 10', '<a>내용 10</a>,', '내용 10',
-        0, CURRENT_TIMESTAMP);
-
-INSERT INTO tb_community(category, author_id, title, content, content_without_html_tags,
-                         view_count, created_at)
-VALUES ('TECH_SHARE', 3, '테스트 기술공유 게시글 - 11', '<a>내용 11</a>,', '내용 11',
-        0, CURRENT_TIMESTAMP);
-
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '1', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '1', 'Spring');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '1', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '1', 'JPA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '2', 'Figma');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '2', 'Adobe XD');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '2', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '3', 'Querydsl');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '3', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '3', 'Python');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '4', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '4', 'Node');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '5', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '6', 'Figma');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '6', 'Adobe XD');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '7', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '7', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '8', 'Node');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '8', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '9', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '9', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '10', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '10', 'TypeScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '10', 'PHP');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '11', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '12', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '12', 'Ruby');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '12', 'C++');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '13', 'Python');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '13', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '14', 'C');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '14', 'TypeScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '14', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '14', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '14', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '15', 'JPA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '16', 'Querydsl');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '16', 'Querydsl');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '16', 'C');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '16', 'Python');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '17', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '17', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '17', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '17', 'Unity');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '18', 'Spring');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '19', 'Spring Data Jpa');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '19', 'Spring');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '19', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '20', 'TypeScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '20', 'Python');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '20', 'Ruby');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '20', 'Spring');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '21', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '21', 'TypeScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '22', 'Java');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '23', 'Python');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '24', 'Querydsl');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '25', 'Spring Boot');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '26', 'Java');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '26', 'Figma');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '26', 'Adobe XD');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '27', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '27', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '28', 'Unity');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '29', 'Java');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '29', 'TypeScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '29', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '29', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '30', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '30', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '30', 'Figma');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '30', 'React');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '30', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '31', 'JavaScript');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '31', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '32', 'JAVA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '32', 'Spring');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '32', 'JPA');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '33', 'Vue');
-
-INSERT INTO tb_tag_relation(relation_type, relation_id, tag_name)
-VALUES ('COMMUNITY', '33', 'JavaScript');
+INSERT INTO TB_PROJECT(id, created_at, updated_at, address, deadline, end_date, image_url, introduction,
+                       introduction_without_html_tags, online, start_date, times_per_week, title, view_count, writer)
+VALUES (1, TIMESTAMP '2023-10-08 02:30:53.495212', TIMESTAMP '2023-10-08 02:30:53.495212', '서울 여의도', DATE '2023-10-20',
+        DATE '2023-12-05', '', '테스트 내용', NULL, FALSE, DATE '2023-10-20', '토,일', '테스트 프로젝트 1', 0, 1),
+       (2, TIMESTAMP '2023-10-08 02:36:20.70103', TIMESTAMP '2023-10-08 02:36:20.70103', '서울 중구', DATE '2023-11-01',
+        DATE '2023-12-25', '', '테스트 내용', NULL, FALSE, DATE '2023-11-02', '월,수,금', '테스트 프로젝트 2', 0, 1),
+       (3, TIMESTAMP '2023-10-08 02:37:51.726164', TIMESTAMP '2023-10-08 02:37:51.726164', '', DATE '2023-12-05',
+        DATE '2023-12-30', '', '테스트 내용', NULL, TRUE, DATE '2023-12-01', NULL, '테스트 프로젝트 3', 0, 1),
+       (4, TIMESTAMP '2023-10-08 02:40:40.121726', TIMESTAMP '2023-10-08 02:40:40.121726', '', DATE '2023-12-05',
+        DATE '2024-01-30', '', '테스트 내용', NULL, TRUE, DATE '2023-12-05', NULL, '테스트 프로젝트 4', 0, 1),
+       (5, TIMESTAMP '2023-10-08 02:43:09.8197', TIMESTAMP '2023-10-08 02:43:09.8197', '', DATE '2023-11-15',
+        DATE '2024-03-30', '', '테스트 내용', NULL, TRUE, DATE '2023-11-10', '일', '테스트 프로젝트 5', 0, 1),
+       (6, TIMESTAMP '2023-10-08 02:52:20.619404', TIMESTAMP '2023-10-08 02:52:20.619404', '국립중앙도서관', DATE '2023-12-15',
+        DATE '2024-06-30', '', '테스트 내용', NULL, FALSE, DATE '2023-11-11', NULL, '테스트 프로젝트 6', 0, 1),
+       (7, TIMESTAMP '2023-10-08 02:54:27.951311', TIMESTAMP '2023-10-08 02:54:27.951311', '국립중앙도서관', DATE '2023-10-10',
+        DATE '2023-12-30', '', '테스트 내용', NULL, FALSE, DATE '2023-10-05', '월,금,토,일', '테스트 프로젝트 7', 0, 1),
+       (8, TIMESTAMP '2023-10-08 02:55:56.004495', TIMESTAMP '2023-10-08 02:55:56.004495', '', DATE '2023-10-05',
+        DATE '2023-11-05', '', '테스트 내용', NULL, TRUE, DATE '2023-10-05', '월,토', '테스트 프로젝트 8', 0, 1),
+       (9, TIMESTAMP '2023-10-08 02:59:00.096532', TIMESTAMP '2023-10-08 02:59:00.096532', '', DATE '2023-11-05',
+        DATE '2023-12-24', '', '테스트 내용', NULL, TRUE, DATE '2023-10-10', '토,일', '2번 사용자의 테스트 프로젝트 1', 0, 2),
+       (10, TIMESTAMP '2023-10-08 03:00:39.852323', TIMESTAMP '2023-10-08 03:00:39.852323', '서울 여의도', DATE '2023-10-10',
+        DATE '2023-12-30', '', '테스트 내용', NULL, FALSE, DATE '2023-10-10', NULL, '2번 사용자의 테스트 프로젝트 2', 0, 2),
+       (11, TIMESTAMP '2023-10-08 03:01:58.765106', TIMESTAMP '2023-10-08 03:01:58.765106', '서울 여의도', DATE '2023-10-20',
+        DATE '2024-02-15', '', '테스트 내용', NULL, FALSE, DATE '2023-10-15', NULL, '2번 사용자의 테스트 프로젝트 3', 0, 2),
+       (12, TIMESTAMP '2023-10-08 03:05:06.439779', TIMESTAMP '2023-10-08 03:05:06.439779', '서울 여의도', DATE '2023-11-20',
+        DATE '2024-01-01', '', '테스트 내용', NULL, FALSE, DATE '2023-10-20', '수', '2번 사용자의 테스트 프로젝트 4', 0, 2),
+       (13, TIMESTAMP '2023-10-08 03:07:44.986283', TIMESTAMP '2023-10-08 03:07:44.986283', '서울 강남역 근처',
+        DATE '2023-10-10', DATE '2023-12-30', '', '테스트 내용', NULL, FALSE, DATE '2023-10-10', '일', '2번 사용자의 테스트 프로젝트 6',
+        0, 2),
+       (14, TIMESTAMP '2023-10-08 03:10:49.292587', TIMESTAMP '2023-10-08 03:10:49.292587', '', DATE '2023-10-20',
+        DATE '2023-12-25', '', '테스트 내용', NULL, TRUE, DATE '2023-10-21', '수,목', '2번 사용자의 테스트 프로젝트 7', 0, 2),
+       (15, TIMESTAMP '2023-10-08 03:13:26.745278', TIMESTAMP '2023-10-08 03:13:26.745278', '서울 잠실', DATE '2023-11-01',
+        DATE '2024-01-30', '', '테스트 내용', NULL, FALSE, DATE '2023-11-01', NULL, '2번 사용자의 테스트 프로젝트 8', 0, 2),
+       (16, TIMESTAMP '2023-10-08 03:16:56.941771', TIMESTAMP '2023-10-08 03:16:56.941771', '서울 신촌', DATE '2023-10-31',
+        DATE '2023-12-30', '', '테스트 내용', NULL, FALSE, DATE '2023-11-01', '월,화,수,목,금', '단기프로젝트 하실분?', 0, 3),
+       (17, TIMESTAMP '2023-10-08 03:20:00.896088', TIMESTAMP '2023-10-08 03:20:00.896088', '서울 고속터미널역 인근 카페',
+        DATE '2023-11-15', DATE '2024-06-30', '', '테스트 내용', NULL, FALSE, DATE '2023-11-15', '월,수,토', '장기 프로젝트 하실분?', 0,
+        3),
+       (18, TIMESTAMP '2023-10-08 03:25:33.286211', TIMESTAMP '2023-10-08 03:25:33.286211', '', DATE '2023-11-01',
+        DATE '2024-03-30', '', '테스트 내용', NULL, TRUE, DATE '2023-11-08', NULL, '비대면진행 사이드플젝 모집', 0, 3),
+       (19, TIMESTAMP '2023-10-08 03:27:23.31553', TIMESTAMP '2023-10-08 03:27:23.31553', '필요시 서울 고속터미널 근처',
+        DATE '2023-11-01', DATE '2024-03-30', '', '테스트 내용', NULL, TRUE, DATE '2023-11-08', NULL, '으악123', 0, 3),
+       (20, TIMESTAMP '2023-10-08 03:31:11.454202', TIMESTAMP '2023-10-08 03:31:11.454202', '', DATE '2023-10-09',
+        DATE '2023-12-30', '', '테스트 내용', NULL, TRUE, DATE '2023-10-09', NULL, '테스트', 0, 3),
+       (21, TIMESTAMP '2023-10-08 03:34:14.828755', TIMESTAMP '2023-10-08 03:34:14.828755', '', DATE '2023-10-15',
+        DATE '2023-12-05', '', '테스트 내용', NULL, FALSE, DATE '2023-10-05', '토,일', '테스트 프로젝트 데이터', 0, 3),
+       (22, TIMESTAMP '2023-10-08 03:35:47.148905', TIMESTAMP '2023-10-08 03:35:47.148905', '', DATE '2023-10-31',
+        DATE '2023-12-30', '', '테스트 내용', NULL, TRUE, DATE '2023-11-01', '토,일', '데이터', 0, 3),
+       (23, TIMESTAMP '2023-10-08 03:38:55.273798', TIMESTAMP '2023-10-08 03:38:55.273798', '서울 광화문역 인근',
+        DATE '2023-11-01', DATE '2024-02-10', '', '테스트 내용', NULL, FALSE, DATE '2023-11-10', '월,수,토', '데이터 데이터 데이터 데이터',
+        0, 3);
+
+
+INSERT INTO TB_PROJECT_JOIN(id, created_at, updated_at, member_id, position_id, project_id)
+VALUES (1, TIMESTAMP '2023-10-08 02:30:53.516686', TIMESTAMP '2023-10-08 02:30:53.516686', 1, 1, 1),
+       (2, TIMESTAMP '2023-10-08 02:36:20.712234', TIMESTAMP '2023-10-08 02:36:20.712234', 1, 6, 2),
+       (3, TIMESTAMP '2023-10-08 02:37:51.730809', TIMESTAMP '2023-10-08 02:37:51.730809', 1, 10, 3),
+       (4, TIMESTAMP '2023-10-08 02:40:40.129866', TIMESTAMP '2023-10-08 02:40:40.129866', 1, 13, 4),
+       (5, TIMESTAMP '2023-10-08 02:43:09.834019', TIMESTAMP '2023-10-08 02:43:09.834019', 1, 17, 5),
+       (6, TIMESTAMP '2023-10-08 02:52:20.627745', TIMESTAMP '2023-10-08 02:52:20.627745', 1, 22, 6),
+       (7, TIMESTAMP '2023-10-08 02:54:27.956306', TIMESTAMP '2023-10-08 02:54:27.956306', 1, 25, 7),
+       (8, TIMESTAMP '2023-10-08 02:55:56.010032', TIMESTAMP '2023-10-08 02:55:56.010032', 1, 30, 8),
+       (9, TIMESTAMP '2023-10-08 02:59:00.103805', TIMESTAMP '2023-10-08 02:59:00.103805', 2, 33, 9),
+       (10, TIMESTAMP '2023-10-08 03:00:39.858741', TIMESTAMP '2023-10-08 03:00:39.858741', 2, 36, 10),
+       (11, TIMESTAMP '2023-10-08 03:01:58.769408', TIMESTAMP '2023-10-08 03:01:58.769408', 2, 39, 11),
+       (12, TIMESTAMP '2023-10-08 03:05:06.444908', TIMESTAMP '2023-10-08 03:05:06.444908', 2, 40, 12),
+       (13, TIMESTAMP '2023-10-08 03:07:44.990374', TIMESTAMP '2023-10-08 03:07:44.990374', 2, 46, 13),
+       (14, TIMESTAMP '2023-10-08 03:10:49.296519', TIMESTAMP '2023-10-08 03:10:49.296519', 2, 52, 14),
+       (15, TIMESTAMP '2023-10-08 03:13:26.750665', TIMESTAMP '2023-10-08 03:13:26.750665', 2, 57, 15),
+       (16, TIMESTAMP '2023-10-08 03:16:56.953576', TIMESTAMP '2023-10-08 03:16:56.953576', 3, 58, 16),
+       (17, TIMESTAMP '2023-10-08 03:20:00.901536', TIMESTAMP '2023-10-08 03:20:00.901536', 3, 62, 17),
+       (18, TIMESTAMP '2023-10-08 03:25:33.292071', TIMESTAMP '2023-10-08 03:25:33.292071', 3, 65, 18),
+       (19, TIMESTAMP '2023-10-08 03:27:23.318619', TIMESTAMP '2023-10-08 03:27:23.318619', 3, 70, 19),
+       (20, TIMESTAMP '2023-10-08 03:31:11.462077', TIMESTAMP '2023-10-08 03:31:11.462077', 3, 73, 20),
+       (21, TIMESTAMP '2023-10-08 03:34:14.832308', TIMESTAMP '2023-10-08 03:34:14.832308', 3, 77, 21),
+       (22, TIMESTAMP '2023-10-08 03:35:47.150937', TIMESTAMP '2023-10-08 03:35:47.150937', 3, 80, 22),
+       (23, TIMESTAMP '2023-10-08 03:38:55.27903', TIMESTAMP '2023-10-08 03:38:55.27903', 3, 84, 23);
+
+INSERT INTO TB_PROJECT_POSITION(id, created_at, updated_at, name, needs, recruited, project_id)
+VALUES (1, TIMESTAMP '2023-10-08 02:30:53.514304', TIMESTAMP '2023-10-08 02:30:53.514304', '백엔드
+', 2, 1, 1),
+       (2, TIMESTAMP '2023-10-08 02:30:53.51795', TIMESTAMP '2023-10-08 02:30:53.51795', '프론트엔드
+', 2, 0, 1),
+       (3, TIMESTAMP '2023-10-08 02:30:53.518438', TIMESTAMP '2023-10-08 02:30:53.518438', '기획
+', 1, 0, 1),
+       (4, TIMESTAMP '2023-10-08 02:30:53.518888', TIMESTAMP '2023-10-08 02:30:53.518888', '디자인
+', 1, 0, 1),
+       ( 5, TIMESTAMP '2023-10-08 02:36:20.710176', TIMESTAMP '2023-10-08 02:36:20.710176', 'Backend'
+       , 1, 0, 2),
+       ( 6, TIMESTAMP '2023-10-08 02:36:20.711601', TIMESTAMP '2023-10-08 02:36:20.711601', 'Frontend'
+       , 2, 1, 2),
+       (7, TIMESTAMP '2023-10-08 02:36:20.712753', TIMESTAMP '2023-10-08 02:36:20.712753', '기획자
+', 1, 0, 2),
+       (8, TIMESTAMP '2023-10-08 02:36:20.713281', TIMESTAMP '2023-10-08 02:36:20.713281', '디자이너
+', 1, 0, 2),
+       ( 9, TIMESTAMP '2023-10-08 02:37:51.729621', TIMESTAMP '2023-10-08 02:37:51.729621', 'Backend'
+       , 1, 0, 3),
+       ( 10, TIMESTAMP '2023-10-08 02:37:51.730353', TIMESTAMP '2023-10-08 02:37:51.730353', 'Frontend'
+       , 1, 1, 3),
+       (11, TIMESTAMP '2023-10-08 02:37:51.731228', TIMESTAMP '2023-10-08 02:37:51.731228', '디자이너
+', 1, 0, 3),
+       (12, TIMESTAMP '2023-10-08 02:40:40.125658', TIMESTAMP '2023-10-08 02:40:40.125658', '프론트엔드
+', 2, 0, 4),
+       (13, TIMESTAMP '2023-10-08 02:40:40.127841', TIMESTAMP '2023-10-08 02:40:40.127841', '서버개발
+', 2, 1, 4),
+       (14, TIMESTAMP '2023-10-08 02:40:40.131163', TIMESTAMP '2023-10-08 02:40:40.131163', '디자인
+', 2, 0, 4),
+       (15, TIMESTAMP '2023-10-08 02:43:09.828891', TIMESTAMP '2023-10-08 02:43:09.828891', 'IOS개발
+', 1, 0, 5),
+       (16, TIMESTAMP '2023-10-08 02:43:09.830283', TIMESTAMP '2023-10-08 02:43:09.830283', '안드로이드 개발
+', 1, 0, 5),
+       (17, TIMESTAMP '2023-10-08 02:43:09.831381', TIMESTAMP '2023-10-08 02:43:09.831381', 'API서버 개발
+', 1, 1, 5),
+       (18, TIMESTAMP '2023-10-08 02:43:09.835069', TIMESTAMP '2023-10-08 02:43:09.835069', '디자인
+', 1, 0, 5),
+       (19, TIMESTAMP '2023-10-08 02:43:09.836425', TIMESTAMP '2023-10-08 02:43:09.836425', '기획자
+', 1, 0, 5),
+       (20, TIMESTAMP '2023-10-08 02:52:20.624082', TIMESTAMP '2023-10-08 02:52:20.624082', '게임 클라이언트
+', 3, 0, 6),
+       (21, TIMESTAMP '2023-10-08 02:52:20.62593', TIMESTAMP '2023-10-08 02:52:20.62593', '게임 서버
+', 3, 0, 6),
+       (22, TIMESTAMP '2023-10-08 02:52:20.626879', TIMESTAMP '2023-10-08 02:52:20.626879', '풀스택 웹개발
+', 2, 1, 6),
+       (23, TIMESTAMP '2023-10-08 02:52:20.628778', TIMESTAMP '2023-10-08 02:52:20.628778', '게임 기획
+', 2, 0, 6),
+       (24, TIMESTAMP '2023-10-08 02:52:20.62986', TIMESTAMP '2023-10-08 02:52:20.62986', '디자인
+', 2, 0, 6),
+       ( 25, TIMESTAMP '2023-10-08 02:54:27.954424', TIMESTAMP '2023-10-08 02:54:27.954424', 'DBA'
+       , 1, 1, 7),
+       (26, TIMESTAMP '2023-10-08 02:54:27.958856', TIMESTAMP '2023-10-08 02:54:27.958856', '서버개발
+', 2, 0, 7),
+       (27, TIMESTAMP '2023-10-08 02:54:27.960442', TIMESTAMP '2023-10-08 02:54:27.960442', '화면개발
+', 2, 0, 7),
+       (28, TIMESTAMP '2023-10-08 02:54:27.961345', TIMESTAMP '2023-10-08 02:54:27.961345', '디자인
+', 1, 0, 7),
+       (29, TIMESTAMP '2023-10-08 02:55:56.007376', TIMESTAMP '2023-10-08 02:55:56.007376', '서버개발
+', 1, 0, 8),
+       (30, TIMESTAMP '2023-10-08 02:55:56.008705', TIMESTAMP '2023-10-08 02:55:56.008705', '화면개발
+', 1, 1, 8),
+       (31, TIMESTAMP '2023-10-08 02:55:56.011642', TIMESTAMP '2023-10-08 02:55:56.011642', '디자인
+', 1, 0, 8),
+       (32, TIMESTAMP '2023-10-08 02:59:00.099194', TIMESTAMP '2023-10-08 02:59:00.099194', 'API 개발
+', 2, 0, 9),
+       (33, TIMESTAMP '2023-10-08 02:59:00.101069', TIMESTAMP '2023-10-08 02:59:00.101069', 'SPA 개발
+', 1, 1, 9),
+       (34, TIMESTAMP '2023-10-08 02:59:00.105141', TIMESTAMP '2023-10-08 02:59:00.105141', '기획
+', 1, 0, 9),
+       (35, TIMESTAMP '2023-10-08 03:00:39.85538', TIMESTAMP '2023-10-08 03:00:39.85538', '채팅서버 개발
+', 2, 0, 10),
+       (36, TIMESTAMP '2023-10-08 03:00:39.85743', TIMESTAMP '2023-10-08 03:00:39.85743', '화면 개발
+', 1, 1, 10),
+       (37, TIMESTAMP '2023-10-08 03:00:39.859857', TIMESTAMP '2023-10-08 03:00:39.859857', '기획 및 디자인
+', 1, 0, 10),
+       (38, TIMESTAMP '2023-10-08 03:01:58.767339', TIMESTAMP '2023-10-08 03:01:58.767339', 'Front-end
+', 1, 0, 11),
+       (39, TIMESTAMP '2023-10-08 03:01:58.768564', TIMESTAMP '2023-10-08 03:01:58.768564', 'Back-end
+', 1, 1, 11),
+       ( 40, TIMESTAMP '2023-10-08 03:05:06.443082', TIMESTAMP '2023-10-08 03:05:06.443082', 'DBA'
+       , 1, 1, 12),
+       ( 41, TIMESTAMP '2023-10-08 03:05:06.445974', TIMESTAMP '2023-10-08 03:05:06.445974', 'Server'
+       , 1, 0, 12),
+       ( 42, TIMESTAMP '2023-10-08 03:05:06.447064', TIMESTAMP '2023-10-08 03:05:06.447064', 'Android'
+       , 1, 0, 12),
+       ( 43, TIMESTAMP '2023-10-08 03:05:06.448028', TIMESTAMP '2023-10-08 03:05:06.448028', 'IOS'
+       , 1, 0, 12),
+       ( 44, TIMESTAMP '2023-10-08 03:05:06.448862', TIMESTAMP '2023-10-08 03:05:06.448862', 'PM'
+       , 1, 0, 12),
+       ( 45, TIMESTAMP '2023-10-08 03:05:06.44987', TIMESTAMP '2023-10-08 03:05:06.44987', 'QA'
+       , 1, 0, 12),
+       (46, TIMESTAMP '2023-10-08 03:07:44.989174', TIMESTAMP '2023-10-08 03:07:44.989174', 'Server개발자
+', 1, 1, 13),
+       (47, TIMESTAMP '2023-10-08 03:07:44.991426', TIMESTAMP '2023-10-08 03:07:44.991426', 'Client개발자
+', 1, 0, 13),
+       (48, TIMESTAMP '2023-10-08 03:07:44.992944', TIMESTAMP '2023-10-08 03:07:44.992944', '기획자
+', 1, 0, 13),
+       (49, TIMESTAMP '2023-10-08 03:07:44.993739', TIMESTAMP '2023-10-08 03:07:44.993739', '디자이너
+', 1, 0, 13),
+       (50, TIMESTAMP '2023-10-08 03:07:44.994957', TIMESTAMP '2023-10-08 03:07:44.994957', '테스터
+', 1, 0, 13),
+       (51, TIMESTAMP '2023-10-08 03:10:49.295291', TIMESTAMP '2023-10-08 03:10:49.295291', 'Flutter개발
+', 1, 0, 14),
+       (52, TIMESTAMP '2023-10-08 03:10:49.296134', TIMESTAMP '2023-10-08 03:10:49.296134', 'API서버개발
+', 2, 1, 14),
+       (53, TIMESTAMP '2023-10-08 03:10:49.297108', TIMESTAMP '2023-10-08 03:10:49.297108', '디자이너
+', 2, 0, 14),
+       (54, TIMESTAMP '2023-10-08 03:10:49.297572', TIMESTAMP '2023-10-08 03:10:49.297572', '기획
+', 1, 0, 14),
+       (55, TIMESTAMP '2023-10-08 03:13:26.747345', TIMESTAMP '2023-10-08 03:13:26.747345', '서버개발
+', 5, 0, 15),
+       (56, TIMESTAMP '2023-10-08 03:13:26.748795', TIMESTAMP '2023-10-08 03:13:26.748795', '앱개발
+', 3, 0, 15),
+       (57, TIMESTAMP '2023-10-08 03:13:26.749818', TIMESTAMP '2023-10-08 03:13:26.749818', '웹 프론트
+', 3, 1, 15),
+       (58, TIMESTAMP '2023-10-08 03:16:56.951847', TIMESTAMP '2023-10-08 03:16:56.951847', 'Back-end
+', 2, 1, 16),
+       (59, TIMESTAMP '2023-10-08 03:16:56.954534', TIMESTAMP '2023-10-08 03:16:56.954534', 'Fornt-end
+', 2, 0, 16),
+       (60, TIMESTAMP '2023-10-08 03:16:56.955439', TIMESTAMP '2023-10-08 03:16:56.955439', '기획/디자인
+', 1, 0, 16),
+       (61, TIMESTAMP '2023-10-08 03:20:00.898795', TIMESTAMP '2023-10-08 03:20:00.898795', '웹백엔드
+', 4, 0, 17),
+       (62, TIMESTAMP '2023-10-08 03:20:00.900268', TIMESTAMP '2023-10-08 03:20:00.900268', '웹프론트
+', 4, 1, 17),
+       (63, TIMESTAMP '2023-10-08 03:20:00.906944', TIMESTAMP '2023-10-08 03:20:00.906944', '기획
+', 2, 0, 17),
+       (64, TIMESTAMP '2023-10-08 03:20:00.908016', TIMESTAMP '2023-10-08 03:20:00.908016', '디자인
+', 2, 0, 17),
+       (65, TIMESTAMP '2023-10-08 03:25:33.290115', TIMESTAMP '2023-10-08 03:25:33.290115', '백엔드
+', 2, 1, 18),
+       (66, TIMESTAMP '2023-10-08 03:25:33.292961', TIMESTAMP '2023-10-08 03:25:33.292961', '프론트엔드
+', 2, 0, 18),
+       (67, TIMESTAMP '2023-10-08 03:25:33.293819', TIMESTAMP '2023-10-08 03:25:33.293819', '기획
+', 1, 0, 18),
+       (68, TIMESTAMP '2023-10-08 03:25:33.294739', TIMESTAMP '2023-10-08 03:25:33.294739', '디자인
+', 1, 0, 18),
+       ( 69, TIMESTAMP '2023-10-08 03:25:33.295564', TIMESTAMP '2023-10-08 03:25:33.295564', 'QA'
+       , 1, 0, 18),
+       (70, TIMESTAMP '2023-10-08 03:27:23.317503', TIMESTAMP '2023-10-08 03:27:23.317503', '백엔드
+', 1, 1, 19),
+       (71, TIMESTAMP '2023-10-08 03:27:23.319358', TIMESTAMP '2023-10-08 03:27:23.319358', '프론트엔드
+', 1, 0, 19),
+       (72, TIMESTAMP '2023-10-08 03:27:23.320256', TIMESTAMP '2023-10-08 03:27:23.320256', '디자인
+', 1, 0, 19),
+       (73, TIMESTAMP '2023-10-08 03:31:11.457906', TIMESTAMP '2023-10-08 03:31:11.457906', '앱 API 개발
+', 1, 1, 20),
+       ( 74, TIMESTAMP '2023-10-08 03:31:11.462761', TIMESTAMP '2023-10-08 03:31:11.462761', 'Android'
+       , 1, 0, 20),
+       ( 75, TIMESTAMP '2023-10-08 03:31:11.463012', TIMESTAMP '2023-10-08 03:31:11.463012', 'IOS'
+       , 1, 0, 20),
+       (76, TIMESTAMP '2023-10-08 03:31:11.463219', TIMESTAMP '2023-10-08 03:31:11.463219', '기획/디자인
+', 1, 0, 20),
+       (77, TIMESTAMP '2023-10-08 03:34:14.830562', TIMESTAMP '2023-10-08 03:34:14.830562', '앱 API 개발
+', 1, 1, 21),
+       ( 78, TIMESTAMP '2023-10-08 03:34:14.833634', TIMESTAMP '2023-10-08 03:34:14.833634', 'Android'
+       , 1, 0, 21),
+       (79, TIMESTAMP '2023-10-08 03:34:14.834933', TIMESTAMP '2023-10-08 03:34:14.834933', '기획/디자인
+', 1, 0, 21),
+       (80, TIMESTAMP '2023-10-08 03:35:47.150309', TIMESTAMP '2023-10-08 03:35:47.150309', '웹 풀스택
+', 1, 1, 22),
+       (81, TIMESTAMP '2023-10-08 03:35:47.151461', TIMESTAMP '2023-10-08 03:35:47.151461', '기획/디자인
+', 1, 0, 22),
+       (82, TIMESTAMP '2023-10-08 03:38:55.27645', TIMESTAMP '2023-10-08 03:38:55.27645', '백엔드
+', 5, 0, 23),
+       (83, TIMESTAMP '2023-10-08 03:38:55.27759', TIMESTAMP '2023-10-08 03:38:55.27759', '프론트엔드
+', 5, 0, 23),
+       (84, TIMESTAMP '2023-10-08 03:38:55.278533', TIMESTAMP '2023-10-08 03:38:55.278533', '기획
+', 2, 1, 23),
+       (85, TIMESTAMP '2023-10-08 03:38:55.279554', TIMESTAMP '2023-10-08 03:38:55.279554', '디자인', 2, 0, 23);
+
+INSERT INTO TB_TAG_RELATION(id, created_at, updated_at, relation_id, relation_type, tag_name)
+VALUES (1, NULL, NULL, 1, 'COMMUNITY', 'JAVA'),
+       (2, NULL, NULL, 1, 'COMMUNITY', 'Spring'),
+       (3, NULL, NULL, 1, 'COMMUNITY', 'Spring Boot'),
+       (4, NULL, NULL, 1, 'COMMUNITY', 'JPA'),
+       (5, NULL, NULL, 2, 'COMMUNITY', 'Figma'),
+       (6, NULL, NULL, 2, 'COMMUNITY', 'Adobe XD'),
+       (7, NULL, NULL, 2, 'COMMUNITY', 'React'),
+       (8, NULL, NULL, 3, 'COMMUNITY', 'Querydsl'),
+       (9, NULL, NULL, 3, 'COMMUNITY', 'JAVA'),
+       (10, NULL, NULL, 3, 'COMMUNITY', 'Python'),
+       (11, NULL, NULL, 4, 'COMMUNITY', 'Vue'),
+       (12, NULL, NULL, 4, 'COMMUNITY', 'Node'),
+       (13, NULL, NULL, 5, 'COMMUNITY', 'JAVA'),
+       (14, NULL, NULL, 6, 'COMMUNITY', 'Figma'),
+       (15, NULL, NULL, 6, 'COMMUNITY', 'Adobe XD'),
+       (16, NULL, NULL, 7, 'COMMUNITY', 'JavaScript'),
+       (17, NULL, NULL, 7, 'COMMUNITY', 'React'),
+       (18, NULL, NULL, 8, 'COMMUNITY', 'Node'),
+       (19, NULL, NULL, 8, 'COMMUNITY', 'Spring Boot'),
+       (20, NULL, NULL, 9, 'COMMUNITY', 'JavaScript'),
+       (21, NULL, NULL, 9, 'COMMUNITY', 'Vue'),
+       (22, NULL, NULL, 10, 'COMMUNITY', 'JavaScript'),
+       (23, NULL, NULL, 10, 'COMMUNITY', 'TypeScript'),
+       (24, NULL, NULL, 10, 'COMMUNITY', 'PHP'),
+       (25, NULL, NULL, 11, 'COMMUNITY', 'Spring Boot'),
+       (26, NULL, NULL, 12, 'COMMUNITY', 'JavaScript'),
+       (27, NULL, NULL, 12, 'COMMUNITY', 'Ruby'),
+       (28, NULL, NULL, 12, 'COMMUNITY', 'C++'),
+       (29, NULL, NULL, 13, 'COMMUNITY', 'Python'),
+       (30, NULL, NULL, 13, 'COMMUNITY', 'JAVA'),
+       (31, NULL, NULL, 14, 'COMMUNITY', 'C'),
+       (32, NULL, NULL, 14, 'COMMUNITY', 'TypeScript'),
+       (33, NULL, NULL, 14, 'COMMUNITY', 'JAVA'),
+       (34, NULL, NULL, 14, 'COMMUNITY', 'Spring Boot'),
+       (35, NULL, NULL, 14, 'COMMUNITY', 'React'),
+       (36, NULL, NULL, 15, 'COMMUNITY', 'JPA'),
+       (37, NULL, NULL, 16, 'COMMUNITY', 'Querydsl'),
+       (38, NULL, NULL, 16, 'COMMUNITY', 'Querydsl'),
+       (39, NULL, NULL, 16, 'COMMUNITY', 'C'),
+       (40, NULL, NULL, 16, 'COMMUNITY', 'Python'),
+       (41, NULL, NULL, 17, 'COMMUNITY', 'Spring Boot'),
+       (42, NULL, NULL, 17, 'COMMUNITY', 'JAVA'),
+       (43, NULL, NULL, 17, 'COMMUNITY', 'JavaScript'),
+       (44, NULL, NULL, 17, 'COMMUNITY', 'Unity'),
+       (45, NULL, NULL, 18, 'COMMUNITY', 'Spring'),
+       (46, NULL, NULL, 19, 'COMMUNITY', 'Spring Data Jpa'),
+       (47, NULL, NULL, 19, 'COMMUNITY', 'Spring'),
+       (48, NULL, NULL, 19, 'COMMUNITY', 'React'),
+       (49, NULL, NULL, 20, 'COMMUNITY', 'TypeScript'),
+       (50, NULL, NULL, 20, 'COMMUNITY', 'Python'),
+       (51, NULL, NULL, 20, 'COMMUNITY', 'Ruby'),
+       (52, NULL, NULL, 20, 'COMMUNITY', 'Spring'),
+       (53, NULL, NULL, 21, 'COMMUNITY', 'Vue'),
+       (54, NULL, NULL, 21, 'COMMUNITY', 'TypeScript'),
+       (55, NULL, NULL, 22, 'COMMUNITY', 'Java'),
+       (56, NULL, NULL, 23, 'COMMUNITY', 'Python'),
+       (57, NULL, NULL, 24, 'COMMUNITY', 'Querydsl'),
+       (58, NULL, NULL, 25, 'COMMUNITY', 'Spring Boot'),
+       (59, NULL, NULL, 26, 'COMMUNITY', 'Java'),
+       (60, NULL, NULL, 26, 'COMMUNITY', 'Figma'),
+       (61, NULL, NULL, 26, 'COMMUNITY', 'Adobe XD'),
+       (62, NULL, NULL, 27, 'COMMUNITY', 'Vue'),
+       (63, NULL, NULL, 27, 'COMMUNITY', 'React'),
+       (64, NULL, NULL, 28, 'COMMUNITY', 'Unity'),
+       (65, NULL, NULL, 29, 'COMMUNITY', 'Java'),
+       (66, NULL, NULL, 29, 'COMMUNITY', 'TypeScript'),
+       (67, NULL, NULL, 29, 'COMMUNITY', 'JavaScript'),
+       (68, NULL, NULL, 29, 'COMMUNITY', 'React'),
+       (69, NULL, NULL, 30, 'COMMUNITY', 'Vue'),
+       (70, NULL, NULL, 30, 'COMMUNITY', 'React'),
+       (71, NULL, NULL, 30, 'COMMUNITY', 'Figma'),
+       (72, NULL, NULL, 30, 'COMMUNITY', 'React'),
+       (73, NULL, NULL, 30, 'COMMUNITY', 'JavaScript'),
+       (74, NULL, NULL, 31, 'COMMUNITY', 'JavaScript'),
+       (75, NULL, NULL, 31, 'COMMUNITY', 'Vue'),
+       (76, NULL, NULL, 32, 'COMMUNITY', 'JAVA'),
+       (77, NULL, NULL, 32, 'COMMUNITY', 'Spring'),
+       (78, NULL, NULL, 32, 'COMMUNITY', 'JPA'),
+       (79, NULL, NULL, 33, 'COMMUNITY', 'Vue'),
+       (80, NULL, NULL, 33, 'COMMUNITY', 'JavaScript'),
+       (81, TIMESTAMP '2023-10-08 02:30:53.550689', TIMESTAMP '2023-10-08 02:30:53.550689', 1, 'PROJECT', 'Spring'),
+       (82, TIMESTAMP '2023-10-08 02:30:53.552315', TIMESTAMP '2023-10-08 02:30:53.552315', 1, 'PROJECT', 'React'),
+       (83, TIMESTAMP '2023-10-08 02:36:20.722126', TIMESTAMP '2023-10-08 02:36:20.722126', 2, 'PROJECT', 'JAVA'),
+       (84, TIMESTAMP '2023-10-08 02:36:20.723522', TIMESTAMP '2023-10-08 02:36:20.723522', 2, 'PROJECT', 'Vue.js'),
+       (85, TIMESTAMP '2023-10-08 02:36:20.724105', TIMESTAMP '2023-10-08 02:36:20.724105', 2, 'PROJECT', 'CSR'),
+       (86, TIMESTAMP '2023-10-08 02:36:20.724751', TIMESTAMP '2023-10-08 02:36:20.724751', 2, 'PROJECT', 'React'),
+       (87, TIMESTAMP '2023-10-08 02:37:51.733839', TIMESTAMP '2023-10-08 02:37:51.733839', 3, 'PROJECT', 'Vue.js'),
+       (88, TIMESTAMP '2023-10-08 02:40:40.137993', TIMESTAMP '2023-10-08 02:40:40.137993', 4, 'PROJECT', 'JAVA'),
+       (89, TIMESTAMP '2023-10-08 02:40:40.138829', TIMESTAMP '2023-10-08 02:40:40.138829', 4, 'PROJECT',
+        'Spring Boot'),
+       (90, TIMESTAMP '2023-10-08 02:40:40.139265', TIMESTAMP '2023-10-08 02:40:40.139265', 4, 'PROJECT', 'Jpa'),
+       (91, TIMESTAMP '2023-10-08 02:40:40.13959', TIMESTAMP '2023-10-08 02:40:40.13959', 4, 'PROJECT', 'MSA'),
+       (92, TIMESTAMP '2023-10-08 02:40:40.140042', TIMESTAMP '2023-10-08 02:40:40.140042', 4, 'PROJECT', 'React'),
+       (93, TIMESTAMP '2023-10-08 02:40:40.140389', TIMESTAMP '2023-10-08 02:40:40.140389', 4, 'PROJECT', 'AWS'),
+       (94, TIMESTAMP '2023-10-08 02:43:09.84095', TIMESTAMP '2023-10-08 02:43:09.84095', 5, 'PROJECT', 'JAVA'),
+       (95, TIMESTAMP '2023-10-08 02:43:09.84149', TIMESTAMP '2023-10-08 02:43:09.84149', 5, 'PROJECT', 'Figma'),
+       (96, TIMESTAMP '2023-10-08 02:43:09.84178', TIMESTAMP '2023-10-08 02:43:09.84178', 5, 'PROJECT', 'IOS'),
+       (97, TIMESTAMP '2023-10-08 02:43:09.842034', TIMESTAMP '2023-10-08 02:43:09.842034', 5, 'PROJECT', 'Android'),
+       (98, TIMESTAMP '2023-10-08 02:52:20.635217', TIMESTAMP '2023-10-08 02:52:20.635217', 6, 'PROJECT', 'JAVA'),
+       (99, TIMESTAMP '2023-10-08 02:52:20.635918', TIMESTAMP '2023-10-08 02:52:20.635918', 6, 'PROJECT', 'C++'),
+       (100, TIMESTAMP '2023-10-08 02:52:20.636328', TIMESTAMP '2023-10-08 02:52:20.636328', 6, 'PROJECT', 'Unity'),
+       (101, TIMESTAMP '2023-10-08 02:52:20.636681', TIMESTAMP '2023-10-08 02:52:20.636681', 6, 'PROJECT', 'Unreal'),
+       (102, TIMESTAMP '2023-10-08 02:54:27.969175', TIMESTAMP '2023-10-08 02:54:27.969175', 7, 'PROJECT', 'Vue.js'),
+       (103, TIMESTAMP '2023-10-08 02:54:27.970645', TIMESTAMP '2023-10-08 02:54:27.970645', 7, 'PROJECT', 'C++'),
+       (104, TIMESTAMP '2023-10-08 02:54:27.971474', TIMESTAMP '2023-10-08 02:54:27.971474', 7, 'PROJECT', 'MySQL'),
+       (105, TIMESTAMP '2023-10-08 02:54:27.972197', TIMESTAMP '2023-10-08 02:54:27.972197', 7, 'PROJECT', 'AWS'),
+       (106, TIMESTAMP '2023-10-08 02:54:27.972986', TIMESTAMP '2023-10-08 02:54:27.972986', 7, 'PROJECT', 'React'),
+       (107, TIMESTAMP '2023-10-08 02:55:56.022793', TIMESTAMP '2023-10-08 02:55:56.022793', 8, 'PROJECT', 'Vue.js'),
+       (108, TIMESTAMP '2023-10-08 02:55:56.024046', TIMESTAMP '2023-10-08 02:55:56.024046', 8, 'PROJECT', '자유'),
+       (109, TIMESTAMP '2023-10-08 02:59:00.111362', TIMESTAMP '2023-10-08 02:59:00.111362', 9, 'PROJECT', 'JAVA'),
+       (110, TIMESTAMP '2023-10-08 02:59:00.11186', TIMESTAMP '2023-10-08 02:59:00.11186', 9, 'PROJECT', 'Figma'),
+       (111, TIMESTAMP '2023-10-08 02:59:00.112606', TIMESTAMP '2023-10-08 02:59:00.112606', 9, 'PROJECT',
+        'JavaScript'),
+       (112, TIMESTAMP '2023-10-08 02:59:00.113563', TIMESTAMP '2023-10-08 02:59:00.113563', 9, 'PROJECT', 'Swagger'),
+       (113, TIMESTAMP '2023-10-08 03:00:39.864412', TIMESTAMP '2023-10-08 03:00:39.864412', 10, 'PROJECT', '웹소켓'),
+       (114, TIMESTAMP '2023-10-08 03:00:39.864827', TIMESTAMP '2023-10-08 03:00:39.864827', 10, 'PROJECT', 'SPA'),
+       (115, TIMESTAMP '2023-10-08 03:01:58.776594', TIMESTAMP '2023-10-08 03:01:58.776594', 11, 'PROJECT', 'Vue.js'),
+       (116, TIMESTAMP '2023-10-08 03:01:58.777781', TIMESTAMP '2023-10-08 03:01:58.777781', 11, 'PROJECT', 'REST API'),
+       (117, TIMESTAMP '2023-10-08 03:01:58.779231', TIMESTAMP '2023-10-08 03:01:58.779231', 11, 'PROJECT',
+        'Spring Boot'),
+       (118, TIMESTAMP '2023-10-08 03:01:58.780061', TIMESTAMP '2023-10-08 03:01:58.780061', 11, 'PROJECT', 'JPA'),
+       (119, TIMESTAMP '2023-10-08 03:01:58.780486', TIMESTAMP '2023-10-08 03:01:58.780486', 11, 'PROJECT', 'React'),
+       (120, TIMESTAMP '2023-10-08 03:05:06.452656', TIMESTAMP '2023-10-08 03:05:06.452656', 12, 'PROJECT', 'RDBMS'),
+       (121, TIMESTAMP '2023-10-08 03:05:06.452989', TIMESTAMP '2023-10-08 03:05:06.452989', 12, 'PROJECT', 'IOS'),
+       (122, TIMESTAMP '2023-10-08 03:05:06.453243', TIMESTAMP '2023-10-08 03:05:06.453243', 12, 'PROJECT', 'JIRA'),
+       (123, TIMESTAMP '2023-10-08 03:05:06.453478', TIMESTAMP '2023-10-08 03:05:06.453478', 12, 'PROJECT', 'Kotlin'),
+       (124, TIMESTAMP '2023-10-08 03:05:06.453713', TIMESTAMP '2023-10-08 03:05:06.453713', 12, 'PROJECT', 'Android'),
+       (125, TIMESTAMP '2023-10-08 03:07:44.998063', TIMESTAMP '2023-10-08 03:07:44.998063', 13, 'PROJECT', 'Figma'),
+       (126, TIMESTAMP '2023-10-08 03:07:44.998424', TIMESTAMP '2023-10-08 03:07:44.998424', 13, 'PROJECT', '포토샵'),
+       (127, TIMESTAMP '2023-10-08 03:07:44.998695', TIMESTAMP '2023-10-08 03:07:44.998695', 13, 'PROJECT', 'JIRA'),
+       (128, TIMESTAMP '2023-10-08 03:07:44.99894', TIMESTAMP '2023-10-08 03:07:44.99894', 13, 'PROJECT', '일러스트'),
+       (129, TIMESTAMP '2023-10-08 03:10:49.302734', TIMESTAMP '2023-10-08 03:10:49.302734', 14, 'PROJECT', 'REST API'),
+       (130, TIMESTAMP '2023-10-08 03:10:49.303128', TIMESTAMP '2023-10-08 03:10:49.303128', 14, 'PROJECT', 'Figma'),
+       (131, TIMESTAMP '2023-10-08 03:10:49.303379', TIMESTAMP '2023-10-08 03:10:49.303379', 14, 'PROJECT', '포토샵'),
+       (132, TIMESTAMP '2023-10-08 03:10:49.303603', TIMESTAMP '2023-10-08 03:10:49.303603', 14, 'PROJECT', 'Flutter'),
+       (133, TIMESTAMP '2023-10-08 03:10:49.303825', TIMESTAMP '2023-10-08 03:10:49.303825', 14, 'PROJECT', '크로스플랫폼'),
+       (134, TIMESTAMP '2023-10-08 03:13:26.760195', TIMESTAMP '2023-10-08 03:13:26.760195', 15, 'PROJECT', 'Vue.js'),
+       (135, TIMESTAMP '2023-10-08 03:13:26.760798', TIMESTAMP '2023-10-08 03:13:26.760798', 15, 'PROJECT', 'REST API'),
+       (136, TIMESTAMP '2023-10-08 03:13:26.761044', TIMESTAMP '2023-10-08 03:13:26.761044', 15, 'PROJECT',
+        'JavaScript'),
+       (137, TIMESTAMP '2023-10-08 03:13:26.761278', TIMESTAMP '2023-10-08 03:13:26.761278', 15, 'PROJECT', 'IOS'),
+       (138, TIMESTAMP '2023-10-08 03:13:26.761484', TIMESTAMP '2023-10-08 03:13:26.761484', 15, 'PROJECT', 'React'),
+       (139, TIMESTAMP '2023-10-08 03:13:26.761683', TIMESTAMP '2023-10-08 03:13:26.761683', 15, 'PROJECT', 'Android'),
+       (140, TIMESTAMP '2023-10-08 03:16:56.962465', TIMESTAMP '2023-10-08 03:16:56.962465', 16, 'PROJECT', 'Figma'),
+       (141, TIMESTAMP '2023-10-08 03:16:56.963265', TIMESTAMP '2023-10-08 03:16:56.963265', 16, 'PROJECT',
+        'JavaScript'),
+       (142, TIMESTAMP '2023-10-08 03:16:56.963966', TIMESTAMP '2023-10-08 03:16:56.963966', 16, 'PROJECT',
+        'Spring Boot'),
+       (143, TIMESTAMP '2023-10-08 03:16:56.964695', TIMESTAMP '2023-10-08 03:16:56.964695', 16, 'PROJECT', 'JPA'),
+       (144, TIMESTAMP '2023-10-08 03:16:56.965256', TIMESTAMP '2023-10-08 03:16:56.965256', 16, 'PROJECT', 'Spring'),
+       (145, TIMESTAMP '2023-10-08 03:20:00.911944', TIMESTAMP '2023-10-08 03:20:00.911944', 17, 'PROJECT', 'Vue.js'),
+       (146, TIMESTAMP '2023-10-08 03:20:00.912453', TIMESTAMP '2023-10-08 03:20:00.912453', 17, 'PROJECT', '서버기술 자유'),
+       (147, TIMESTAMP '2023-10-08 03:20:00.912995', TIMESTAMP '2023-10-08 03:20:00.912995', 17, 'PROJECT', 'React'),
+       (148, TIMESTAMP '2023-10-08 03:25:33.301647', TIMESTAMP '2023-10-08 03:25:33.301647', 18, 'PROJECT', 'JAVA'),
+       (149, TIMESTAMP '2023-10-08 03:25:33.302594', TIMESTAMP '2023-10-08 03:25:33.302594', 18, 'PROJECT',
+        'Spring Boot'),
+       (150, TIMESTAMP '2023-10-08 03:25:33.303398', TIMESTAMP '2023-10-08 03:25:33.303398', 18, 'PROJECT', 'JPA'),
+       (151, TIMESTAMP '2023-10-08 03:25:33.303976', TIMESTAMP '2023-10-08 03:25:33.303976', 18, 'PROJECT',
+        'Spring Data JPA'),
+       (152, TIMESTAMP '2023-10-08 03:27:23.332222', TIMESTAMP '2023-10-08 03:27:23.332222', 19, 'PROJECT', 'JAVA'),
+       (153, TIMESTAMP '2023-10-08 03:31:11.465291', TIMESTAMP '2023-10-08 03:31:11.465291', 20, 'PROJECT', 'REST API'),
+       (154, TIMESTAMP '2023-10-08 03:31:11.465578', TIMESTAMP '2023-10-08 03:31:11.465578', 20, 'PROJECT', 'IOS'),
+       (155, TIMESTAMP '2023-10-08 03:31:11.465949', TIMESTAMP '2023-10-08 03:31:11.465949', 20, 'PROJECT', 'Android'),
+       (156, TIMESTAMP '2023-10-08 03:34:14.840521', TIMESTAMP '2023-10-08 03:34:14.840521', 21, 'PROJECT', 'REST API'),
+       (157, TIMESTAMP '2023-10-08 03:34:14.840954', TIMESTAMP '2023-10-08 03:34:14.840954', 21, 'PROJECT', 'Android'),
+       (158, TIMESTAMP '2023-10-08 03:35:47.158589', TIMESTAMP '2023-10-08 03:35:47.158589', 22, 'PROJECT',
+        'Spring MVC'),
+       (159, TIMESTAMP '2023-10-08 03:38:55.285597', TIMESTAMP '2023-10-08 03:38:55.285597', 23, 'PROJECT', 'JAVA'),
+       (160, TIMESTAMP '2023-10-08 03:38:55.286558', TIMESTAMP '2023-10-08 03:38:55.286558', 23, 'PROJECT', 'Figma'),
+       (161, TIMESTAMP '2023-10-08 03:38:55.28722', TIMESTAMP '2023-10-08 03:38:55.28722', 23, 'PROJECT', 'Adobe XD'),
+       (162, TIMESTAMP '2023-10-08 03:38:55.287835', TIMESTAMP '2023-10-08 03:38:55.287835', 23, 'PROJECT', 'SPA'),
+       (163, TIMESTAMP '2023-10-08 03:38:55.288387', TIMESTAMP '2023-10-08 03:38:55.288387', 23, 'PROJECT',
+        'JavaScript'),
+       (164, TIMESTAMP '2023-10-08 03:38:55.288598', TIMESTAMP '2023-10-08 03:38:55.288598', 23, 'PROJECT', 'JPA'),
+       (165, TIMESTAMP '2023-10-08 03:38:55.288772', TIMESTAMP '2023-10-08 03:38:55.288772', 23, 'PROJECT',
+        'Spring Boot'),
+       (166, TIMESTAMP '2023-10-08 03:38:55.288975', TIMESTAMP '2023-10-08 03:38:55.288975', 23, 'PROJECT', 'Spring'),
+       (167, TIMESTAMP '2023-10-08 03:38:55.289141', TIMESTAMP '2023-10-08 03:38:55.289141', 23, 'PROJECT',
+        'Spring Data JPA');

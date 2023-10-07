@@ -1,10 +1,13 @@
 package much.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import much.api.common.aop.MuchValid;
+import much.api.common.exception.NoAuthority;
 import much.api.common.exception.ProjectNotFound;
 import much.api.common.util.ContextUtils;
 import much.api.dto.request.ProjectCreation;
+import much.api.dto.request.ProjectModification;
 import much.api.dto.response.ProjectDetail;
 import much.api.entity.Project;
 import much.api.entity.ProjectPosition;
@@ -14,10 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toMap;
 import static much.api.common.enums.MuchType.PROJECT;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -40,15 +46,15 @@ public class ProjectService {
         // 저장
         List<String> requestTimesPerWeek = projectCreation.getTimesPerWeek();
 
-        String timesPerWeek = requestTimesPerWeek.isEmpty() ? "협의" :
-                String.join(", ", requestTimesPerWeek);
+        String timesPerWeek = requestTimesPerWeek.isEmpty() ? null :
+                String.join(",", requestTimesPerWeek);
 
         final String requestIntroduction = projectCreation.getIntroduction();
         final Set<String> requestTags = projectCreation.getTags();
 
-        // TODO 등록자 본인의 포지션?
         Project project = Project.builder()
                 .writer(user)
+                .title(projectCreation.getTitle())
                 .imageUrl(projectCreation.getImageUrl())
                 .online(projectCreation.getOnline())
                 .address(projectCreation.getAddress())
@@ -61,14 +67,18 @@ public class ProjectService {
 
         Project saved = projectRepository.save(project);
 
-        // 포지션정보 등록
-        projectCreation.getRecruit().stream()
-                .map(ps -> ProjectPosition.builder()
-                        .project(saved)
-                        .name(ps.getName())
-                        .needs(ps.getNeeds())
-                        .build())
-                .forEach(pp -> saved.getPositionStatus().add(pp));
+        // 포지션 정보 등록
+        ProjectCreation.Recruit recruit = projectCreation.getRecruit();
+        for (ProjectCreation.Recruit.PositionStatus ps : recruit.getPositionStatus()) {
+
+            ProjectPosition projectPosition = ProjectPosition.builder()
+                    .project(saved)
+                    .name(ps.getName())
+                    .needs(ps.getNeeds())
+                    .build();
+
+            saved.addPosition(projectPosition, ps.isContainsMe());
+        }
 
         // 파일 관리정보 업데이트
         fileService.handleEditorImage(PROJECT, saved.getId(), requestIntroduction);
@@ -80,15 +90,133 @@ public class ProjectService {
     }
 
 
-    public ProjectDetail getProject(Long id) {
+    public ProjectDetail getProject(Long projectId) {
 
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ProjectNotFound(id));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFound(projectId));
 
-        Set<String> tags = tagHelperService.getTags(PROJECT, id);
+        Set<String> tags = tagHelperService.getTags(PROJECT, projectId);
 
         project.increaseViewCount();
         return ProjectDetail.ofEntity(project, tags);
+    }
+
+
+    @Transactional
+    public void deleteProject(Long projectId) {
+
+        // 사용자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFound(projectId));
+
+        if (!project.isWriter()) {
+            throw new NoAuthority("프로젝트 삭제");
+        }
+
+        // 태그정보 삭제
+        tagHelperService.deleteTagRelation(PROJECT, projectId);
+
+        // 파일정보 관리
+        fileService.releaseEditorImage(PROJECT, projectId);
+
+        // 삭제 - CaseCade
+        projectRepository.delete(project);
+    }
+
+
+    @Transactional
+    public ProjectDetail modifyProject(Long projectId,
+                                       @MuchValid ProjectModification request) {
+
+        // 사용자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
+        // 기존글 조회
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFound(projectId));
+
+        // 수정
+        List<String> requestTimesPerWeek = request.getTimesPerWeek();
+
+        String timesPerWeek = requestTimesPerWeek.isEmpty() ? null :
+                String.join(",", requestTimesPerWeek);
+
+        final String modifiedIntroduction = request.getIntroduction();
+
+        project.modify(
+                request.getTitle(),
+                request.getImageUrl(),
+                request.getOnline(),
+                request.getAddress(),
+                request.getDeadline(),
+                request.getStartDate(),
+                request.getEndDate(),
+                timesPerWeek,
+                modifiedIntroduction
+        );
+
+        // 포지션 정보 변경
+        handlePosition(project, request.getRecruit().getPositionStatus()
+        );
+
+        // 태그정보 수정
+        final Set<String> tags = request.getTags();
+        tagHelperService.handleTagRelation(PROJECT, projectId, tags);
+
+        // 파일정보 수정
+        fileService.handleEditorImage(PROJECT, projectId, modifiedIntroduction);
+
+        return ProjectDetail.ofEntity(project, tags);
+    }
+
+
+    // TODO 테스트 데이터 넣고, 테스트
+    private void handlePosition(Project project,
+                                List<ProjectModification.Recruit.PositionStatus> tobe) {
+
+        // 기존 포지션 Map
+        Map<Long, ProjectPosition> asisPositionMap = project.getPositionStatus()
+                .stream()
+                .collect(toMap(ProjectPosition::getId, pp -> pp));
+
+        tobe.forEach(tobePosition -> {
+
+            Long key = tobePosition.getId();
+            ProjectPosition asisPosition = asisPositionMap.get(key);
+
+            // 기존 포지션 ID
+            if (asisPosition != null) {
+                // 이름과 인원수 변경
+                asisPosition.modify(
+                        tobePosition.getName(),
+                        tobePosition.getNeeds(),
+                        tobePosition.isContainsMe() // 기존 포지션 유지 OR 기존 -> 기존 다른 포지션
+                );
+
+                // 완료된 것 Map remove
+                asisPositionMap.remove(key);
+            } else {
+                // 새로운 포지션 -> 등록
+                project.addPosition(
+                        ProjectPosition.builder()
+                                .project(project)
+                                .name(tobePosition.getName())
+                                .needs(tobePosition.getNeeds())
+                                .build(),
+                        tobePosition.isContainsMe() // 기존 포지션 -> 새로운 포지션
+                );
+            }
+
+        });
+
+        // 미처리 된 나머지 -> 삭제 될 포지션
+        // 삭제. 신청서 또한 삭제됨
+        project.deletePosition(asisPositionMap.values());
     }
 
 }

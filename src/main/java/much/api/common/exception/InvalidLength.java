@@ -5,8 +5,18 @@ import static much.api.common.enums.Code.INVALID_LENGTH;
 
 public class InvalidLength extends MuchException {
 
-    public InvalidLength(String subject, Integer maxLength, Integer current) {
-        super(null, format(INVALID_LENGTH.getMessage(), subject, maxLength, current, maxLength));
+    public InvalidLength(String subject,
+                         Integer minLength,
+                         Integer maxLength,
+                         Integer current) {
+
+        super(INVALID_LENGTH, format(INVALID_LENGTH.getMessage(),
+                subject,
+                minLength,
+                maxLength,
+                current,
+                maxLength)
+        );
     }
 
 }

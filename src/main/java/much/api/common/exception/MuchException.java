@@ -12,18 +12,13 @@ public class MuchException extends RuntimeException {
         this.code = code;
     }
 
-    public MuchException(Code code, String messageForLog) {
-        super(messageForLog);
+    public MuchException(Code code, String message) {
+        super(message);
         this.code = code;
     }
 
-    public MuchException(Code code, String... replaceParams) {
-        super(String.format(code.getMessage(), (Object[]) replaceParams));
-        this.code = code;
-    }
-
-    public MuchException(Code code, String messageForLog, Throwable cause) {
-        super(messageForLog, cause);
+    public MuchException(Code code, String message, Throwable cause) {
+        super(message, cause);
         this.code = code;
     }
 }

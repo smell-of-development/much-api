@@ -39,6 +39,11 @@ public class ContextUtils {
         }
     }
 
+    public static boolean isAnonymous() {
+
+        return ContextUtils.getUserId() == null;
+    }
+
     public static RunMode getRunMode() {
 
         return runMode;

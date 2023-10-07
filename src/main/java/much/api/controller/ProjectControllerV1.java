@@ -4,8 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.ProjectApiV1;
 import much.api.dto.request.ProjectCreation;
+import much.api.dto.request.ProjectModification;
+import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.Envelope;
+import much.api.dto.response.PagedResult;
 import much.api.dto.response.ProjectDetail;
+import much.api.dto.response.ProjectSummary;
 import much.api.service.ProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +34,38 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @GetMapping("/projects/{id}")
-    public ResponseEntity<Envelope<ProjectDetail>> getProject(@PathVariable Long id) {
+    @PutMapping("/projects/{projectId}")
+    public ResponseEntity<Envelope<ProjectDetail>> modifyProject(@PathVariable Long projectId,
+                                                                 @RequestBody @Valid ProjectModification request) {
 
         return ok(
-                Envelope.ok(projectService.getProject(id))
+                Envelope.ok(projectService.modifyProject(projectId, request))
+        );
+    }
+
+
+    @Override
+    @GetMapping("/projects/{projectId}")
+    public ResponseEntity<Envelope<ProjectDetail>> getProject(@PathVariable Long projectId) {
+
+        return ok(
+                Envelope.ok(projectService.getProject(projectId))
+        );
+    }
+
+    @Override
+    public ResponseEntity<Envelope<PagedResult<ProjectSummary>>> getProjects(ProjectSearch searchCondition) {
+        return null;
+    }
+
+
+    @Override
+    @DeleteMapping("/projects/{projectId}")
+    public ResponseEntity<Envelope<Void>> deleteProject(@PathVariable Long projectId) {
+
+        projectService.deleteProject(projectId);
+        return ok(
+                Envelope.empty()
         );
     }
 
