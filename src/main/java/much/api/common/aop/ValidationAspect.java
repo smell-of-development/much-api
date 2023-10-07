@@ -20,32 +20,56 @@ public class ValidationAspect {
     @Before("execution(* *(.., @much.api.common.aop.MuchValid (*), ..))")
     public void validate(JoinPoint joinPoint) {
 
-        Object[] args = joinPoint.getArgs();
+        Object[] objectParameters = joinPoint.getArgs();
 
-        for (Object arg : args) {
+        try {
+            for (Object object : objectParameters) {
 
-            Field[] fields =  arg.getClass().getDeclaredFields();
-
-            for (Field field : fields) {
-                Check check = field.getAnnotation(Check.class);
-                if (check == null) {
-                    continue;
+                SelfCheck selfCheck = object.getClass().getAnnotation(SelfCheck.class);
+                if (selfCheck != null) {
+                    checkMyself(object, selfCheck);
+                    break;
                 }
 
-                try {
-                    Class<?> type = field.getType();
-                    Method method = ValidationChecker.class.getDeclaredMethod(check.value(), type);
-                    field.setAccessible(true);
+                Field[] fields = object.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    Check check = field.getAnnotation(Check.class);
 
-                    method.invoke(null, field.get(arg));
-                } catch (InvocationTargetException e) {
-                    throw (RuntimeException) e.getTargetException();
-                } catch (Exception e) {
-                    throw new MuchException(INTERNAL_SERVER_ERROR, "Validation AOP 처리중 오류", e);
+                    if (check == null) {
+                        continue;
+                    }
+
+                    checkWithValidationChecker(object, field, check);
                 }
+
             }
-
+        } catch (InvocationTargetException e) {
+            throw (RuntimeException) e.getTargetException();
+        } catch (Exception e) {
+            throw new MuchException(INTERNAL_SERVER_ERROR, "Validation AOP 처리중 오류", e);
         }
+
+    }
+
+
+    private static void checkWithValidationChecker(Object object, Field field, Check check) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (check == null) return;
+
+        Class<?> type = field.getType();
+        Method method = ValidationChecker.class.getDeclaredMethod(check.value(), type);
+        field.setAccessible(true);
+
+        method.invoke(null, field.get(object));
+    }
+
+
+    private static void checkMyself(Object object, SelfCheck selfCheck) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (selfCheck == null) return;
+
+        Method selfCheckMethod = object.getClass().getDeclaredMethod(selfCheck.value());
+        selfCheckMethod.setAccessible(true);
+
+        selfCheckMethod.invoke(object);
     }
 
 }

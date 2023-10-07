@@ -1,7 +1,7 @@
 package much.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import much.api.common.enums.MuchType;
 import much.api.controller.swagger.ProjectApiV1;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.response.Envelope;
@@ -10,7 +10,7 @@ import much.api.service.ProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +21,10 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
     @Override
     @PostMapping("/projects")
-    public ResponseEntity<Envelope<Long>> createProject(@RequestBody ProjectCreation request) {
+    public ResponseEntity<Envelope<Long>> createProject(@RequestBody @Valid ProjectCreation request) {
 
         return ok(
-                Envelope.ok(projectService.createProject(request, MuchType.PROJECT))
+                Envelope.ok(projectService.createProject(request))
         );
     }
 

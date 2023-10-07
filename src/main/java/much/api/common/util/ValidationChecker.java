@@ -26,7 +26,7 @@ public class ValidationChecker {
     public static final Pattern NICKNAME_PATTERN = Pattern.compile(NICKNAME_REGEX);
 
 
-    public static void isValidLoginId(String id) {
+    public static void checkLoginId(String id) {
 
         if (!StringUtils.hasText(id) || !LOGIN_ID_PATTERN.matcher(id).matches()) {
             throw new InvalidLoginID(id);
@@ -34,7 +34,7 @@ public class ValidationChecker {
     }
 
 
-    public static void isValidPassword(String password) {
+    public static void checkPassword(String password) {
 
         if (!StringUtils.hasText(password) || !PASSWORD_PATTERN.matcher(password).matches()) {
             throw new InvalidPassword();
@@ -42,7 +42,7 @@ public class ValidationChecker {
     }
 
 
-    public static void isValidNickname(String nickname) {
+    public static void checkNickname(String nickname) {
 
         if (!StringUtils.hasText(nickname) || !NICKNAME_PATTERN.matcher(nickname).matches()) {
             throw new InvalidNickname(nickname);
@@ -50,7 +50,7 @@ public class ValidationChecker {
     }
 
 
-    public static void isValidPhoneNumber(String phoneNumber) {
+    public static void checkPhoneNumber(String phoneNumber) {
 
         if (!StringUtils.hasText(phoneNumber) || !PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches()) {
             throw new InvalidPhoneNumber(phoneNumber);
