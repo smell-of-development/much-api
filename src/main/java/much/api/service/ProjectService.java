@@ -234,7 +234,8 @@ public class ProjectService {
     // TODO 테스트 작성
     public PagedResult<ProjectSummary> getProjects(ProjectSearch searchCondition) {
 
-        Page<ProjectSearchRepository.ProjectSearchDto> page = projectSearchRepository.searchProjects(searchCondition, null);
+        Long userId = ContextUtils.getUserId();
+        Page<ProjectSearchRepository.ProjectSearchDto> page = projectSearchRepository.searchProjects(searchCondition, userId);
 
         // 결과 PROJECT ID 리스트
         List<Long> projectIds = page.stream()

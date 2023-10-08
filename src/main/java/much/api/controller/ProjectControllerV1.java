@@ -36,7 +36,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     @Override
     @PutMapping("/projects/{projectId}")
     public ResponseEntity<Envelope<Long>> modifyProject(@PathVariable Long projectId,
-                                                                 @RequestBody @Valid ProjectModification request) {
+                                                        @RequestBody @Valid ProjectModification request) {
 
         return ok(
                 Envelope.ok(projectService.modifyProject(projectId, request).getId())

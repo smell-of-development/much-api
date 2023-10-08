@@ -1,8 +1,11 @@
 package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.common.enums.ImageResizeType;
+import much.api.common.enums.MuchType;
 import much.api.dto.response.Envelope;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +55,7 @@ public interface CommonApiV1 {
             description = """
                     이미지를 업로드합니다.
                     ### 요청
-                    - POST /common/image?type=PROFILE
+                    - POST /api/v1/common/image?type=PROFILE
                     - (multipart/form-data) key: image
                     - type 파라미터 종류 : THUMBNAIL, PROFILE, NONE(기본값)
                     - type 파라미터 종류에 따라서 이미지 리사이징하여 저장
@@ -73,5 +76,27 @@ public interface CommonApiV1 {
                     - code 9000 : 파일 처리중 오류
                     """)
     ResponseEntity<Resource> getLocalImage(String storedFilename);
+
+
+    @Operation(summary = "PICK LIST 추가 및 제거",
+            description = """
+                    로그인 유저의 PICK LIST 대상에 추가하거나 제거합니다. (스위칭 형식의 찜 기능)
+                    ### 요청
+                    - POST /api/v1/picklist
+                    - form-data
+                    - targetType : 찜 대상의 유형 ex) STUDY, PROJECT
+                    - targetId   : 찜 대상의 고유 ID
+                    - ex) targetType=PROJECT&targetId=2 -> ID가 2인 프로젝트를 찜
+                    ### 응답값
+                    - code 200
+                    - picked : 요청 이후의 (targetType, targetId)찜 상태 (Boolean)
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 지정한 targetType에 해당하는 targetId를 찾을 수 없어 찜하기 실패하는 경우
+                    """,
+            parameters = @Parameter(
+                    name = "targetType",
+                    schema = @Schema(name = "targetType", allowableValues = {"PROJECT", "STUDY"})))
+    ResponseEntity<Envelope<Boolean>> addPickList(MuchType targetType, Long targetId);
 
 }

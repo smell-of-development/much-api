@@ -24,6 +24,7 @@ public enum Code {
     POST_NOT_FOUND(2000, "게시글을 찾을 수 없어요.", false),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없어요.", false),
     FILE_NOT_FOUND(2000, "파일을 찾을 수 없어요.", false),
+    PICK_PROCESSING_FAIL(2000, "찜하기에 실패했어요.", false),
 
     INVALID_NICKNAME(2000, "닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있어요.", false),
     INVALID_LOGIN_ID(2000, "ID는 4글자 이상 20글자 이하 영어, 숫자만 사용할 수 있어요.", false),

@@ -92,7 +92,7 @@ public interface CommunityApiV1 {
                     """,
             requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
     ResponseEntity<Envelope<Long>> modifyCommunityPost(Long postId,
-                                                                      CommunityPostModification request);
+                                                       CommunityPostModification request);
 
     @Operation(
             summary = "커뮤니티 글 삭제 API",

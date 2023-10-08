@@ -2,6 +2,7 @@ package much.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import much.api.common.enums.ImageResizeType;
+import much.api.common.enums.MuchType;
 import much.api.common.enums.SkillTag;
 import much.api.controller.swagger.CommonApiV1;
 import much.api.dto.response.Envelope;
@@ -98,6 +99,15 @@ public class CommonControllerV1 implements CommonApiV1 {
         return ok()
                 .header(CONTENT_TYPE, localImage.getContentType())
                 .body(localImage.getResource());
+    }
+
+    @Override
+    @PostMapping("/picklist")
+    public ResponseEntity<Envelope<Boolean>> addPickList(@RequestParam MuchType targetType, @RequestParam Long targetId) {
+
+        return ok(
+                Envelope.ok(commonService.addPickList(targetType, targetId))
+        );
     }
 
 }

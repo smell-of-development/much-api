@@ -27,6 +27,7 @@ import static com.querydsl.core.types.dsl.Expressions.*;
 import static much.api.common.enums.MuchType.PROJECT;
 import static much.api.entity.QProject.project;
 import static much.api.entity.QTagRelation.tagRelation;
+import static much.api.entity.QUserPick.userPick;
 
 @Slf4j
 @Repository
@@ -56,7 +57,13 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                                             .where(tagRelation.relationType.eq(PROJECT),
                                                     tagRelation.relationId.eq(project.id)),
                                     project.viewCount,
-                                    Expressions.asBoolean(false), // TODO 찜기능
+                                    JPAExpressions.select(userPick.available)
+                                            .from(userPick)
+                                            .where(
+                                                    userPick.user.id.eq(loginUserId),
+                                                    userPick.targetType.eq(PROJECT),
+                                                    userPick.targetId.eq(project.id)
+                                            ),
                                     Expressions.asNumber(0L)
                             )
                     )
@@ -86,7 +93,13 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                         JPAExpressions.select(subP.meetingDays).from(subP).where(subP.id.eq(project.id)),
                         stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName),
                         JPAExpressions.select(subP.viewCount).from(subP).where(subP.id.eq(project.id)),
-                        Expressions.asBoolean(false), // TODO 찜기능
+                        JPAExpressions.select(userPick.available)
+                                .from(userPick)
+                                .where(
+                                        userPick.user.id.eq(loginUserId),
+                                        userPick.targetType.eq(PROJECT),
+                                        userPick.targetId.eq(project.id)
+                                ),
                         as(JPAExpressions
                                 .select(countTr.count())
                                 .from(countTr)
@@ -206,7 +219,7 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                     .address(address)
                     .timesPerWeek(meetingDays == null ? null : (long) meetingDays.split(",").length)
                     .deadlineDDay(ChronoUnit.DAYS.between(LocalDate.now(), deadline))
-                    .pick(pick)
+                    .pick(pick != null && pick)
                     .imageUrl(imageUrl)
                     .viewCount(viewCount)
                     .build();

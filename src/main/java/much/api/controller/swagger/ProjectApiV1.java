@@ -127,8 +127,7 @@ public interface ProjectApiV1 {
     @Operation(
             summary = "프로젝트 다건조회 API",
             description = """
-                    # 검색기능에서 태그검색만 구현되어 있고, 검색어(search) 값 제목검색은 구현되어있지 않습니다.
-                    # 현재 찜기능은 아직 미구현이라서 로그인 유무와 상관없이 항상 false 값 입니다.  
+                    # 검색기능에서 태그검색만 구현되어 있고, 검색어(search) 값 제목검색은 구현되어있지 않습니다.  
                     프로젝트를 다건 조회합니다.
                     - 페이지 결과를 얻습니다.
                     - 요청예시 GET /api/v1/projects?search=제목&page=1&size=16&tags=Spring,JPA
@@ -158,7 +157,7 @@ public interface ProjectApiV1 {
                     - timesPerWeek : 주 모임주기 (Number)
                     - viewCount    : 조회수 (Number)
                     - deadlineDDay : 마감일 D-Day (Number)
-                    - pick         : 찜 여부 (Boolean) 로그인을 안했다면 ""
+                    - pick         : 찜 여부 (Boolean)
                     - imageUrl     : 대표 이미지 url (String)
                     - <b>recruit   : 모집정보 (Object)</b>
                     ##### Object: recruit

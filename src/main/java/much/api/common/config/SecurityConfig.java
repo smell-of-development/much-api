@@ -63,7 +63,7 @@ public class SecurityConfig {
                                 .requestMatchers(SWAGGER_URL_ARRAY).permitAll()
                                 .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                                 .requestMatchers(toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("/api/v1/common/**").permitAll()
+                                .requestMatchers(GET, "/api/v1/common/**").permitAll()
 //                        .requestMatchers("/oauth2/**").permitAll()
                                 .requestMatchers("/api/v1/auth/refresh").permitAll()
                                 .requestMatchers("/api/v1/sms/**").permitAll()
