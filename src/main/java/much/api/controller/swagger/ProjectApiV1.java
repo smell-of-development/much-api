@@ -147,8 +147,31 @@ public interface ProjectApiV1 {
                     - result.page             : 현재 페이지
                     - result.numberOfElements : 현재 페이지 요소들의 수
                     - result.totalPages       : 전체 페이지
-                    - result.first            : 첫번째 페이지인지 여부 true/false
-                    - result.last             : 마지막 페이지인지 여부 true/false
+                    - result.first            : 첫번째 페이지인지 여부 true / false
+                    - result.last             : 마지막 페이지인지 여부 true / false
+                    ##### elements[]
+                    - id           : 고유 ID (Number)
+                    - title        : 제목 (String)
+                    - tags[]       : 태그 (String[])
+                    - online       : 온라인 모임여부 (Boolean)
+                    - address      : 모임위치 (String) 협의라면 ""
+                    - timesPerWeek : 주 모임주기 (Number)
+                    - viewCount    : 조회수 (Number)
+                    - deadlineDDay : 마감일 D-Day (Number)
+                    - pick         : 찜 여부 (Boolean) 로그인을 안했다면 ""
+                    - imageUrl     : 대표 이미지 url (String)
+                    - <b>recruit   : 모집정보 (Object)</b>
+                    ##### Object: recruit
+                    - state             : 전체 모집 상태 ({"code": String, "name": String})
+                    - needs             : 전체 필요 인원 (Number)
+                    - recruited         : 모집된 전체 인원 (Number)
+                    - <b>positionStatus : 포지션 현황 (Object) - 필수</b>
+                    ##### Object: positionStatus
+                    - state      : 포지션 모집 상태 ({"code": String, "name": String})
+                    - id         : 포지션 고유 ID (Number) 아래의 '포지션 이름' 이 같아도 고유 ID는 모두 다르다.
+                    - name       : 포지션 이름 (String)
+                    - needs      : 포지션 필요 인원 (Number)
+                    - recruited  : 모집된 포지션 인원 (Number)
                     """)
     ResponseEntity<Envelope<PagedResult<ProjectSummary>>> getProjects(ProjectSearch searchCondition);
 
