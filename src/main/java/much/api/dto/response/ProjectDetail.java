@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.MuchState;
-import much.api.entity.Project;
-import much.api.entity.ProjectPosition;
-import much.api.entity.User;
+import much.api.common.util.ContextUtils;
+import much.api.entity.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,7 +26,13 @@ public class ProjectDetail {
     private WriterDetail writer;
 
     // 수정 가능 여부
-    private boolean editable;
+    private Boolean editable;
+
+    // 가입 되어있는지
+    private Boolean alreadyJoined;
+
+    // 신청 했는지 여부
+    private Boolean alreadyApplied;
 
     // 게시글 고유 ID
     private Long id;
@@ -78,9 +83,20 @@ public class ProjectDetail {
 
         List<ProjectPosition> projectPositions = project.getPositionStatus();
 
+        Long userId = ContextUtils.getUserId();
+        boolean isLoggedOut = (userId == null);
+        boolean isWriter = project.isWriter();
+
+        Boolean alreadyJoined = isLoggedOut ? null
+                : isWriter || isJoined(userId, project.getProjectMembers());
+        Boolean alreadyApplied = isLoggedOut ? null
+                : !alreadyJoined && hasApplied(userId, project.getApplications());
+
         return ProjectDetail.builder()
                 .writer(ofWriter(project.getWriter()))
-                .editable(project.isWriter())
+                .editable(isWriter)
+                .alreadyJoined(alreadyJoined)
+                .alreadyApplied(alreadyApplied)
                 .id(project.getId())
                 .title(project.getTitle())
                 .imageUrl(project.getImageUrl())
@@ -99,6 +115,20 @@ public class ProjectDetail {
                 .tags(tags)
                 .introduction(project.getIntroduction())
                 .build();
+    }
+
+    private static boolean hasApplied(Long userId, List<ProjectApplication> applications) {
+        if (userId == null) return false;
+
+        return applications.stream()
+                .anyMatch(ap -> ap.getMember().getId().equals(userId));
+    }
+
+    private static boolean isJoined(Long userId, List<ProjectJoin> projectMembers) {
+        if (userId == null) return false;
+
+        return projectMembers.stream()
+                .anyMatch(pj -> pj.getMember().getId().equals(userId));
     }
 
 

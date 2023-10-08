@@ -87,22 +87,24 @@ public interface ProjectApiV1 {
                     ### 요청
                     - (경로변수) id : 프로젝트 고유 ID
                     ### 응답값
-                    - <b>writer    : 작성자 정보 (Object)</b>
-                    - editable     : 수정가능 여부 (Boolean)
-                    - id           : 고유 ID (Number)
-                    - title        : 제목 (String)
-                    - imageUrl     : 대표 이미지 url (String)
-                    - online       : 온라인 모임여부 (Boolean)
-                    - address      : 모임위치 (String) 협의라면 ""
-                    - deadline     : 마감일 (String)
-                    - deadlineDDay : 마감일 D-Day (Number)
-                    - startDate    : 일정 시작일 (String) 협의라면 ""
-                    - endDate      : 일정 종료일 (String) 협의라면 ""
-                    - between      : 시작일~종료일 사이 차이 (Number) 협의라면 ""
-                    - meetingDays  : 모임일 (String[]) 협의라면 ""
-                    - <b>recruit   : 모집정보 (Object)</b>
-                    - tags         : 태그 (String[])
-                    - introduction : 소개 (String)
+                    - <b>writer      : 작성자 정보 (Object)</b>
+                    - editable       : 수정가능 여부. 즉, 작성자인지 (Boolean)
+                    - alreadyJoined  : 현재 로그인 사용자가 가입되었는지 (Boolean) 비로그인은 ""
+                    - alreadyApplied : 현재 로그인 사용자가 신청했는지 (Boolean) 비로그인은 ""
+                    - id             : 고유 ID (Number)
+                    - title          : 제목 (String)
+                    - imageUrl       : 대표 이미지 url (String)
+                    - online         : 온라인 모임여부 (Boolean)
+                    - address        : 모임위치 (String) 협의라면 ""
+                    - deadline       : 마감일 (String)
+                    - deadlineDDay   : 마감일 D-Day (Number)
+                    - startDate      : 일정 시작일 (String) 협의라면 ""
+                    - endDate        : 일정 종료일 (String) 협의라면 ""
+                    - between        : 시작일~종료일 사이 차이 (Number) 협의라면 ""
+                    - meetingDays    : 모임일 (String[]) 협의라면 ""
+                    - <b>recruit     : 모집정보 (Object)</b>
+                    - tags           : 태그 (String[])
+                    - introduction   : 소개 (String)
                     ##### Object: writer
                     - id       : 작성자 고유 ID
                     - nickname : 작성자 닉네임
@@ -190,4 +192,5 @@ public interface ProjectApiV1 {
                     - 본인글이 아닌경우
                     """)
     ResponseEntity<Envelope<Void>> deleteProject(Long projectId);
+
 }
