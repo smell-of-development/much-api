@@ -36,7 +36,7 @@ public class ProjectCreation {
     @DateTimeFormat(pattern = "yyyy.MM.dd")
     private LocalDate endDate;
 
-    private List<String> timesPerWeek = new ArrayList<>();
+    private List<String> meetingDays = new ArrayList<>();
 
     @NotNull
     private Recruit recruit;

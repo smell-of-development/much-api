@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 public class ProjectSearch {
 
-    private static final int DEFAULT_SIZE_PER_PAGE = 5;
+    private static final int DEFAULT_SIZE_PER_PAGE = 16;
     private static final int MAX_SIZE_PER_PAGE = 40;
 
     private String search;

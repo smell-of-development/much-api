@@ -55,8 +55,8 @@ class CommunityServiceTest {
     void clean() {
         communityRepository.deleteAll();
         fileRepository.deleteAll();
-        userRepository.deleteAll();
         tagRelationRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     static class PostAggregator implements ArgumentsAggregator {

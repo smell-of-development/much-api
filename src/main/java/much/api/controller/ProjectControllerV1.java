@@ -35,11 +35,11 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
     @Override
     @PutMapping("/projects/{projectId}")
-    public ResponseEntity<Envelope<ProjectDetail>> modifyProject(@PathVariable Long projectId,
+    public ResponseEntity<Envelope<Long>> modifyProject(@PathVariable Long projectId,
                                                                  @RequestBody @Valid ProjectModification request) {
 
         return ok(
-                Envelope.ok(projectService.modifyProject(projectId, request))
+                Envelope.ok(projectService.modifyProject(projectId, request).getId())
         );
     }
 
@@ -54,8 +54,12 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     }
 
     @Override
+    @GetMapping("/projects")
     public ResponseEntity<Envelope<PagedResult<ProjectSummary>>> getProjects(ProjectSearch searchCondition) {
-        return null;
+
+        return ok(
+                Envelope.ok(projectService.getProjects(searchCondition))
+        );
     }
 
 

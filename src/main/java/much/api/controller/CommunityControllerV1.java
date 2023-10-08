@@ -45,21 +45,21 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
     @Override
     @PostMapping("/communities")
-    public ResponseEntity<Envelope<CommunityPostDetail>> createCommunityPost(@RequestBody @Valid CommunityPostCreation request) {
+    public ResponseEntity<Envelope<Long>> createCommunityPost(@RequestBody @Valid CommunityPostCreation request) {
 
         return ok(
-                Envelope.ok(communityService.createPost(request))
+                Envelope.ok(communityService.createPost(request).getId())
         );
     }
 
 
     @Override
     @PutMapping("/communities/{postId}")
-    public ResponseEntity<Envelope<CommunityPostDetail>> modifyCommunityPost(@PathVariable Long postId,
+    public ResponseEntity<Envelope<Long>> modifyCommunityPost(@PathVariable Long postId,
                                                                              @RequestBody @Valid CommunityPostModification request) {
 
         return ok(
-                Envelope.ok(communityService.modifyPost(postId, request))
+                Envelope.ok(communityService.modifyPost(postId, request).getId())
         );
     }
 

@@ -52,12 +52,13 @@ public class CommunityService {
     }
 
 
-    // TODO GET POSTS 테스트 작성
+    // TODO 테스트 작성
     public PagedResult<CommunityPostSummary> getPosts(CommunitySearch searchCondition) {
 
         Page<CommunitySearchRepository.CommunitySearchDto> page = communitySearchRepository.searchCommunityPosts(searchCondition);
+
         // noinspection unchecked
-        return (PagedResult<CommunityPostSummary>) PagedResult.ofPage(page);
+        return (PagedResult<CommunityPostSummary>) PagedResult.ofPageWithNotMapped(page);
     }
 
 

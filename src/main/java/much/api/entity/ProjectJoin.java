@@ -35,7 +35,7 @@ public class ProjectJoin extends BaseTimeEntity {
     private ProjectPosition position;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User member;
 
     @Builder

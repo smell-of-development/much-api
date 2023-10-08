@@ -55,7 +55,15 @@ public class PagedResult<T> {
     }
 
 
-    public static PagedResult<?> ofPage(Page<? extends PageElement<?>> page) {
+    public static PagedResult<?> ofPageWithCompletelyMapped(Page<?> page) {
+
+        return pageBuilder(page)
+                .elements(page.getContent())
+                .build();
+    }
+
+
+    public static PagedResult<?> ofPageWithNotMapped(Page<? extends PageElement<?>> page) {
 
         return pageBuilder(page)
                 .elements(page.getContent()
@@ -66,7 +74,7 @@ public class PagedResult<T> {
     }
 
 
-    public static PagedResult<?> ofSlice(Slice<? extends PageElement<?>> slice) {
+    public static PagedResult<?> ofSliceWithNotMapped(Slice<? extends PageElement<?>> slice) {
 
         return sliceBuilder(slice)
                 .elements(slice.getContent()
@@ -77,14 +85,14 @@ public class PagedResult<T> {
     }
 
 
-    public static PagedResultBuilder<?> pageBuilder(Page<? extends PageElement<?>> page) {
+    public static PagedResultBuilder<?> pageBuilder(Page<?> page) {
 
         return sliceBuilder(page)
                 .totalPages(page.getTotalPages());
     }
 
 
-    public static PagedResultBuilder<?> sliceBuilder(Slice<? extends PageElement<?>> slice) {
+    public static PagedResultBuilder<?> sliceBuilder(Slice<?> slice) {
 
         return PagedResult.builder()
                 .page(slice.getNumber())

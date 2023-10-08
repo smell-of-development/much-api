@@ -67,8 +67,8 @@ class CommunityControllerV1Test {
     void clean() {
         communityRepository.deleteAll();
         fileRepository.deleteAll();
-        userRepository.deleteAll();
         tagRelationRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     static class PostAggregator implements ArgumentsAggregator {
@@ -129,14 +129,7 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").isEmpty())
                 .andExpect(jsonPath("$.requires").isEmpty())
-                .andExpect(jsonPath("$.result.id").isNumber())
-                .andExpect(jsonPath("$.result.editable").value(true))
-                .andExpect(jsonPath("$.result.category").value(information.getCategory().name()))
-                .andExpect(jsonPath("$.result.tags.length()").value(information.getTags().size()))
-                .andExpect(jsonPath("$.result.content").value(information.getContent()))
-                .andExpect(jsonPath("$.result.authorId").value(userId))
-                .andExpect(jsonPath("$.result.authorNickname").isNotEmpty())
-                .andExpect(jsonPath("$.result.authorImageUrl").hasJsonPath());
+                .andExpect(jsonPath("$.result").isNumber());
     }
 
 
@@ -194,15 +187,7 @@ class CommunityControllerV1Test {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").isEmpty())
                 .andExpect(jsonPath("$.requires").isEmpty())
-                .andExpect(jsonPath("$.result.id").isNumber())
-                .andExpect(jsonPath("$.result.editable").value(true))
-                .andExpect(jsonPath("$.result.category").value(information.getCategory().name()))
-                .andExpect(jsonPath("$.result.tags.length()").value(information.getTags().size()))
-                .andExpect(jsonPath("$.result.title").value(information.getTitle()))
-                .andExpect(jsonPath("$.result.content").value(information.getContent()))
-                .andExpect(jsonPath("$.result.authorId").value(userId))
-                .andExpect(jsonPath("$.result.authorNickname").isNotEmpty())
-                .andExpect(jsonPath("$.result.authorImageUrl").hasJsonPath());
+                .andExpect(jsonPath("$.result").isNumber());
     }
 
 

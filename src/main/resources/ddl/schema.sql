@@ -89,7 +89,7 @@ create table tb_project
     deadline                       date,
     start_date                     date,
     end_date                       date,
-    times_per_week                 varchar(50),
+    meeting_days                   varchar(50),
     introduction                   text,
     introduction_without_html_tags text,
     view_count                     bigint default 0 not null,
@@ -139,9 +139,6 @@ alter table if exists tb_user add constraint tb_user_idx1 unique (login_id);
 alter table if exists tb_user add constraint tb_user_idx2 unique (kakao_id);
 
 alter table if exists tb_user add constraint tb_user_idx3 unique (google_id);
-
-alter table if exists tb_project
-    add constraint tb_project_fk1 foreign key (writer) references tb_user;
 
 alter table if exists tb_project_position
     add constraint tb_project_position_fk1 foreign key (project_id) references tb_project;

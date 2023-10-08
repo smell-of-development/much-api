@@ -62,8 +62,8 @@ public class ProjectDetail {
     // 모임 종료일 - 모임 마감일 차이 또는 협의("")
     private Long between;
 
-    // 모임 주기 ex) "월", "수", "금"
-    private List<String> timesPerWeek;
+    // 모임일 ex) "월", "수", "금"
+    private List<String> meetingDays;
 
     // 모집 정보
     private Recruit recruit;
@@ -91,9 +91,9 @@ public class ProjectDetail {
                 .endDate(project.getEndDate())
                 .deadlineDDay(project.getDeadlineDDay())
                 .between(project.getBetween())
-                .timesPerWeek(
-                        project.getTimesPerWeek() == null ?
-                                null : stream(project.getTimesPerWeek().split(",")).toList()
+                .meetingDays(
+                        project.getMeetingDays() == null ?
+                                null : stream(project.getMeetingDays().split(",")).toList()
                 )
                 .recruit(Recruit.of(projectPositions))
                 .tags(tags)
@@ -130,7 +130,7 @@ public class ProjectDetail {
 
 
     @Getter
-    static class Recruit {
+    public static class Recruit {
 
         // 전체 모집 상태
         private State state;
@@ -157,7 +157,7 @@ public class ProjectDetail {
         }
 
 
-        static Recruit of(List<ProjectPosition> projectPositions) {
+        public static Recruit of(List<ProjectPosition> projectPositions) {
 
             int totalNeeds = 0;
             int totalRecruited = 0;

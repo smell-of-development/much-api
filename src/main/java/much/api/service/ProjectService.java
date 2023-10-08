@@ -8,11 +8,17 @@ import much.api.common.exception.ProjectNotFound;
 import much.api.common.util.ContextUtils;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.request.ProjectModification;
+import much.api.dto.request.ProjectSearch;
+import much.api.dto.response.PagedResult;
 import much.api.dto.response.ProjectDetail;
+import much.api.dto.response.ProjectSummary;
 import much.api.entity.Project;
 import much.api.entity.ProjectPosition;
 import much.api.entity.User;
+import much.api.repository.ProjectPositionRepository;
 import much.api.repository.ProjectRepository;
+import much.api.repository.ProjectSearchRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static much.api.common.enums.MuchType.PROJECT;
 
@@ -33,6 +40,10 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
+    private final ProjectPositionRepository projectPositionRepository;
+
+    private final ProjectSearchRepository projectSearchRepository;
+
     private final FileService fileService;
 
     private final TagHelperService tagHelperService;
@@ -44,10 +55,10 @@ public class ProjectService {
         User user = commonService.getUserOrThrowException(userId);
 
         // 저장
-        List<String> requestTimesPerWeek = projectCreation.getTimesPerWeek();
+        List<String> requestMeetingDays = projectCreation.getMeetingDays();
 
-        String timesPerWeek = requestTimesPerWeek.isEmpty() ? null :
-                String.join(",", requestTimesPerWeek);
+        String meetingDays = requestMeetingDays.isEmpty() ? null :
+                String.join(",", requestMeetingDays);
 
         final String requestIntroduction = projectCreation.getIntroduction();
         final Set<String> requestTags = projectCreation.getTags();
@@ -61,7 +72,7 @@ public class ProjectService {
                 .deadline(projectCreation.getDeadline())
                 .startDate(projectCreation.getStartDate())
                 .endDate(projectCreation.getEndDate())
-                .timesPerWeek(timesPerWeek)
+                .meetingDays(meetingDays)
                 .introduction(requestIntroduction)
                 .build();
 
@@ -141,10 +152,10 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectNotFound(projectId));
 
         // 수정
-        List<String> requestTimesPerWeek = request.getTimesPerWeek();
+        List<String> requestMeetingDays = request.getMeetingDays();
 
-        String timesPerWeek = requestTimesPerWeek.isEmpty() ? null :
-                String.join(",", requestTimesPerWeek);
+        String timesPerWeek = requestMeetingDays.isEmpty() ? null :
+                String.join(",", requestMeetingDays);
 
         final String modifiedIntroduction = request.getIntroduction();
 
@@ -219,4 +230,31 @@ public class ProjectService {
         project.deletePosition(asisPositionMap.values());
     }
 
+
+    // TODO 테스트 작성
+    public PagedResult<ProjectSummary> getProjects(ProjectSearch searchCondition) {
+
+        Page<ProjectSearchRepository.ProjectSearchDto> page = projectSearchRepository.searchProjects(searchCondition, null);
+
+        // 결과 PROJECT ID 리스트
+        List<Long> projectIds = page.stream()
+                .map(ProjectSearchRepository.ProjectSearchDto::getId)
+                .toList();
+
+        // 결과 ID 이용해 포지션 정보 획득
+        Map<Long, List<ProjectPosition>> projectPositionMap = projectPositionRepository.findAllByProjectIdIn(projectIds)
+                .stream()
+                .collect(groupingBy(pp -> pp.getProject().getId()));
+
+        // 포지션 정보 조립
+        Page<ProjectSummary> mappedPage = page.map(ProjectSearchRepository.ProjectSearchDto::toResponseDto);
+
+        mappedPage.getContent()
+                .forEach(ps -> ps.setRecruit(
+                        ProjectDetail.Recruit.of(projectPositionMap.get(ps.getId())))
+                );
+
+        // noinspection unchecked
+        return (PagedResult<ProjectSummary>) PagedResult.ofPageWithCompletelyMapped(mappedPage);
+    }
 }

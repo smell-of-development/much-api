@@ -41,8 +41,8 @@ class UserServiceTest {
 
     @BeforeEach
     void clean() {
-        userRepository.deleteAll();
         smsCertificationHistRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     static class UserCreationAggregator implements ArgumentsAggregator {

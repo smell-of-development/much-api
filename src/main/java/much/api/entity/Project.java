@@ -26,7 +26,7 @@ import static java.util.function.Predicate.not;
 @Table(
         name = "tb_project",
         indexes = {
-                @Index(name = "tb_project_idx1", columnList = "deadline"),
+                @Index(name = "tb_project_idx1", columnList = "id, deadline"),
         }
 )
 public class Project extends BaseTimeEntity {
@@ -38,7 +38,7 @@ public class Project extends BaseTimeEntity {
 
     @Getter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer")
+    @JoinColumn(name = "writer", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User writer;
 
     @Getter
@@ -66,7 +66,7 @@ public class Project extends BaseTimeEntity {
     private LocalDate endDate;
 
     @Getter
-    private String timesPerWeek;
+    private String meetingDays;
 
     @Getter
     @Column(columnDefinition = "text")
@@ -100,7 +100,7 @@ public class Project extends BaseTimeEntity {
                    LocalDate deadline,
                    LocalDate startDate,
                    LocalDate endDate,
-                   String timesPerWeek,
+                   String meetingDays,
                    String introduction,
                    String introductionWithoutHtmlTags) {
 
@@ -112,7 +112,7 @@ public class Project extends BaseTimeEntity {
         this.deadline = deadline;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.timesPerWeek = timesPerWeek;
+        this.meetingDays = meetingDays;
         this.introduction = introduction;
         this.introductionWithoutHtmlTags = introductionWithoutHtmlTags;
     }
@@ -167,7 +167,7 @@ public class Project extends BaseTimeEntity {
         this.deadline = deadline;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.timesPerWeek = timesPerWeek;
+        this.meetingDays = timesPerWeek;
         this.introduction = introduction;
     }
 

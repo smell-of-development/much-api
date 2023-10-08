@@ -43,6 +43,8 @@ public class QProject extends EntityPathBase<Project> {
 
     public final StringPath introductionWithoutHtmlTags = createString("introductionWithoutHtmlTags");
 
+    public final StringPath meetingDays = createString("meetingDays");
+
     public final BooleanPath online = createBoolean("online");
 
     public final ListPath<ProjectPosition, QProjectPosition> positionStatus = this.<ProjectPosition, QProjectPosition>createList("positionStatus", ProjectPosition.class, QProjectPosition.class, PathInits.DIRECT2);
@@ -50,8 +52,6 @@ public class QProject extends EntityPathBase<Project> {
     public final ListPath<ProjectJoin, QProjectJoin> projectMembers = this.<ProjectJoin, QProjectJoin>createList("projectMembers", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
-
-    public final StringPath timesPerWeek = createString("timesPerWeek");
 
     public final StringPath title = createString("title");
 

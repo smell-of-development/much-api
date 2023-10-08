@@ -19,6 +19,8 @@ public class CommunityPostCreation {
 
     private Set<String> tags = new HashSet<>();
 
+    // TODO String 최대길이 제한
+
     @NotNull
     private String title;
 

@@ -30,7 +30,7 @@ public class CommunityPostDetail {
 
     private final String authorImageUrl;
 
-    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private final LocalDateTime createdAt;
 
     private final Long viewCount;

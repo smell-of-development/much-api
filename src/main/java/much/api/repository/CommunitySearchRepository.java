@@ -35,12 +35,13 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
         super(Community.class);
     }
 
+    // TODO querydsl 걷어내기
     public Page<CommunitySearchDto> searchCommunityPosts(CommunitySearch searchCondition) {
 
         PageRequest pageRequest = PageRequest.of(searchCondition.getPage(), searchCondition.getSize());
 
         // TODO 검색어 및 검색태그 없음 => 전체글 검색
-        // TODO 제목 및 내용으로만 검색 - 인메모리 DB 에서 MySQL FULLTEXT 미지원
+        // TODO 제목 검색 - 인메모리 DB 에서 MySQL FULLTEXT 미지원.
         if (searchCondition.getTags().isEmpty()) {
             return applyPagination(pageRequest,
                     qf -> select(Projections.constructor(CommunitySearchDto.class,
@@ -56,8 +57,8 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                                     JPAExpressions
                                             .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
                                             .from(tagRelation)
-                                            .where(tagRelation.relationType.eq(COMMUNITY)
-                                                    .and(tagRelation.relationId.eq(community.id))),
+                                            .where(tagRelation.relationType.eq(COMMUNITY),
+                                                    tagRelation.relationId.eq(community.id)),
                                     community.viewCount
                             )
                     )
@@ -131,22 +132,22 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                         as(JPAExpressions
                                 .select(countTr.count())
                                 .from(countTr)
-                                .where(countTr.relationType.eq(COMMUNITY)
-                                        .and(countTr.relationId.eq(community.id))
-                                        .and(countTr.tagName.in(searchCondition.getTags()))), "tagHitCount"),
+                                .where(countTr.relationType.eq(COMMUNITY),
+                                        countTr.relationId.eq(community.id),
+                                        countTr.tagName.in(searchCondition.getTags())), "tagHitCount"),
                         stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName),
                         JPAExpressions.select(subC.viewCount).from(subC).where(subC.id.eq(community.id)))
                 )
                         .from(tagRelation)
                         .join(community)
-                        .on(tagRelation.relationType.eq(COMMUNITY)
-                                .and(tagRelation.relationId.eq(community.id))
-                                .and(community.category.eq(searchCondition.getCategory())))
+                        .on(tagRelation.relationType.eq(COMMUNITY),
+                                tagRelation.relationId.eq(community.id),
+                                community.category.eq(searchCondition.getCategory()))
                         .where(JPAExpressions
                                 .selectFrom(subTr)
-                                .where(subTr.relationType.eq(COMMUNITY)
-                                        .and(subTr.relationId.eq(community.id))
-                                        .and(subTr.tagName.in(searchCondition.getTags()))).exists())
+                                .where(subTr.relationType.eq(COMMUNITY),
+                                        subTr.relationId.eq(community.id),
+                                        subTr.tagName.in(searchCondition.getTags())).exists())
                         .groupBy(community.id, community.author.id)
                         .orderBy(orderSpecifiers(searchCondition.isByRecent()))
                 ,
@@ -155,14 +156,14 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                 qf -> select(tagRelation.relationId)
                         .from(tagRelation)
                         .join(community)
-                        .on(tagRelation.relationType.eq(COMMUNITY)
-                                .and(tagRelation.relationId.eq(community.id))
-                                .and(community.category.eq(searchCondition.getCategory())))
+                        .on(tagRelation.relationType.eq(COMMUNITY),
+                                tagRelation.relationId.eq(community.id),
+                                community.category.eq(searchCondition.getCategory()))
                         .where(JPAExpressions
                                 .selectFrom(subTr)
-                                .where(subTr.relationType.eq(COMMUNITY)
-                                        .and(subTr.relationId.eq(community.id))
-                                        .and(subTr.tagName.in(searchCondition.getTags()))).exists())
+                                .where(subTr.relationType.eq(COMMUNITY),
+                                        subTr.relationId.eq(community.id),
+                                        subTr.tagName.in(searchCondition.getTags())).exists())
                         .groupBy(community.id, community.author.id)
         );
     }

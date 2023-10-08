@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class CommunitySearch {
 
-    private static final int DEFAULT_SIZE_PER_PAGE = 5;
+    private static final int DEFAULT_SIZE_PER_PAGE = 10;
     private static final int MAX_SIZE_PER_PAGE = 40;
 
     @Pattern(
@@ -33,11 +33,11 @@ public class CommunitySearch {
 
     @Builder
     private CommunitySearch(String category,
-                           String search,
-                           List<String> tags,
-                           Integer page,
-                           Integer size,
-                           Boolean byRecent) {
+                            String search,
+                            List<String> tags,
+                            Integer page,
+                            Integer size,
+                            Boolean byRecent) {
 
         this.category = category;
         this.search = search;
