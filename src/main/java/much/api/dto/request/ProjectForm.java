@@ -1,12 +1,12 @@
 package much.api.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import much.api.common.aop.SelfCheck;
 import much.api.common.exception.*;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,15 +32,16 @@ public class ProjectForm {
 
     private String address;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @NotNull
+    @JsonFormat(pattern = "yyyy.MM.dd")
     @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate deadline;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate startDate;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate endDate;
 
