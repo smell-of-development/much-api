@@ -232,13 +232,13 @@ public class ProjectService {
         // 이미 참여중 유저인지 확인
         projectJoinRepository.findByProjectIdAndMemberId(projectId, userId)
                 .ifPresent(pj -> {
-                    throw new AlreadyJoinedProject();
+                    throw new AlreadyJoined();
                 });
 
         // 이미 신청한 유저인지 확인
         projectApplicationRepository.findByProjectIdAndMemberId(projectId, userId)
                 .ifPresent(pa -> {
-                    throw new AlreadyAppliedProject();
+                    throw new AlreadyApplied();
                 });
 
         // 프로젝트 포지션 확인
@@ -274,7 +274,7 @@ public class ProjectService {
 
         int deleted = projectApplicationRepository.deleteByProjectIdAndMemberId(projectId, userId);
         if (deleted == 0) {
-            throw new ProjectApplicationNotFound();
+            throw new ApplicationFormNotFound();
         }
     }
 
@@ -316,7 +316,7 @@ public class ProjectService {
 
         // 신청서 확인
         much.api.entity.ProjectApplication application = projectApplicationRepository.findById(applicationId)
-                .orElseThrow(ProjectApplicationNotFound::new);
+                .orElseThrow(ApplicationFormNotFound::new);
 
         // 승인자, 신청서 프로젝트의 생성자 일치 확인
         Project project = application.getProject();

@@ -24,7 +24,7 @@ public enum Code {
     POST_NOT_FOUND(2000, "게시글을 찾을 수 없어요.", false),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없어요.", false),
     PROJECT_POSITION_NOT_FOUND(2000, "포지션 정보를 찾을 수 없어요.", false),
-    PROJECT_APPLICATION_NOT_FOUND(2000, "신청서 정보를 찾을 수 없어요.", false),
+    APPLICATION_FORM_NOT_FOUND(2000, "신청서 정보를 찾을 수 없어요.", false),
     FILE_NOT_FOUND(2000, "파일을 찾을 수 없어요.", false),
 
     PICK_PROCESSING_FAIL(2000, "찜하기에 실패했어요.", false),
@@ -42,8 +42,8 @@ public enum Code {
     NEEDS_LESS_THAN_RECRUITED(2000, "%s 포지션의 모집완료 인원 %s명보다 필요인원이 더 적어요.", true),
     POSITION_CAN_NOT_BE_DELETED(2000, "%s 포지션은 이미 모집된 인원이 있어 삭제할 수 없어요.", true),
 
-    ALREADY_APPLIED_PROJECT(2000, "이미 신청한 프로젝트에요.", false),
-    ALREADY_JOINED_PROJECT(2000, "이미 가입한 프로젝트에요.", false),
+    ALREADY_APPLIED(2000, "이미 신청이 되어있어요.", false),
+    ALREADY_JOINED(2000, "이미 가입이 되어있어요.", false),
     ALREADY_RECRUITED_POSITION(2000, "%s 포지션은 이미 모집이 완료되었어요.", true),
 
     DUPLICATED_NICKNAME(2000, "중복되는 닉네임이 있어 사용할 수 없어요.", false),
