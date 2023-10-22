@@ -50,7 +50,7 @@ public interface ProjectApiV1 {
             description = """
                     프로젝트 글을 수정합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
-                    - 요청예시 PUT /api/v1/projects/1
+                    - 요청예시 PUT /v1/projects/1
                     ### 요청값
                     - title (String)         : 프로젝트 제목 (40자 이하) - 필수
                     - imageUrl (String)      : 대표 이미지 url
@@ -133,7 +133,7 @@ public interface ProjectApiV1 {
                     # 검색기능에서 태그검색만 구현되어 있고, 검색어(search) 값 제목검색은 구현되어있지 않습니다.  
                     프로젝트를 다건 조회합니다.
                     - 페이지 결과를 얻습니다.
-                    - 요청예시 GET /api/v1/projects?search=제목&page=1&size=16&tags=Spring,JPA
+                    - 요청예시 GET /v1/projects?search=제목&page=1&size=16&tags=Spring,JPA
                     ### 정확도순 정렬시(byRecent=false) 우선순위
                     - 태그 일치 개수 순서이므로 요청값 'tags' 존재해야 의미있음.
                     ### 요청값
@@ -184,7 +184,7 @@ public interface ProjectApiV1 {
                     프로젝트 글을 삭제합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
                     - 프로젝트와 연관된 신청, 가입정보 모두 삭제됩니다.
-                    - 요청예시 DELETE /api/v1/projects/1
+                    - 요청예시 DELETE /v1/projects/1
                     ### 응답값
                     - code 200
                     - 삭제 성공

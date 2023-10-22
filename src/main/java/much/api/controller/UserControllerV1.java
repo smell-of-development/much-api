@@ -19,7 +19,7 @@ import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/v1")
 public class UserControllerV1 implements UserApiV1 {
 
     private final UserService userService;

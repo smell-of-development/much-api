@@ -60,7 +60,7 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                                     JPAExpressions.select(userPick.available)
                                             .from(userPick)
                                             .where(
-                                                    userPick.user.id.eq(loginUserId),
+                                                    userPick.user.id.eq(loginUserId == null ? 0 : loginUserId),
                                                     userPick.targetType.eq(PROJECT),
                                                     userPick.targetId.eq(project.id)
                                             ),

@@ -17,14 +17,14 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/v1/communities")
 public class CommunityControllerV1 implements CommunityApiV1 {
 
     private final CommunityService communityService;
 
 
     @Override
-    @GetMapping("/communities/{postId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<Envelope<CommunityPostDetail>> getPost(@PathVariable Long postId) {
 
         return ok(
@@ -33,7 +33,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
     }
 
     @Override
-    @GetMapping("/communities")
+    @GetMapping
     public ResponseEntity<Envelope<PagedResult<CommunityPostSummary>>> getPosts(@ModelAttribute @Valid CommunitySearch searchCondition) {
 
         return ok(
@@ -43,7 +43,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
-    @PostMapping("/communities")
+    @PostMapping
     public ResponseEntity<Envelope<Long>> createCommunityPost(@RequestBody @Valid CommunityPostForm request) {
 
         return ok(
@@ -53,7 +53,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
-    @PutMapping("/communities/{postId}")
+    @PutMapping("/{postId}")
     public ResponseEntity<Envelope<Long>> modifyCommunityPost(@PathVariable Long postId,
                                                               @RequestBody @Valid CommunityPostForm request) {
 
@@ -64,7 +64,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
 
     @Override
-    @DeleteMapping("/communities/{postId}")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<Envelope<Void>> deleteCommunityPost(@PathVariable Long postId) {
 
         communityService.deletePost(postId);

@@ -55,7 +55,7 @@ public interface CommonApiV1 {
             description = """
                     이미지를 업로드합니다.
                     ### 요청
-                    - POST /api/v1/common/image?type=PROFILE
+                    - POST /v1/common/image?type=PROFILE
                     - (multipart/form-data) key: image
                     - type 파라미터 종류 : THUMBNAIL, PROFILE, NONE(기본값)
                     - type 파라미터 종류에 따라서 이미지 리사이징하여 저장
@@ -82,7 +82,7 @@ public interface CommonApiV1 {
             description = """
                     로그인 유저의 PICK LIST 대상에 추가하거나 제거합니다. (스위칭 형식의 찜 기능)
                     ### 요청
-                    - POST /api/v1/picklist
+                    - POST /v1/picklist
                     - form-data
                     - targetType : 찜 대상의 유형 ex) STUDY, PROJECT
                     - targetId   : 찜 대상의 고유 ID

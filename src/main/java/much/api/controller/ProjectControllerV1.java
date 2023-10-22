@@ -17,13 +17,13 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/v1/projects")
 public class ProjectControllerV1 implements ProjectApiV1 {
 
     private final ProjectService projectService;
 
     @Override
-    @PostMapping("/projects")
+    @PostMapping
     public ResponseEntity<Envelope<Long>> createProject(@RequestBody @Valid ProjectForm request) {
 
         return ok(
@@ -33,7 +33,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @PutMapping("/projects/{projectId}")
+    @PutMapping("/{projectId}")
     public ResponseEntity<Envelope<Long>> modifyProject(@PathVariable Long projectId,
                                                         @RequestBody @Valid ProjectForm request) {
 
@@ -44,7 +44,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @GetMapping("/projects/{projectId}")
+    @GetMapping("/{projectId}")
     public ResponseEntity<Envelope<ProjectDetail>> getProject(@PathVariable Long projectId) {
 
         return ok(
@@ -53,7 +53,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     }
 
     @Override
-    @GetMapping("/projects")
+    @GetMapping
     public ResponseEntity<Envelope<PagedResult<ProjectSummary>>> getProjects(ProjectSearch searchCondition) {
 
         return ok(
@@ -63,7 +63,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @DeleteMapping("/projects/{projectId}")
+    @DeleteMapping("/{projectId}")
     public ResponseEntity<Envelope<Void>> deleteProject(@PathVariable Long projectId) {
 
         projectService.deleteProject(projectId);
@@ -74,7 +74,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @PostMapping("/projects/{projectId}/applications")
+    @PostMapping("/{projectId}/applications")
     public ResponseEntity<Envelope<Void>> createProjectApplication(@PathVariable Long projectId,
                                                                    @RequestBody @Valid ProjectApplicationForm request) {
 
@@ -86,7 +86,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @DeleteMapping("/projects/{projectId}/applications")
+    @DeleteMapping("/{projectId}/applications")
     public ResponseEntity<Envelope<Void>> deleteProjectApplication(@PathVariable Long projectId) {
 
         projectService.deleteProjectApplication(projectId);
@@ -97,7 +97,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @GetMapping("/projects/{projectId}/applications")
+    @GetMapping("/{projectId}/applications")
     public ResponseEntity<Envelope<List<ProjectApplication>>> getProjectApplications(@PathVariable Long projectId) {
 
         return ok(
@@ -107,7 +107,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
 
     @Override
-    @PostMapping("/projects/applications/{applicationId}/accept")
+    @PostMapping("/applications/{applicationId}/accept")
     public ResponseEntity<Envelope<Void>> acceptProjectApplication(@PathVariable Long applicationId) {
 
         projectService.acceptProjectApplication(applicationId);

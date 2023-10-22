@@ -25,7 +25,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/common")
+@RequestMapping("/v1/common")
 public class CommonControllerV1 implements CommonApiV1 {
 
     private final CommonService commonService;

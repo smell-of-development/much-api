@@ -25,7 +25,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/v1")
 public class AuthControllerV1 implements AuthApiV1 {
 
     private final AuthService authService;

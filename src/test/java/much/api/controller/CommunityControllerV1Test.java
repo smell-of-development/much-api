@@ -110,7 +110,7 @@ class CommunityControllerV1Test {
         );
 
         mockMvc.perform(
-                        post("/api/v1/communities")
+                        post("/v1/communities")
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -165,7 +165,7 @@ class CommunityControllerV1Test {
         String request = objectMapper.writeValueAsString(information);
 
         mockMvc.perform(
-                        put("/api/v1/communities/{postId}", saved.getId())
+                        put("/v1/communities/{postId}", saved.getId())
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -190,7 +190,7 @@ class CommunityControllerV1Test {
         String request = objectMapper.writeValueAsString(information);
 
         mockMvc.perform(
-                        post("/api/v1/communities")
+                        post("/v1/communities")
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -216,7 +216,7 @@ class CommunityControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        put("/api/v1/communities/{postId}", 1L)
+                        put("/v1/communities/{postId}", 1L)
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -258,7 +258,7 @@ class CommunityControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        put("/api/v1/communities/{postId}", saved.getId())
+                        put("/v1/communities/{postId}", saved.getId())
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -285,7 +285,7 @@ class CommunityControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        put("/api/v1/communities/{postId}", 0L)
+                        put("/v1/communities/{postId}", 0L)
                                 .contentType(APPLICATION_JSON)
                                 .content(request)
                 )
@@ -326,7 +326,7 @@ class CommunityControllerV1Test {
 
         // expected
         mockMvc.perform(
-                        delete("/api/v1/communities/{postId}", saved.getId())
+                        delete("/v1/communities/{postId}", saved.getId())
                 )
                 .andDo(print())
                 .andExpect(status().isOk())

@@ -33,7 +33,7 @@ public interface CommunityApiV1 {
                     커뮤니티 글을 다건 조회합니다.
                     - 페이지 결과를 얻습니다.
                     - 내용은 50자까지 미리보기
-                    - 요청예시 GET /api/v1/communities?category=QNA&search=제목&page=1&size=10
+                    - 요청예시 GET /v1/communities?category=QNA&search=제목&page=1&size=10
                     ### 정확도순 정렬(byRecent=false)
                     - 태그 일치 개수 순서이므로 요청값 'tags' 존재해야 의미있음.
                     ### 요청값
@@ -78,7 +78,7 @@ public interface CommunityApiV1 {
             description = """
                     커뮤니티 글을 수정합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
-                    - 요청예시 PUT /api/v1/communities/1
+                    - 요청예시 PUT /v1/communities/1
                     ### 요청값
                     - 쿼리스트링(id) - Number   : (필수) 글 ID
                     - body(category) - String   : (필수) QNA, FREE, TECH_SHARE 중 하나 (수정 데이터)
@@ -101,7 +101,7 @@ public interface CommunityApiV1 {
             description = """
                     커뮤니티 글을 삭제합니다.
                     - 로그인 사용자와 등록자가 같아야합니다.
-                    - 요청예시 DELETE /api/v1/communities/1
+                    - 요청예시 DELETE /v1/communities/1
                     ### 응답값
                     - code 200
                     - 삭제 성공
