@@ -3,10 +3,12 @@ package much.api.controller.swagger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import much.api.dto.request.CommunityPostCreation;
-import much.api.dto.request.CommunityPostModification;
+import much.api.dto.request.CommunityPostForm;
 import much.api.dto.request.CommunitySearch;
-import much.api.dto.response.*;
+import much.api.dto.response.CommunityPostDetail;
+import much.api.dto.response.CommunityPostSummary;
+import much.api.dto.response.Envelope;
+import much.api.dto.response.PagedResult;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "커뮤니티 API", description = "커뮤니티 관련 API")
@@ -69,7 +71,7 @@ public interface CommunityApiV1 {
                     - 로그인 된 사용자를 찾을 수 없는경우
                     """,
             requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
-    ResponseEntity<Envelope<Long>> createCommunityPost(CommunityPostCreation request);
+    ResponseEntity<Envelope<Long>> createCommunityPost(CommunityPostForm request);
 
     @Operation(
             summary = "커뮤니티 글 수정 API",
@@ -92,7 +94,7 @@ public interface CommunityApiV1 {
                     """,
             requestBody = @RequestBody(required = true, description = "카테고리, 태그, 내용"))
     ResponseEntity<Envelope<Long>> modifyCommunityPost(Long postId,
-                                                       CommunityPostModification request);
+                                                       CommunityPostForm request);
 
     @Operation(
             summary = "커뮤니티 글 삭제 API",

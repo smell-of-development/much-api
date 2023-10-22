@@ -3,7 +3,7 @@ package much.api.repository;
 import lombok.extern.slf4j.Slf4j;
 import much.api.WithUser;
 import much.api.common.enums.CommunityCategory;
-import much.api.dto.request.CommunityPostCreation;
+import much.api.dto.request.CommunityPostForm;
 import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.service.CommunityService;
@@ -46,21 +46,21 @@ class CommunitySearchRepositoryTest {
     @WithUser(loginId = "testUser", password = "pw", nickname = "테스트")
     void test() {
 
-        CommunityPostCreation p1 = CommunityPostCreation.builder()
+        CommunityPostForm p1 = CommunityPostForm.builder()
                 .category(CommunityCategory.QNA)
                 .title("test1")
                 .content("test1")
                 .tags(Set.of("Spring Boot", "JPA", "React", "JAVA"))
                 .build();
 
-        CommunityPostCreation p2 = CommunityPostCreation.builder()
+        CommunityPostForm p2 = CommunityPostForm.builder()
                 .category(CommunityCategory.FREE)
                 .title("test2")
                 .content("test2")
                 .tags(Set.of("Spring Boot", "JAVA"))
                 .build();
 
-        CommunityPostCreation p3 = CommunityPostCreation.builder()
+        CommunityPostForm p3 = CommunityPostForm.builder()
                 .category(CommunityCategory.QNA)
                 .title("test3")
                 .content("test3")

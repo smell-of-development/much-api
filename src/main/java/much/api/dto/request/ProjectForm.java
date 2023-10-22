@@ -16,7 +16,11 @@ import java.util.Set;
 
 @Getter
 @SelfCheck("checkValidation")
-public class ProjectCreation {
+public class ProjectForm {
+
+    private static final int MAX_TITLE_LENGTH = 40;
+
+    private static final int MAX_NAME_LENGTH = 20;
 
     @NotNull
     private String title;
@@ -52,8 +56,9 @@ public class ProjectCreation {
 
     private void checkValidation() {
 
-        if (title.length() > 40) {
-            throw new InvalidLength("제목은", 1, 40, title.length());
+        int titleLength = title.length();
+        if (titleLength > MAX_TITLE_LENGTH) {
+            throw new InvalidLength("제목은", 1, MAX_TITLE_LENGTH, titleLength);
         }
 
         if (deadline == null) {
@@ -82,8 +87,8 @@ public class ProjectCreation {
             int needs = p.getNeeds();
 
             int nameLength = StringUtils.length(name);
-            if (nameLength == 0 || nameLength > 20) {
-                throw new InvalidLength("포지션 이름은", 1, 20, nameLength);
+            if (nameLength == 0 || nameLength > MAX_NAME_LENGTH) {
+                throw new InvalidLength("포지션 이름은", 1, MAX_NAME_LENGTH, nameLength);
             }
 
             if (needs < 1) {
@@ -105,7 +110,7 @@ public class ProjectCreation {
             throw new InvalidMyPosition();
         }
 
-        // TODO 사용자 입력 내용 글자수 정해서 제한
+        // TODO 소개 내용 글자수 제한?
     }
 
 
@@ -116,6 +121,8 @@ public class ProjectCreation {
 
         @Getter
         public static class PositionStatus {
+
+            private Long id;
 
             private String name;
 

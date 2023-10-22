@@ -7,7 +7,7 @@ import much.api.common.exception.InvalidLength;
 
 @Getter
 @SelfCheck("checkValidation")
-public class ProjectApplicationCreation {
+public class ProjectApplicationForm {
 
     @NotNull
     private Long positionId;

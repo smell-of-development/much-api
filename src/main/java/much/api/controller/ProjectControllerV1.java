@@ -3,9 +3,8 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.ProjectApiV1;
-import much.api.dto.request.ProjectApplicationCreation;
-import much.api.dto.request.ProjectCreation;
-import much.api.dto.request.ProjectModification;
+import much.api.dto.request.ProjectApplicationForm;
+import much.api.dto.request.ProjectForm;
 import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.*;
 import much.api.service.ProjectService;
@@ -25,7 +24,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
     @Override
     @PostMapping("/projects")
-    public ResponseEntity<Envelope<Long>> createProject(@RequestBody @Valid ProjectCreation request) {
+    public ResponseEntity<Envelope<Long>> createProject(@RequestBody @Valid ProjectForm request) {
 
         return ok(
                 Envelope.ok(projectService.createProject(request))
@@ -36,7 +35,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     @Override
     @PutMapping("/projects/{projectId}")
     public ResponseEntity<Envelope<Long>> modifyProject(@PathVariable Long projectId,
-                                                        @RequestBody @Valid ProjectModification request) {
+                                                        @RequestBody @Valid ProjectForm request) {
 
         return ok(
                 Envelope.ok(projectService.modifyProject(projectId, request).getId())
@@ -77,7 +76,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     @Override
     @PostMapping("/projects/{projectId}/applications")
     public ResponseEntity<Envelope<Void>> createProjectApplication(@PathVariable Long projectId,
-                                                                   @RequestBody @Valid ProjectApplicationCreation request) {
+                                                                   @RequestBody @Valid ProjectApplicationForm request) {
 
         projectService.createProjectApplication(projectId, request);
         return ok(

@@ -5,8 +5,7 @@ import much.api.common.enums.CommunityCategory;
 import much.api.common.exception.NoAuthority;
 import much.api.common.exception.PostNotFound;
 import much.api.common.util.ContextUtils;
-import much.api.dto.request.CommunityPostCreation;
-import much.api.dto.request.CommunityPostModification;
+import much.api.dto.request.CommunityPostForm;
 import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.dto.response.CommunityPostSummary;
@@ -63,7 +62,7 @@ public class CommunityService {
 
 
     @Transactional
-    public CommunityPostDetail createPost(CommunityPostCreation postCreation) {
+    public CommunityPostDetail createPost(CommunityPostForm postCreation) {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
@@ -97,11 +96,11 @@ public class CommunityService {
 
     @Transactional
     public CommunityPostDetail modifyPost(Long postId,
-                                          CommunityPostModification postModification) {
+                                          CommunityPostForm postModification) {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
-        User user = commonService.getUserOrThrowException(userId);
+        commonService.getUserOrThrowException(userId);
 
         final CommunityCategory category = postModification.getCategory();
 

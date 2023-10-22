@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import much.api.common.aop.MuchValid;
 import much.api.common.exception.*;
 import much.api.common.util.ContextUtils;
-import much.api.dto.request.ProjectApplicationCreation;
-import much.api.dto.request.ProjectCreation;
-import much.api.dto.request.ProjectModification;
+import much.api.dto.request.ProjectApplicationForm;
+import much.api.dto.request.ProjectForm;
 import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.PagedResult;
 import much.api.dto.response.ProjectApplication;
@@ -53,29 +52,29 @@ public class ProjectService {
     private final TagHelperService tagHelperService;
 
     @Transactional
-    public Long createProject(@MuchValid ProjectCreation projectCreation) {
+    public Long createProject(@MuchValid ProjectForm projectForm) {
 
         Long userId = ContextUtils.getUserId();
         User user = commonService.getUserOrThrowException(userId);
 
         // 저장
-        List<String> requestMeetingDays = projectCreation.getMeetingDays();
+        List<String> requestMeetingDays = projectForm.getMeetingDays();
 
         String meetingDays = requestMeetingDays.isEmpty() ? null :
                 String.join(",", requestMeetingDays);
 
-        final String requestIntroduction = projectCreation.getIntroduction();
-        final Set<String> requestTags = projectCreation.getTags();
+        final String requestIntroduction = projectForm.getIntroduction();
+        final Set<String> requestTags = projectForm.getTags();
 
         Project project = Project.builder()
                 .writer(user)
-                .title(projectCreation.getTitle())
-                .imageUrl(projectCreation.getImageUrl())
-                .online(projectCreation.getOnline())
-                .address(projectCreation.getAddress())
-                .deadline(projectCreation.getDeadline())
-                .startDate(projectCreation.getStartDate())
-                .endDate(projectCreation.getEndDate())
+                .title(projectForm.getTitle())
+                .imageUrl(projectForm.getImageUrl())
+                .online(projectForm.getOnline())
+                .address(projectForm.getAddress())
+                .deadline(projectForm.getDeadline())
+                .startDate(projectForm.getStartDate())
+                .endDate(projectForm.getEndDate())
                 .meetingDays(meetingDays)
                 .introduction(requestIntroduction)
                 .build();
@@ -83,8 +82,8 @@ public class ProjectService {
         Project saved = projectRepository.save(project);
 
         // 포지션 정보 등록
-        ProjectCreation.Recruit recruit = projectCreation.getRecruit();
-        for (ProjectCreation.Recruit.PositionStatus ps : recruit.getPositionStatus()) {
+        ProjectForm.Recruit recruit = projectForm.getRecruit();
+        for (ProjectForm.Recruit.PositionStatus ps : recruit.getPositionStatus()) {
 
             ProjectPosition projectPosition = ProjectPosition.builder()
                     .project(saved)
@@ -145,7 +144,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectDetail modifyProject(Long projectId,
-                                       @MuchValid ProjectModification request) {
+                                       @MuchValid ProjectForm request) {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
@@ -219,7 +218,7 @@ public class ProjectService {
 
     @Transactional
     public void createProjectApplication(Long projectId,
-                                         @MuchValid ProjectApplicationCreation applicationForm) {
+                                         @MuchValid ProjectApplicationForm applicationForm) {
 
         // 신청자 확인
         Long userId = ContextUtils.getUserId();
@@ -349,7 +348,7 @@ public class ProjectService {
 
 
     private void handlePosition(Project project,
-                                List<ProjectModification.Recruit.PositionStatus> tobe) {
+                                List<ProjectForm.Recruit.PositionStatus> tobe) {
 
         // 기존 포지션 Map
         Map<Long, ProjectPosition> asisPositionMap = project.getPositionStatus()

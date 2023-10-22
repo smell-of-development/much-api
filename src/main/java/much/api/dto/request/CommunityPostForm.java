@@ -12,23 +12,27 @@ import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommunityPostModification {
+public class CommunityPostForm {
 
     @NotNull
     private CommunityCategory category;
 
     private Set<String> tags = new HashSet<>();
 
+    // TODO String 최대길이 제한
+
+    @NotNull
     private String title;
 
+    @NotNull
     private String content;
 
 
     @Builder
-    private CommunityPostModification(CommunityCategory category,
-                                      Set<String> tags,
-                                      String title,
-                                      String content) {
+    private CommunityPostForm(CommunityCategory category,
+                              Set<String> tags,
+                              String title,
+                              String content) {
 
         this.category = category;
         this.tags = tags;

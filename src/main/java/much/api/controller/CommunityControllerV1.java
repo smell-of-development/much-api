@@ -3,8 +3,7 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.CommunityApiV1;
-import much.api.dto.request.CommunityPostCreation;
-import much.api.dto.request.CommunityPostModification;
+import much.api.dto.request.CommunityPostForm;
 import much.api.dto.request.CommunitySearch;
 import much.api.dto.response.CommunityPostDetail;
 import much.api.dto.response.CommunityPostSummary;
@@ -45,7 +44,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
 
     @Override
     @PostMapping("/communities")
-    public ResponseEntity<Envelope<Long>> createCommunityPost(@RequestBody @Valid CommunityPostCreation request) {
+    public ResponseEntity<Envelope<Long>> createCommunityPost(@RequestBody @Valid CommunityPostForm request) {
 
         return ok(
                 Envelope.ok(communityService.createPost(request).getId())
@@ -56,7 +55,7 @@ public class CommunityControllerV1 implements CommunityApiV1 {
     @Override
     @PutMapping("/communities/{postId}")
     public ResponseEntity<Envelope<Long>> modifyCommunityPost(@PathVariable Long postId,
-                                                                             @RequestBody @Valid CommunityPostModification request) {
+                                                              @RequestBody @Valid CommunityPostForm request) {
 
         return ok(
                 Envelope.ok(communityService.modifyPost(postId, request).getId())

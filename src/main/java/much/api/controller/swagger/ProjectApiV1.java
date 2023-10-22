@@ -2,9 +2,8 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import much.api.dto.request.ProjectApplicationCreation;
-import much.api.dto.request.ProjectCreation;
-import much.api.dto.request.ProjectModification;
+import much.api.dto.request.ProjectApplicationForm;
+import much.api.dto.request.ProjectForm;
 import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.*;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +42,7 @@ public interface ProjectApiV1 {
                     - code 2000
                     - 로그인 된 사용자 미존재
                     """)
-    ResponseEntity<Envelope<Long>> createProject(ProjectCreation request);
+    ResponseEntity<Envelope<Long>> createProject(ProjectForm request);
 
 
     @Operation(
@@ -79,7 +78,7 @@ public interface ProjectApiV1 {
                     - 본인글이 아닌경우
                     """)
     ResponseEntity<Envelope<Long>> modifyProject(Long projectId,
-                                                 ProjectModification request);
+                                                 ProjectForm request);
 
 
     @Operation(
@@ -219,7 +218,7 @@ public interface ProjectApiV1 {
                     - code 4001
                     - 로그인이 되어있지 않은경우
                     """)
-    ResponseEntity<Envelope<Void>> createProjectApplication(Long projectId, ProjectApplicationCreation request);
+    ResponseEntity<Envelope<Void>> createProjectApplication(Long projectId, ProjectApplicationForm request);
 
 
     @Operation(
