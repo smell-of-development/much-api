@@ -66,7 +66,7 @@ public interface ProjectApiV1 {
                     ##### Object: recruit
                     - <b>positionStatus (Object[]) : 포지션 현황 - 필수</b>
                     ##### Object: positionStatus
-                    - id (Number)          : 포지션 고유 ID - 기존의 ID 또는 신규값 이라면 필요X
+                    - id (Number)          : 포지션 고유 ID - 기존의 포지션 ID 또는 신규 포지션 이라면 필요 없음
                     - name (String)        : 포지션 이름 (20자 이하) - 필수
                     - needs (Number)       : 포지션 필요 인원 - 필수, 1 이상
                     - containsMe (Boolean) : 작성자 본인을 포함하는지 - 필수, 전체 포지션중 1개만 true

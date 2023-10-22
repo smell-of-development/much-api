@@ -34,8 +34,9 @@ public enum Code {
     INVALID_PASSWORD(2000, "비밀번호는 공백을 제외한 8글자 이상 20글자 이하만 가능해요.", false),
     INVALID_PHONE_NUMBER(2000, "휴대폰번호 형태가 아니에요.", false),
     INVALID_LENGTH(2000, "%s %s~%s자 사이만 가능해요.(%s/%s)", true),
-    INVALID_PERIOD(2000, "일정 시작일이 종료일보다 같거나 빨라야해요.", false),
+    INVALID_MEETING_TYPE(2000, "모임 방식을 확인해주세요.", false),
     INVALID_DEADLINE(2000, "모집 마감일을 확인해주세요.", false),
+    INVALID_PERIOD(2000, "일정 시작일이 종료일보다 같거나 빨라야해요.", false),
     INVALID_RECRUIT_NEEDS(2000, "각 포지션별 모집인원은 1명 이상이어야 해요.", false),
     INVALID_MY_POSITION(2000, "나를 포함한 포지션은 1개 지정해야 해요.", false),
 

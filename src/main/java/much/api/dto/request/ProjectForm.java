@@ -19,20 +19,19 @@ import java.util.Set;
 public class ProjectForm {
 
     private static final int MAX_TITLE_LENGTH = 40;
+    private static final int MIN_TITLE_LENGTH = 1;
 
     private static final int MAX_NAME_LENGTH = 20;
+    private static final int MIN_NAME_LENGTH = 1;
 
-    @NotNull
     private String title;
 
     private String imageUrl;
 
-    @NotNull
     private Boolean online;
 
     private String address;
 
-    @NotNull
     @JsonFormat(pattern = "yyyy.MM.dd")
     @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate deadline;
@@ -57,9 +56,13 @@ public class ProjectForm {
 
     private void checkValidation() {
 
-        int titleLength = title.length();
-        if (titleLength > MAX_TITLE_LENGTH) {
-            throw new InvalidLength("제목은", 1, MAX_TITLE_LENGTH, titleLength);
+        int titleLength = StringUtils.length(title);
+        if (titleLength < MIN_TITLE_LENGTH || titleLength > MAX_TITLE_LENGTH) {
+            throw new InvalidLength("제목은", MIN_TITLE_LENGTH, MAX_TITLE_LENGTH, titleLength);
+        }
+
+        if (online == null) {
+            throw new InvalidMeetingType();
         }
 
         if (deadline == null) {
@@ -88,8 +91,8 @@ public class ProjectForm {
             int needs = p.getNeeds();
 
             int nameLength = StringUtils.length(name);
-            if (nameLength == 0 || nameLength > MAX_NAME_LENGTH) {
-                throw new InvalidLength("포지션 이름은", 1, MAX_NAME_LENGTH, nameLength);
+            if (nameLength < MIN_NAME_LENGTH || nameLength > MAX_NAME_LENGTH) {
+                throw new InvalidLength("포지션 이름은", MIN_NAME_LENGTH, MAX_NAME_LENGTH, nameLength);
             }
 
             if (needs < 1) {
@@ -118,7 +121,7 @@ public class ProjectForm {
     @Getter
     public static class Recruit {
 
-        List<PositionStatus> positionStatus;
+        List<PositionStatus> positionStatus = new ArrayList<>();
 
         @Getter
         public static class PositionStatus {
