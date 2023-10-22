@@ -2,7 +2,6 @@ package much.api.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import much.api.common.aop.SelfCheck;
 import much.api.common.exception.*;
@@ -46,7 +45,6 @@ public class ProjectForm {
 
     private List<String> meetingDays = new ArrayList<>();
 
-    @NotNull
     private Recruit recruit;
 
     private Set<String> tags = new HashSet<>();
@@ -81,6 +79,10 @@ public class ProjectForm {
         // 일정 시작 ~ 종료일 확인
         if (startDate.isAfter(endDate)) {
             throw new InvalidPeriod(startDate.toString(), endDate.toString());
+        }
+
+        if (recruit == null) {
+            throw new InvalidRecruit();
         }
 
         // 포지션 모집 인원은 1 이상

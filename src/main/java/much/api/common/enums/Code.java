@@ -37,6 +37,7 @@ public enum Code {
     INVALID_MEETING_TYPE(2000, "모임 방식을 확인해주세요.", false),
     INVALID_DEADLINE(2000, "모집 마감일을 확인해주세요.", false),
     INVALID_PERIOD(2000, "일정 시작일이 종료일보다 같거나 빨라야해요.", false),
+    INVALID_RECRUIT(2000, "모집 대상 포지션 정보는 필수에요.", false),
     INVALID_RECRUIT_NEEDS(2000, "각 포지션별 모집인원은 1명 이상이어야 해요.", false),
     INVALID_MY_POSITION(2000, "나를 포함한 포지션은 1개 지정해야 해요.", false),
 

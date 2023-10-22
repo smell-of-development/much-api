@@ -24,7 +24,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
 
     @Override
     @PostMapping
-    public ResponseEntity<Envelope<Long>> createProject(@RequestBody @Valid ProjectForm request) {
+    public ResponseEntity<Envelope<Long>> createProject(@RequestBody ProjectForm request) {
 
         return ok(
                 Envelope.ok(projectService.createProject(request))
@@ -35,7 +35,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     @Override
     @PutMapping("/{projectId}")
     public ResponseEntity<Envelope<Long>> modifyProject(@PathVariable Long projectId,
-                                                        @RequestBody @Valid ProjectForm request) {
+                                                        @RequestBody ProjectForm request) {
 
         return ok(
                 Envelope.ok(projectService.modifyProject(projectId, request).getId())
