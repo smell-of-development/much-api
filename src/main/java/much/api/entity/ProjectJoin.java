@@ -17,7 +17,8 @@ import org.hibernate.annotations.DynamicUpdate;
         name = "tb_project_join",
         indexes = {
                 @Index(name = "tb_project_join_idx1", columnList = "project_id, position_id"),
-                @Index(name = "tb_project_join_idx2", columnList = "member_id")
+                @Index(name = "tb_project_join_idx2", columnList = "project_id, member_id"),
+                @Index(name = "tb_project_join_idx3", columnList = "member_id")
         }
 )
 public class ProjectJoin extends BaseTimeEntity {

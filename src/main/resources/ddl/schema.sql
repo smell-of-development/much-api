@@ -127,7 +127,7 @@ create table tb_project_application
     project_id  bigint,
     position_id bigint,
     member_id   bigint,
-    approved    boolean default 0 not null,
+    memo        varchar(500),
     created_at  timestamp(6),
     updated_at  timestamp(6),
     constraint tb_project_application_pk primary key (id)
@@ -177,10 +177,12 @@ create index tb_project_idx1 on tb_project (deadline);
 create index tb_project_position_idx1 on tb_project_position (project_id);
 
 create index tb_project_join_idx1 on tb_project_join (project_id, position_id);
-create index tb_project_join_idx2 on tb_project_join (member_id);
+create index tb_project_join_idx2 on tb_project_join (project_id, member_id);
+create index tb_project_join_idx3 on tb_project_join (member_id);
 
 create index tb_project_application_idx1 on tb_project_application (project_id, position_id);
-create index tb_project_application_idx2 on tb_project_application (member_id);
+create index tb_project_application_idx2 on tb_project_application (project_id, member_id);
+create index tb_project_application_idx3 on tb_project_application (member_id);
 
 create index tb_sms_certification_hist_idx1 on tb_sms_certification_hist (phone_number);
 

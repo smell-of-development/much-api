@@ -33,9 +33,9 @@ public class QProjectPosition extends EntityPathBase<ProjectPosition> {
 
     public final NumberPath<Integer> needs = createNumber("needs", Integer.class);
 
-    public final ListPath<ProjectApplication, QProjectApplication> positionApplicationList = this.<ProjectApplication, QProjectApplication>createList("positionApplicationList", ProjectApplication.class, QProjectApplication.class, PathInits.DIRECT2);
+    public final ListPath<ProjectApplication, QProjectApplication> positionApplications = this.<ProjectApplication, QProjectApplication>createList("positionApplications", ProjectApplication.class, QProjectApplication.class, PathInits.DIRECT2);
 
-    public final ListPath<ProjectJoin, QProjectJoin> positionJoinList = this.<ProjectJoin, QProjectJoin>createList("positionJoinList", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
+    public final ListPath<ProjectJoin, QProjectJoin> positionJoins = this.<ProjectJoin, QProjectJoin>createList("positionJoins", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
 
     public final QProject project;
 

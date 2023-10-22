@@ -1,5 +1,6 @@
 package much.api.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import much.api.common.aop.SelfCheck;
@@ -28,12 +29,15 @@ public class ProjectCreation {
     private String address;
 
     @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate deadline;
 
     @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate startDate;
 
     @DateTimeFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate endDate;
 
     private List<String> meetingDays = new ArrayList<>();

@@ -17,7 +17,8 @@ import org.hibernate.annotations.DynamicUpdate;
         name = "tb_project_application",
         indexes = {
                 @Index(name = "tb_project_application_idx1", columnList = "project_id, position_id"),
-                @Index(name = "tb_project_application_idx2", columnList = "member_id")
+                @Index(name = "tb_project_application_idx2", columnList = "project_id, member_id"),
+                @Index(name = "tb_project_application_idx3", columnList = "member_id")
         }
 )
 public class ProjectApplication extends BaseTimeEntity {
@@ -35,19 +36,32 @@ public class ProjectApplication extends BaseTimeEntity {
     private ProjectPosition position;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User member;
 
-    boolean approved;
+    private String memo;
 
     @Builder
     private ProjectApplication(Project project,
+                               ProjectPosition position,
                                User member,
-                               ProjectPosition position) {
+                               String memo) {
 
         this.project = project;
-        this.member = member;
         this.position = position;
-        this.approved = false;
+        this.member = member;
+        this.memo = memo;
+    }
+
+    public void accept() {
+
+        position.addPositionJoin(
+                ProjectJoin.builder()
+                        .project(project)
+                        .position(position)
+                        .member(member)
+                        .build());
+
+        position.getPositionApplications().remove(this);
     }
 }

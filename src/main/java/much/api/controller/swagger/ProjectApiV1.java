@@ -2,19 +2,20 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.request.ProjectApplicationCreation;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.request.ProjectModification;
 import much.api.dto.request.ProjectSearch;
-import much.api.dto.response.Envelope;
-import much.api.dto.response.PagedResult;
-import much.api.dto.response.ProjectDetail;
-import much.api.dto.response.ProjectSummary;
+import much.api.dto.response.*;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 @Tag(name = "프로젝트 관련 API")
 public interface ProjectApiV1 {
 
-    @Operation(summary = "프로젝트 등록 API",
+    @Operation(
+            summary = "프로젝트 등록 API",
             description = """
                     프로젝트를 등록합니다.
                     - 로그인이 되어있어야 합니다.
@@ -81,7 +82,8 @@ public interface ProjectApiV1 {
                                                  ProjectModification request);
 
 
-    @Operation(summary = "프로젝트 상세 조회 API",
+    @Operation(
+            summary = "프로젝트 상세 조회 API",
             description = """
                     id 에 해당하는 프로젝트의 상세정보를 조회합니다.
                     ### 요청
@@ -190,7 +192,93 @@ public interface ProjectApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 본인글이 아닌경우
+                    - code 4001
+                    - 로그인이 되어있지 않은경우
                     """)
     ResponseEntity<Envelope<Void>> deleteProject(Long projectId);
 
+
+    @Operation(
+            summary = "프로젝트 신청 API",
+            description = """
+                    프로젝트의 특정 포지션을 신청합니다.
+                    - 로그인이 되어있어야 합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 프로젝트 고유 ID
+                    - positionId (Number)  : 프로젝트 포지션 ID (프로젝트 상세조회의 positionStatus.id) - 필수
+                    - memo (String)        : 신청자의 메모
+                    ### 응답값
+                    - code 200
+                    - 신청 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 프로젝트를 찾을 수 없는경우
+                    - 이미 가입된 프로젝트인 경우
+                    - 이미 신청한 프로젝트인 경우
+                    - 프로젝트의 포지션을 찾을 수 없는경우
+                    - code 4001
+                    - 로그인이 되어있지 않은경우
+                    """)
+    ResponseEntity<Envelope<Void>> createProjectApplication(Long projectId, ProjectApplicationCreation request);
+
+
+    @Operation(
+            summary = "프로젝트 신청서 삭제(취소) API",
+            description = """
+                    신청한 프로젝트 신청서를 삭제합니다.
+                    - 로그인이 되어있어야 합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 신청서를 삭제할 프로젝트 고유 ID
+                    ### 응답값
+                    - code 200
+                    - 삭제 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 프로젝트에 해당하는 신청서를 찾을 수 없는경우
+                    - code 4001
+                    - 로그인이 되어있지 않은경우
+                    """)
+    ResponseEntity<Envelope<Void>> deleteProjectApplication(Long projectId);
+
+
+    @Operation(
+            summary = "프로젝트 신청서 목록 얻어오기 API",
+            description = """
+                    프로젝트에 신청한 신청서들을 요청합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 프로젝트 고유 ID - 요청자가 생성한 프로젝트
+                    ### 응답값
+                    - code 200
+                    - result[].applicant    : 지원자 정보 (Object)
+                    - result[].id           : 신청서 고유 ID (Number)
+                    - result[].positionName : 신청 포지션 이름 (String)
+                    - result[].memo         : 신청시의 메모 (String)
+                    ##### Object: applicant
+                    - id       : 지원자 고유 ID
+                    - nickname : 지원자 닉네임
+                    - imageUrl : 지원자 이미지
+                    - code 2000
+                    - 프로젝트를 찾을 수 없는경우
+                    - 프로젝트 생성자가 아닌경우
+                    """)
+    ResponseEntity<Envelope<List<ProjectApplication>>> getProjectApplications(Long projectId);
+
+
+    @Operation(
+            summary = "프로젝트 신청 승인하기",
+            description = """
+                    프로젝트 신청서를 승인합니다.
+                    ### 요청값
+                    - (경로변수) applicationId : 신청서 고유 ID
+                    ### 응답값
+                    - code 200
+                    - 승인처리 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 신청서를 찾을 수 없는경우
+                    - 승인하는 신청서의 포지션이 프로젝트에 없는경우
+                    - 승인하는 신청서의 포지션이 이미 모집완료 되었을 경우
+                    - 승인자와 프로젝트 생성자가 다른경우
+                    """)
+    ResponseEntity<Envelope<Void>> acceptProjectApplication(Long applicationId);
 }

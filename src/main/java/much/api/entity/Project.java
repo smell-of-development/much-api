@@ -85,7 +85,7 @@ public class Project extends BaseTimeEntity {
 
     @Getter
     @OneToMany(mappedBy = "project")
-    private List<ProjectJoin> projectMembers = new ArrayList<>();
+    private List<ProjectJoin> projectJoins = new ArrayList<>();
 
     @Getter
     @OneToMany(mappedBy = "project")

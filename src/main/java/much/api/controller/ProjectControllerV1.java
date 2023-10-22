@@ -3,16 +3,16 @@ package much.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import much.api.controller.swagger.ProjectApiV1;
+import much.api.dto.request.ProjectApplicationCreation;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.request.ProjectModification;
 import much.api.dto.request.ProjectSearch;
-import much.api.dto.response.Envelope;
-import much.api.dto.response.PagedResult;
-import much.api.dto.response.ProjectDetail;
-import much.api.dto.response.ProjectSummary;
+import much.api.dto.response.*;
 import much.api.service.ProjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -68,6 +68,50 @@ public class ProjectControllerV1 implements ProjectApiV1 {
     public ResponseEntity<Envelope<Void>> deleteProject(@PathVariable Long projectId) {
 
         projectService.deleteProject(projectId);
+        return ok(
+                Envelope.empty()
+        );
+    }
+
+
+    @Override
+    @PostMapping("/projects/{projectId}/applications")
+    public ResponseEntity<Envelope<Void>> createProjectApplication(@PathVariable Long projectId,
+                                                                   @RequestBody @Valid ProjectApplicationCreation request) {
+
+        projectService.createProjectApplication(projectId, request);
+        return ok(
+                Envelope.empty()
+        );
+    }
+
+
+    @Override
+    @DeleteMapping("/projects/{projectId}/applications")
+    public ResponseEntity<Envelope<Void>> deleteProjectApplication(@PathVariable Long projectId) {
+
+        projectService.deleteProjectApplication(projectId);
+        return ok(
+                Envelope.empty()
+        );
+    }
+
+
+    @Override
+    @GetMapping("/projects/{projectId}/applications")
+    public ResponseEntity<Envelope<List<ProjectApplication>>> getProjectApplications(@PathVariable Long projectId) {
+
+        return ok(
+                Envelope.ok(projectService.getProjectApplications(projectId))
+        );
+    }
+
+
+    @Override
+    @PostMapping("/projects/applications/{applicationId}/accept")
+    public ResponseEntity<Envelope<Void>> acceptProjectApplication(@PathVariable Long applicationId) {
+
+        projectService.acceptProjectApplication(applicationId);
         return ok(
                 Envelope.empty()
         );

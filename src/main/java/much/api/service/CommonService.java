@@ -41,6 +41,12 @@ public class CommonService {
     }
 
 
+    public Optional<User> getUser(Long id) {
+
+        return userRepository.findById(id);
+    }
+
+
     public void checkDuplicatedLoginId(String loginId) {
 
         if (userRepository.existsByLoginId(loginId)) {

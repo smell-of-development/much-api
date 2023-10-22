@@ -1,6 +1,8 @@
 package much.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.CommunityCategory;
@@ -10,58 +12,32 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class CommunityPostDetail {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean editable;
+    private boolean editable;
 
-    private final CommunityCategory category;
+    private CommunityCategory category;
 
-    private final Set<String> tags;
+    private Set<String> tags;
 
-    private final String title;
+    private String title;
 
-    private final String content;
+    private String content;
 
-    private final Long authorId;
+    private Long authorId;
 
-    private final String authorNickname;
+    private String authorNickname;
 
-    private final String authorImageUrl;
+    private String authorImageUrl;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private final LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
+    @Schema(example = "yyyy.MM.dd HH:mm", type = "string")
+    private LocalDateTime createdAt;
 
-    private final Long viewCount;
-
-
-    @Builder
-    private CommunityPostDetail(Long id,
-                                boolean editable,
-                                CommunityCategory category,
-                                Set<String> tags,
-                                String title,
-                                String content,
-                                Long authorId,
-                                String authorNickname,
-                                String authorImageUrl,
-                                LocalDateTime createdAt,
-                                Long viewCount) {
-
-        this.id = id;
-        this.editable = editable;
-        this.category = category;
-        this.tags = tags;
-        this.title = title;
-        this.content = content;
-        this.authorId = authorId;
-        this.authorNickname = authorNickname;
-        this.authorImageUrl = authorImageUrl;
-        this.createdAt = createdAt;
-        this.viewCount = viewCount;
-    }
-
+    private Long viewCount;
 
     public static CommunityPostDetail ofEntity(Community community, Set<String> tags) {
 

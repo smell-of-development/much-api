@@ -1,11 +1,16 @@
 package much.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import much.api.common.enums.MuchState;
 import much.api.common.util.ContextUtils;
-import much.api.entity.*;
+import much.api.entity.Project;
+import much.api.entity.ProjectJoin;
+import much.api.entity.ProjectPosition;
+import much.api.entity.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,14 +21,14 @@ import static java.util.Arrays.stream;
 import static much.api.common.enums.MuchState.DONE;
 import static much.api.common.enums.MuchState.RECRUITING;
 import static much.api.dto.response.ProjectDetail.Recruit.State.ofState;
-import static much.api.dto.response.ProjectDetail.WriterDetail.ofWriter;
+import static much.api.dto.response.ProjectDetail.Writer.ofUser;
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public class ProjectDetail {
 
     // 작성자 정보
-    private WriterDetail writer;
+    private Writer writer;
 
     // 수정 가능 여부
     private Boolean editable;
@@ -51,6 +56,7 @@ public class ProjectDetail {
 
     // 모집 마감일
     @JsonFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate deadline;
 
     // 마감일 D-Day
@@ -58,10 +64,12 @@ public class ProjectDetail {
 
     // 모임 시작일
     @JsonFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate startDate;
 
     // 모임 종료일
     @JsonFormat(pattern = "yyyy.MM.dd")
+    @Schema(example = "yyyy.MM.dd", type = "string")
     private LocalDate endDate;
 
     // 모임 종료일 - 모임 마감일 차이 또는 협의("")
@@ -88,12 +96,12 @@ public class ProjectDetail {
         boolean isWriter = project.isWriter();
 
         Boolean alreadyJoined = isLoggedOut ? null
-                : isWriter || isJoined(userId, project.getProjectMembers());
+                : isWriter || isJoined(userId, project.getProjectJoins());
         Boolean alreadyApplied = isLoggedOut ? null
                 : !alreadyJoined && hasApplied(userId, project.getApplications());
 
         return ProjectDetail.builder()
-                .writer(ofWriter(project.getWriter()))
+                .writer(ofUser(project.getWriter()))
                 .editable(isWriter)
                 .alreadyJoined(alreadyJoined)
                 .alreadyApplied(alreadyApplied)
@@ -117,23 +125,23 @@ public class ProjectDetail {
                 .build();
     }
 
-    private static boolean hasApplied(Long userId, List<ProjectApplication> applications) {
+    private static boolean hasApplied(Long userId, List<much.api.entity.ProjectApplication> applications) {
         if (userId == null) return false;
 
         return applications.stream()
                 .anyMatch(ap -> ap.getMember().getId().equals(userId));
     }
 
-    private static boolean isJoined(Long userId, List<ProjectJoin> projectMembers) {
+    private static boolean isJoined(Long userId, List<ProjectJoin> projectJoins) {
         if (userId == null) return false;
 
-        return projectMembers.stream()
+        return projectJoins.stream()
                 .anyMatch(pj -> pj.getMember().getId().equals(userId));
     }
 
 
     @Getter
-    static class WriterDetail {
+    static class Writer {
 
         // 작성자 고유 ID
         private Long id;
@@ -145,16 +153,16 @@ public class ProjectDetail {
         private String imageUrl;
 
 
-        private WriterDetail(Long id, String nickname, String imageUrl) {
+        private Writer(Long id, String nickname, String imageUrl) {
             this.id = id;
             this.nickname = nickname;
             this.imageUrl = imageUrl;
         }
 
 
-        public static WriterDetail ofWriter(User writer) {
+        public static Writer ofUser(User writer) {
 
-            return new WriterDetail(writer.getId(), writer.getNickname(), writer.getImageUrl());
+            return new Writer(writer.getId(), writer.getNickname(), writer.getImageUrl());
         }
     }
 

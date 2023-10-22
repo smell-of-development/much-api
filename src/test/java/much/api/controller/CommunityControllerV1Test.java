@@ -277,7 +277,7 @@ class CommunityControllerV1Test {
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(4003))
+                .andExpect(jsonPath("$.code").value(2000))
                 .andExpect(jsonPath("$.message").isNotEmpty())
                 .andExpect(jsonPath("$.requires").isEmpty())
                 .andExpect(jsonPath("$.result").isEmpty());

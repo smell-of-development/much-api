@@ -3,27 +3,27 @@ package much.api.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.aop.MuchValid;
-import much.api.common.exception.NoAuthority;
-import much.api.common.exception.ProjectNotFound;
+import much.api.common.exception.*;
 import much.api.common.util.ContextUtils;
+import much.api.dto.request.ProjectApplicationCreation;
 import much.api.dto.request.ProjectCreation;
 import much.api.dto.request.ProjectModification;
 import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.PagedResult;
+import much.api.dto.response.ProjectApplication;
 import much.api.dto.response.ProjectDetail;
 import much.api.dto.response.ProjectSummary;
 import much.api.entity.Project;
 import much.api.entity.ProjectPosition;
 import much.api.entity.User;
-import much.api.repository.ProjectPositionRepository;
-import much.api.repository.ProjectRepository;
-import much.api.repository.ProjectSearchRepository;
+import much.api.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -43,6 +43,10 @@ public class ProjectService {
     private final ProjectPositionRepository projectPositionRepository;
 
     private final ProjectSearchRepository projectSearchRepository;
+
+    private final ProjectJoinRepository projectJoinRepository;
+
+    private final ProjectApplicationRepository projectApplicationRepository;
 
     private final FileService fileService;
 
@@ -172,8 +176,7 @@ public class ProjectService {
         );
 
         // 포지션 정보 변경
-        handlePosition(project, request.getRecruit().getPositionStatus()
-        );
+        handlePosition(project, request.getRecruit().getPositionStatus());
 
         // 태그정보 수정
         final Set<String> tags = request.getTags();
@@ -186,7 +189,165 @@ public class ProjectService {
     }
 
 
-    // TODO 테스트 데이터 넣고, 테스트
+    public PagedResult<ProjectSummary> getProjects(ProjectSearch searchCondition) {
+
+        Long userId = ContextUtils.getUserId();
+        Page<ProjectSearchRepository.ProjectSearchDto> page = projectSearchRepository.searchProjects(searchCondition, userId);
+
+        // 결과 PROJECT ID 리스트
+        List<Long> projectIds = page.stream()
+                .map(ProjectSearchRepository.ProjectSearchDto::getId)
+                .toList();
+
+        // 결과 ID 이용해 포지션 정보 획득
+        Map<Long, List<ProjectPosition>> projectPositionMap = projectPositionRepository.findAllByProjectIdIn(projectIds)
+                .stream()
+                .collect(groupingBy(pp -> pp.getProject().getId()));
+
+        // 포지션 정보 조립
+        Page<ProjectSummary> mappedPage = page.map(ProjectSearchRepository.ProjectSearchDto::toResponseDto);
+
+        mappedPage.getContent()
+                .forEach(ps -> ps.setRecruit(
+                        ProjectDetail.Recruit.of(projectPositionMap.get(ps.getId())))
+                );
+
+        // noinspection unchecked
+        return (PagedResult<ProjectSummary>) PagedResult.ofPageWithCompletelyMapped(mappedPage);
+    }
+
+
+    @Transactional
+    public void createProjectApplication(Long projectId,
+                                         @MuchValid ProjectApplicationCreation applicationForm) {
+
+        // 신청자 확인
+        Long userId = ContextUtils.getUserId();
+        User user = commonService.getUserOrThrowException(userId);
+
+        // 프로젝트 확인
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFound(projectId));
+
+        // 이미 참여중 유저인지 확인
+        projectJoinRepository.findByProjectIdAndMemberId(projectId, userId)
+                .ifPresent(pj -> {
+                    throw new AlreadyJoinedProject();
+                });
+
+        // 이미 신청한 유저인지 확인
+        projectApplicationRepository.findByProjectIdAndMemberId(projectId, userId)
+                .ifPresent(pa -> {
+                    throw new AlreadyAppliedProject();
+                });
+
+        // 프로젝트 포지션 확인
+        Long positionId = applicationForm.getPositionId();
+
+        ProjectPosition matchedPosition = project.getPositionStatus().stream()
+                .filter(pp -> pp.getId().equals(positionId))
+                .findAny()
+                .orElseThrow(() -> new ProjectPositionNotFound(positionId));
+
+        if (matchedPosition.isClosed()) {
+            throw new AlreadyRecruitedPosition(matchedPosition.getName());
+        }
+
+        // 신청서 생성, 저장
+        much.api.entity.ProjectApplication application = much.api.entity.ProjectApplication.builder()
+                .project(project)
+                .position(matchedPosition)
+                .member(user)
+                .memo(applicationForm.getMemo())
+                .build();
+
+        matchedPosition.getPositionApplications().add(application);
+    }
+
+
+    @Transactional
+    public void deleteProjectApplication(Long projectId) {
+
+        // 신청자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
+        int deleted = projectApplicationRepository.deleteByProjectIdAndMemberId(projectId, userId);
+        if (deleted == 0) {
+            throw new ProjectApplicationNotFound();
+        }
+    }
+
+
+    public List<ProjectApplication> getProjectApplications(Long projectId) {
+
+        Long userId = ContextUtils.getUserId();
+        if (userId == null) {
+            throw new NoAuthority("신청서 목록 가져오기");
+        }
+
+        Optional<User> userOptional = commonService.getUser(userId);
+        if (userOptional.isEmpty()) {
+            throw new NoAuthority("신청서 목록 가져오기");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFound(projectId));
+
+        Long writer = project.getWriter().getId();
+        if (!writer.equals(userId)) {
+            throw new NoAuthority("신청서 목록 가져오기");
+        }
+
+        // 프로젝트 생성자 == 요청자
+        return project.getApplications()
+                .stream()
+                .map(ProjectApplication::ofEntity)
+                .toList();
+    }
+
+
+    @Transactional
+    public void acceptProjectApplication(Long applicationId) {
+
+        // 사용자 확인
+        Long userId = ContextUtils.getUserId();
+        commonService.getUserOrThrowException(userId);
+
+        // 신청서 확인
+        much.api.entity.ProjectApplication application = projectApplicationRepository.findById(applicationId)
+                .orElseThrow(ProjectApplicationNotFound::new);
+
+        // 승인자, 신청서 프로젝트의 생성자 일치 확인
+        Project project = application.getProject();
+
+        User projectWriter = project.getWriter();
+        assert userId != null;
+        if (!userId.equals(projectWriter.getId())) {
+            throw new NoAuthority("신청서 승인");
+        }
+
+        // 신청서의 포지션이 프로젝트에 존재하는지 확인
+        ProjectPosition applicationPosition = application.getPosition();
+
+        boolean positionMatched = project.getPositionStatus()
+                .stream()
+                .anyMatch(pp -> pp.equals(applicationPosition));
+
+        if (!positionMatched) {
+            throw new ProjectPositionNotFound(applicationPosition.getId());
+        }
+
+        // 포지션 모집완료 확인
+        if (applicationPosition.isClosed()) {
+            throw new AlreadyRecruitedPosition(applicationPosition.getName());
+        }
+
+        // 승인(등록)
+        application.accept();
+    }
+
+
     private void handlePosition(Project project,
                                 List<ProjectModification.Recruit.PositionStatus> tobe) {
 
@@ -230,32 +391,4 @@ public class ProjectService {
         project.deletePosition(asisPositionMap.values());
     }
 
-
-    // TODO 테스트 작성
-    public PagedResult<ProjectSummary> getProjects(ProjectSearch searchCondition) {
-
-        Long userId = ContextUtils.getUserId();
-        Page<ProjectSearchRepository.ProjectSearchDto> page = projectSearchRepository.searchProjects(searchCondition, userId);
-
-        // 결과 PROJECT ID 리스트
-        List<Long> projectIds = page.stream()
-                .map(ProjectSearchRepository.ProjectSearchDto::getId)
-                .toList();
-
-        // 결과 ID 이용해 포지션 정보 획득
-        Map<Long, List<ProjectPosition>> projectPositionMap = projectPositionRepository.findAllByProjectIdIn(projectIds)
-                .stream()
-                .collect(groupingBy(pp -> pp.getProject().getId()));
-
-        // 포지션 정보 조립
-        Page<ProjectSummary> mappedPage = page.map(ProjectSearchRepository.ProjectSearchDto::toResponseDto);
-
-        mappedPage.getContent()
-                .forEach(ps -> ps.setRecruit(
-                        ProjectDetail.Recruit.of(projectPositionMap.get(ps.getId())))
-                );
-
-        // noinspection unchecked
-        return (PagedResult<ProjectSummary>) PagedResult.ofPageWithCompletelyMapped(mappedPage);
-    }
 }

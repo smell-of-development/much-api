@@ -46,11 +46,13 @@ public class ProjectPosition extends BaseTimeEntity {
     @Getter
     private int recruited;
 
+    @Getter
     @OneToMany(mappedBy = "position", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectJoin> positionJoinList = new ArrayList<>();
+    private List<ProjectJoin> positionJoins = new ArrayList<>();
 
+    @Getter
     @OneToMany(mappedBy = "position", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectApplication> positionApplicationList = new ArrayList<>();
+    private List<ProjectApplication> positionApplications = new ArrayList<>();
 
     @Transient
     private boolean containsMe;
@@ -71,7 +73,7 @@ public class ProjectPosition extends BaseTimeEntity {
 
     public boolean isClosed() {
 
-        return needs == recruited;
+        return needs <= recruited;
     }
 
 
@@ -83,7 +85,7 @@ public class ProjectPosition extends BaseTimeEntity {
     public boolean isContainsMe() {
 
         if (project.isWriter()) {
-            positionJoinList.stream()
+            positionJoins.stream()
                     .filter(join -> join.getMember().getId().equals(ContextUtils.getUserId()))
                     .findAny()
                     .ifPresent((pj) -> containsMe = true);
@@ -111,14 +113,14 @@ public class ProjectPosition extends BaseTimeEntity {
 
     public void addPositionJoin(ProjectJoin projectJoin) {
 
-        positionJoinList.add(projectJoin);
-        recruited = positionJoinList.size();
+        positionJoins.add(projectJoin);
+        recruited = positionJoins.size();
     }
 
 
     public void deleteJoin(Collection<ProjectJoin> joins) {
 
-        positionJoinList.removeAll(joins);
+        positionJoins.removeAll(joins);
     }
 
 
@@ -128,13 +130,13 @@ public class ProjectPosition extends BaseTimeEntity {
             User writer = project.getWriter();
 
             // 작성자 수정 기존 포지션 == 기존 작성자 포지션 -> 유지
-            boolean positionMaintained = positionJoinList.stream()
+            boolean positionMaintained = positionJoins.stream()
                     .anyMatch(pj -> pj.getMember().getId().equals(writer.getId()));
 
             // 작성자 기존 포지션 중 이동 -> 처리
             if (!positionMaintained) {
                 // 기존 작성자 포지션 등록을 제거
-                project.getProjectMembers().stream()
+                project.getProjectJoins().stream()
                         .filter(pj -> pj.getMember().getId().equals(writer.getId()))
                         .findAny()
                         .ifPresent(pj -> pj.getPosition().deleteJoin(List.of(pj)));

@@ -23,7 +23,10 @@ public enum Code {
     PHONE_NUMBER_NOT_FOUND(2000, "전화번호에 해당하는 사용자를 찾을 수 없어요.", false),
     POST_NOT_FOUND(2000, "게시글을 찾을 수 없어요.", false),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없어요.", false),
+    PROJECT_POSITION_NOT_FOUND(2000, "포지션 정보를 찾을 수 없어요.", false),
+    PROJECT_APPLICATION_NOT_FOUND(2000, "신청서 정보를 찾을 수 없어요.", false),
     FILE_NOT_FOUND(2000, "파일을 찾을 수 없어요.", false),
+
     PICK_PROCESSING_FAIL(2000, "찜하기에 실패했어요.", false),
 
     INVALID_NICKNAME(2000, "닉네임은 2글자 이상 8글자 이하 완성된 한글, 영어, 숫자만 사용할 수 있어요.", false),
@@ -36,8 +39,12 @@ public enum Code {
     INVALID_RECRUIT_NEEDS(2000, "각 포지션별 모집인원은 1명 이상이어야 해요.", false),
     INVALID_MY_POSITION(2000, "나를 포함한 포지션은 1개 지정해야 해요.", false),
 
-    NEEDS_LESS_THAN_RECRUITED(2000, "%s포지션의 모집완료 인원 %s명보다 필요인원이 더 적어요.", true),
-    POSITION_CAN_NOT_BE_DELETED(2000, "%s포지션은 이미 모집된 인원이 있어 삭제할 수 없어요.", true),
+    NEEDS_LESS_THAN_RECRUITED(2000, "%s 포지션의 모집완료 인원 %s명보다 필요인원이 더 적어요.", true),
+    POSITION_CAN_NOT_BE_DELETED(2000, "%s 포지션은 이미 모집된 인원이 있어 삭제할 수 없어요.", true),
+
+    ALREADY_APPLIED_PROJECT(2000, "이미 신청한 프로젝트에요.", false),
+    ALREADY_JOINED_PROJECT(2000, "이미 가입한 프로젝트에요.", false),
+    ALREADY_RECRUITED_POSITION(2000, "%s 포지션은 이미 모집이 완료되었어요.", true),
 
     DUPLICATED_NICKNAME(2000, "중복되는 닉네임이 있어 사용할 수 없어요.", false),
     DUPLICATED_LOGIN_ID(2000, "중복되는 로그인 ID가 있어 사용할 수 없어요.", false),
@@ -51,9 +58,9 @@ public enum Code {
 
     NOT_IMAGE_FILE(2000, "이미지 파일이 아니에요.", false),
 
-    TOKEN_REFRESH_BLOCKED(4000, "토큰 리프레시가 차단되었어요.", false),
+    TOKEN_REFRESH_BLOCKED(4000, "토큰 리프레시가 차단된 유저", false),
     UNAUTHORIZED(4001, "정상적인 로그인 정보가 없어요.", false),
-    FORBIDDEN(4003, "권한이 없어요.", false),
+    FORBIDDEN(2000, "권한이 없어요.", false),
 
     FILE_UPLOAD_SIZE_EXCEEDED(5000, "최대 업로드 크기를 초과해요.", false),
 

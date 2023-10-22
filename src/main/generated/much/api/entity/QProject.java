@@ -49,7 +49,7 @@ public class QProject extends EntityPathBase<Project> {
 
     public final ListPath<ProjectPosition, QProjectPosition> positionStatus = this.<ProjectPosition, QProjectPosition>createList("positionStatus", ProjectPosition.class, QProjectPosition.class, PathInits.DIRECT2);
 
-    public final ListPath<ProjectJoin, QProjectJoin> projectMembers = this.<ProjectJoin, QProjectJoin>createList("projectMembers", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
+    public final ListPath<ProjectJoin, QProjectJoin> projectJoins = this.<ProjectJoin, QProjectJoin>createList("projectJoins", ProjectJoin.class, QProjectJoin.class, PathInits.DIRECT2);
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
 
