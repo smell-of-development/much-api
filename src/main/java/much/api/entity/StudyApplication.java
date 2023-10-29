@@ -21,7 +21,7 @@ import org.hibernate.annotations.DynamicUpdate;
                 @Index(name = "tb_study_application_idx2", columnList = "member_id")
         }
 )
-public class StudyApplication {
+public class StudyApplication extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

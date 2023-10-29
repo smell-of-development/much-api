@@ -116,7 +116,7 @@ public class StudyDetail {
                         study.getMeetingDays() == null ?
                                 null : stream(study.getMeetingDays().split(",")).toList()
                 )
-                .recruit(Recruit.of(study))
+                .recruit(Recruit.ofEntity(study))
                 .tags(tags)
                 .introduction(study.getIntroduction())
                 .build();
@@ -170,7 +170,13 @@ public class StudyDetail {
         }
 
 
-        public static Recruit of(Study study) {
+        public static Recruit of(boolean closed, Integer needs, Integer recruited) {
+
+            return new Recruit(ofState(closed ? DONE : RECRUITING), needs, recruited);
+        }
+
+
+        public static Recruit ofEntity(Study study) {
 
             return new Recruit(ofState(study.closed() ? DONE : RECRUITING), study.getNeeds(), study.getRecruited());
         }

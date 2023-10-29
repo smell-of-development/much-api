@@ -35,7 +35,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
         super(Community.class);
     }
 
-    // TODO querydsl 걷어내기
+    // TODO querydsl 걷어내기?
     public Page<CommunitySearchDto> searchCommunityPosts(CommunitySearch searchCondition) {
 
         PageRequest pageRequest = PageRequest.of(searchCondition.getPage(), searchCondition.getSize());

@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import much.api.common.exception.NeedsLessThanRecruited;
+import much.api.common.exception.NeedsLessThanRecruitedPosition;
 import much.api.common.util.ContextUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -153,7 +153,7 @@ public class ProjectPosition extends BaseTimeEntity {
         }
 
         if (needs < recruited) {
-            throw new NeedsLessThanRecruited(name, recruited);
+            throw new NeedsLessThanRecruitedPosition(name, recruited);
         }
 
         this.name = name;

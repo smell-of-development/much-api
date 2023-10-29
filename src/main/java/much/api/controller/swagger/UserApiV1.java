@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 public interface UserApiV1 {
 
 
-    @Operation(summary = "사용자등록 및 로그인처리",
+    @Operation(summary = "사용자등록 및 토근발급",
             description = """
                     유저를 등록하고, 로그인 토큰을 발급받습니다.
                     - 개발환경 + DB 개발 파라미터 설정시 휴대폰인증 여부를 확인하지 않습니다.

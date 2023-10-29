@@ -7,12 +7,12 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import much.api.dto.request.ProjectSearch;
+import much.api.dto.request.StudySearch;
 import much.api.dto.response.PageElement;
-import much.api.dto.response.ProjectSummary;
-import much.api.entity.Project;
-import much.api.entity.QProject;
+import much.api.dto.response.StudySummary;
+import much.api.entity.QStudy;
 import much.api.entity.QTagRelation;
+import much.api.entity.Study;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
@@ -24,55 +24,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.querydsl.core.types.dsl.Expressions.*;
-import static much.api.common.enums.MuchType.PROJECT;
-import static much.api.entity.QProject.project;
+import static much.api.common.enums.MuchType.STUDY;
+import static much.api.entity.QStudy.study;
 import static much.api.entity.QTagRelation.tagRelation;
 import static much.api.entity.QUserPick.userPick;
 
 @Slf4j
 @Repository
-public class ProjectSearchRepository extends QuerydslRepositorySupport {
+public class StudySearchRepository extends QuerydslRepositorySupport {
 
-    public ProjectSearchRepository() {
-        super(Project.class);
+    public StudySearchRepository() {
+        super(Study.class);
     }
 
-    public Page<ProjectSearchDto> searchProjects(ProjectSearch searchCondition, Long loginUserId) {
+    public Page<StudySearchDto> searchStudies(StudySearch searchCondition, Long loginUserId) {
 
         PageRequest pageRequest = PageRequest.of(searchCondition.getPage(), searchCondition.getSize());
 
         if (searchCondition.getTags().isEmpty()) {
             return applyPagination(pageRequest,
-                    qf -> select(Projections.constructor(ProjectSearchDto.class,
-                                    project.id,
-                                    project.title,
-                                    project.imageUrl,
-                                    project.online,
-                                    project.address,
-                                    project.deadline,
-                                    project.meetingDays,
+                    qf -> select(Projections.constructor(StudySearchDto.class,
+                                    study.id,
+                                    study.title,
+                                    study.imageUrl,
+                                    study.online,
+                                    study.address,
+                                    study.deadline,
+                                    study.meetingDays,
+                                    study.needs,
+                                    study.recruited,
                                     JPAExpressions
                                             .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
                                             .from(tagRelation)
-                                            .where(tagRelation.relationType.eq(PROJECT),
-                                                    tagRelation.relationId.eq(project.id)),
-                                    project.viewCount,
+                                            .where(tagRelation.relationType.eq(STUDY),
+                                                    tagRelation.relationId.eq(study.id)),
+                                    study.viewCount,
                                     JPAExpressions.select(userPick.available)
                                             .from(userPick)
                                             .where(
                                                     userPick.user.id.eq(loginUserId == null ? 0 : loginUserId),
-                                                    userPick.targetType.eq(PROJECT),
-                                                    userPick.targetId.eq(project.id)
+                                                    userPick.targetType.eq(STUDY),
+                                                    userPick.targetId.eq(study.id)
                                             ),
                                     Expressions.asNumber(0L)
                             )
                     )
-                            .from(project)
+                            .from(study)
                             .where(onlyRecruitingCondition(searchCondition.isOnlyRecruiting()))
-                            .orderBy(project.id.desc())
+                            .orderBy(study.id.desc())
                     ,
 
-                    qf -> selectFrom(project)
+                    qf -> selectFrom(study)
                             .where(onlyRecruitingCondition(searchCondition.isOnlyRecruiting()))
             );
         }
@@ -80,67 +82,69 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
         // 태그가 포함된 검색 (태그테이블 기준 JOIN)
         QTagRelation subTr = new QTagRelation("subTR");
         QTagRelation countTr = new QTagRelation("countTR");
-        QProject subP = new QProject("subP");
+        QStudy subS = new QStudy("subS");
 
         return applyPagination(pageRequest,
-                qf -> select(Projections.constructor(ProjectSearchDto.class,
-                        project.id,
-                        JPAExpressions.select(subP.title).from(subP).where(subP.id.eq(project.id)),
-                        JPAExpressions.select(subP.imageUrl).from(subP).where(subP.id.eq(project.id)),
-                        JPAExpressions.select(subP.online).from(subP).where(subP.id.eq(project.id)),
-                        JPAExpressions.select(subP.address).from(subP).where(subP.id.eq(project.id)),
-                        JPAExpressions.select(subP.deadline).from(subP).where(subP.id.eq(project.id)),
-                        JPAExpressions.select(subP.meetingDays).from(subP).where(subP.id.eq(project.id)),
+                qf -> select(Projections.constructor(StudySearchDto.class,
+                        study.id,
+                        JPAExpressions.select(subS.title).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.imageUrl).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.online).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.address).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.deadline).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.meetingDays).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.needs).from(subS).where(subS.id.eq(study.id)),
+                        JPAExpressions.select(subS.recruited).from(subS).where(subS.id.eq(study.id)),
                         stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName),
-                        JPAExpressions.select(subP.viewCount).from(subP).where(subP.id.eq(project.id)),
+                        JPAExpressions.select(subS.viewCount).from(subS).where(subS.id.eq(study.id)),
                         JPAExpressions.select(userPick.available)
                                 .from(userPick)
                                 .where(
                                         userPick.user.id.eq(loginUserId == null ? 0 : loginUserId),
-                                        userPick.targetType.eq(PROJECT),
-                                        userPick.targetId.eq(project.id)
+                                        userPick.targetType.eq(STUDY),
+                                        userPick.targetId.eq(study.id)
                                 ),
                         as(JPAExpressions
                                 .select(countTr.count())
                                 .from(countTr)
-                                .where(countTr.relationType.eq(PROJECT),
-                                        countTr.relationId.eq(project.id),
+                                .where(countTr.relationType.eq(STUDY),
+                                        countTr.relationId.eq(study.id),
                                         countTr.tagName.in(searchCondition.getTags())), "tagHitCount"))
                 )
                         .from(tagRelation)
-                        .join(project)
-                        .on(tagRelation.relationType.eq(PROJECT),
-                                tagRelation.relationId.eq(project.id))
+                        .join(study)
+                        .on(tagRelation.relationType.eq(STUDY),
+                                tagRelation.relationId.eq(study.id))
                         .where(onlyRecruitingCondition(searchCondition.isOnlyRecruiting()),
                                 JPAExpressions
                                         .selectFrom(subTr)
-                                        .where(subTr.relationType.eq(PROJECT),
-                                                subTr.relationId.eq(project.id),
+                                        .where(subTr.relationType.eq(STUDY),
+                                                subTr.relationId.eq(study.id),
                                                 subTr.tagName.in(searchCondition.getTags())).exists())
-                        .groupBy(project.id)
+                        .groupBy(study.id)
                         .orderBy(orderSpecifiers(searchCondition.isByRecent()))
                 ,
 
                 // 페이징을 위한 COUNT 쿼리
-                qf -> select(project.id)
+                qf -> select(study.id)
                         .from(tagRelation)
-                        .join(project)
-                        .on(tagRelation.relationType.eq(PROJECT),
-                                tagRelation.relationId.eq(project.id))
+                        .join(study)
+                        .on(tagRelation.relationType.eq(STUDY),
+                                tagRelation.relationId.eq(study.id))
                         .where(onlyRecruitingCondition(searchCondition.isOnlyRecruiting()),
                                 JPAExpressions
                                         .selectFrom(subTr)
-                                        .where(subTr.relationType.eq(PROJECT),
-                                                subTr.relationId.eq(project.id),
+                                        .where(subTr.relationType.eq(STUDY),
+                                                subTr.relationId.eq(study.id),
                                                 subTr.tagName.in(searchCondition.getTags())).exists())
-                        .groupBy(project.id)
+                        .groupBy(study.id)
         );
     }
 
     @Nullable
     private static BooleanExpression onlyRecruitingCondition(boolean onlyRecruiting) {
 
-        return onlyRecruiting ? project.deadline.goe(LocalDate.now()) : null;
+        return onlyRecruiting ? study.deadline.goe(LocalDate.now()) : null;
     }
 
 
@@ -152,12 +156,12 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
             orderSpecifiers.add(stringPath("tagHitCount").desc());
         }
 
-        orderSpecifiers.add(project.id.desc());
+        orderSpecifiers.add(study.id.desc());
         return orderSpecifiers.toArray(OrderSpecifier[]::new);
     }
 
     @Getter
-    public static class ProjectSearchDto implements PageElement<ProjectSummary> {
+    public static class StudySearchDto implements PageElement<StudySummary> {
 
         private static final int MAX_CONTENT_LENGTH = 50;
 
@@ -175,6 +179,10 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
 
         private String meetingDays;
 
+        private Integer needs;
+
+        private Integer recruited;
+
         private String tags;
 
         private Long viewCount;
@@ -183,17 +191,19 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
 
         private long tagHitCount;
 
-        public ProjectSearchDto(Long id,
-                                String title,
-                                String imageUrl,
-                                Boolean online,
-                                String address,
-                                LocalDate deadline,
-                                String meetingDays,
-                                String tags,
-                                Long viewCount,
-                                Boolean pick,
-                                long tagHitCount) {
+        public StudySearchDto(Long id,
+                              String title,
+                              String imageUrl,
+                              Boolean online,
+                              String address,
+                              LocalDate deadline,
+                              String meetingDays,
+                              Integer needs,
+                              Integer recruited,
+                              String tags,
+                              Long viewCount,
+                              Boolean pick,
+                              long tagHitCount) {
 
             this.id = id;
             this.title = title;
@@ -202,6 +212,8 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
             this.address = address;
             this.deadline = deadline;
             this.meetingDays = meetingDays;
+            this.needs = needs;
+            this.recruited = recruited;
             this.tags = tags;
             this.viewCount = viewCount;
             this.pick = pick;
@@ -209,9 +221,9 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
         }
 
         @Override
-        public ProjectSummary toResponseDto() {
+        public StudySummary toResponseDto() {
 
-            return ProjectSummary.builder()
+            return StudySummary.builder()
                     .id(id)
                     .title(title)
                     .tags(List.of(tags.split(",")))
@@ -222,6 +234,8 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                     .pick(pick)
                     .imageUrl(imageUrl)
                     .viewCount(viewCount)
+                    .needs(needs)
+                    .recruited(recruited)
                     .build();
         }
     }

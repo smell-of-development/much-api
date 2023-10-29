@@ -9,10 +9,10 @@ import much.api.dto.request.ProjectApplicationForm;
 import much.api.dto.request.ProjectForm;
 import much.api.dto.request.ProjectSearch;
 import much.api.dto.response.PagedResult;
-import much.api.dto.response.ProjectApplication;
 import much.api.dto.response.ProjectDetail;
 import much.api.dto.response.ProjectSummary;
 import much.api.entity.Project;
+import much.api.entity.ProjectApplication;
 import much.api.entity.ProjectPosition;
 import much.api.entity.User;
 import much.api.repository.*;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -252,7 +251,7 @@ public class ProjectService {
         }
 
         // 신청서 생성, 저장
-        much.api.entity.ProjectApplication application = much.api.entity.ProjectApplication.builder()
+        ProjectApplication application = ProjectApplication.builder()
                 .project(project)
                 .position(matchedPosition)
                 .member(user)
@@ -277,30 +276,25 @@ public class ProjectService {
     }
 
 
-    public List<ProjectApplication> getProjectApplications(Long projectId) {
+    public List<much.api.dto.response.ProjectApplication> getProjectApplications(Long projectId) {
 
         Long userId = ContextUtils.getUserId();
         if (userId == null) {
             throw new NoAuthority("신청서 목록 가져오기");
         }
 
-        Optional<User> userOptional = commonService.getUser(userId);
-        if (userOptional.isEmpty()) {
-            throw new NoAuthority("신청서 목록 가져오기");
-        }
+        commonService.getUserOrThrowException(userId);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFound(projectId));
 
-        Long writer = project.getWriter().getId();
-        if (!writer.equals(userId)) {
+        if (!project.isWriter()) {
             throw new NoAuthority("신청서 목록 가져오기");
         }
 
-        // 프로젝트 생성자 == 요청자
         return project.getApplications()
                 .stream()
-                .map(ProjectApplication::ofEntity)
+                .map(much.api.dto.response.ProjectApplication::ofEntity)
                 .toList();
     }
 
@@ -313,7 +307,7 @@ public class ProjectService {
         commonService.getUserOrThrowException(userId);
 
         // 신청서 확인
-        much.api.entity.ProjectApplication application = projectApplicationRepository.findById(applicationId)
+        ProjectApplication application = projectApplicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationFormNotFound::new);
 
         // 프로젝트

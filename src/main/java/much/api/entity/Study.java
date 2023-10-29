@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import much.api.common.exception.NeedsLessThanRecruited;
 import much.api.common.exception.NoAuthority;
 import much.api.common.util.ContextUtils;
 import org.hibernate.annotations.DynamicInsert;
@@ -184,6 +185,11 @@ public class Study extends BaseTimeEntity {
             throw new NoAuthority("스터디 수정");
         }
 
+        if (needs < recruited) {
+            throw new NeedsLessThanRecruited(recruited);
+        }
+        this.needs = needs;
+
         this.title = title;
         this.imageUrl = imageUrl;
         this.online = online;
@@ -192,7 +198,6 @@ public class Study extends BaseTimeEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.meetingDays = timesPerWeek;
-        this.needs = needs;
         this.introduction = introduction;
     }
 

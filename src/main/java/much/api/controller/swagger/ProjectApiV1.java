@@ -76,6 +76,7 @@ public interface ProjectApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 본인글이 아닌경우
+                    - 포지션 인원 수정이 올바르지 않을때
                     """)
     ResponseEntity<Envelope<Long>> modifyProject(Long projectId,
                                                  ProjectForm request);
@@ -160,7 +161,7 @@ public interface ProjectApiV1 {
                     - timesPerWeek : 주 모임주기 (Number)
                     - viewCount    : 조회수 (Number)
                     - deadlineDDay : 마감일 D-Day (Number)
-                    - pick         : 찜 여부 (Boolean)
+                    - pick         : 찜 여부 (Boolean) 비로그인은 ""
                     - imageUrl     : 대표 이미지 url (String)
                     - <b>recruit   : 모집정보 (Object)</b>
                     ##### Object: recruit
@@ -213,6 +214,7 @@ public interface ProjectApiV1 {
                     - 이미 가입된 프로젝트인 경우
                     - 이미 신청한 프로젝트인 경우
                     - 프로젝트의 포지션을 찾을 수 없는경우
+                    - 이미 모집이 완료된 포지션인 경우
                     """)
     ResponseEntity<Envelope<Void>> createProjectApplication(Long projectId, ProjectApplicationForm request);
 
@@ -253,6 +255,7 @@ public interface ProjectApiV1 {
                     - imageUrl : 지원자 이미지
                     - code 2000
                     - 프로젝트를 찾을 수 없는경우
+                    - 사용자를 찾을 수 없는경우
                     - 프로젝트 생성자가 아닌경우
                     """)
     ResponseEntity<Envelope<List<ProjectApplication>>> getProjectApplications(Long projectId);

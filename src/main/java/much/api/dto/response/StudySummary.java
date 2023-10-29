@@ -1,9 +1,6 @@
 package much.api.dto.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -31,9 +28,9 @@ public class StudySummary {
 
     private String imageUrl;
 
-    @Setter
     private StudyDetail.Recruit recruit;
 
+    @Builder
     public StudySummary(Long id,
                         String title,
                         List<String> tags,
@@ -43,7 +40,9 @@ public class StudySummary {
                         Long viewCount,
                         Long deadlineDDay,
                         Boolean pick,
-                        String imageUrl) {
+                        String imageUrl,
+                        Integer needs,
+                        Integer recruited) {
 
         this.id = id;
         this.title = title;
@@ -55,5 +54,6 @@ public class StudySummary {
         this.deadlineDDay = deadlineDDay;
         this.pick = pick;
         this.imageUrl = imageUrl;
+        this.recruit = StudyDetail.Recruit.of(needs <= recruited, needs, recruited);
     }
 }

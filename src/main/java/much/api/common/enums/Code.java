@@ -43,12 +43,14 @@ public enum Code {
     INVALID_REQUIRED_PEOPLE(2000, "모집인원은 1명 이상이어야 해요.", false),
     INVALID_MY_POSITION(2000, "나를 포함한 포지션은 1개 지정해야 해요.", false),
 
-    NEEDS_LESS_THAN_RECRUITED(2000, "%s 포지션의 모집완료 인원 %s명보다 필요인원이 더 적어요.", true),
+    NEEDS_LESS_THAN_RECRUITED_POSITION(2000, "%s 포지션의 모집 완료된 인원 %s명보다 모집 인원이 더 적어요.", true),
+    NEEDS_LESS_THAN_RECRUITED(2000, "모집 완료 인원 %s명보다 모집 인원이 더 적어요.", true),
     POSITION_CAN_NOT_BE_DELETED(2000, "%s 포지션은 이미 모집된 인원이 있어 삭제할 수 없어요.", true),
 
     ALREADY_APPLIED(2000, "이미 신청이 되어있어요.", false),
     ALREADY_JOINED(2000, "이미 가입이 되어있어요.", false),
     ALREADY_RECRUITED_POSITION(2000, "%s 포지션은 이미 모집이 완료되었어요.", true),
+    ALREADY_RECRUITED(2000, "이미 모집이 완료되었어요.", false),
 
     DUPLICATED_NICKNAME(2000, "중복되는 닉네임이 있어 사용할 수 없어요.", false),
     DUPLICATED_LOGIN_ID(2000, "중복되는 로그인 ID가 있어 사용할 수 없어요.", false),

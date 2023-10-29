@@ -2,13 +2,13 @@ package much.api.controller.swagger;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.request.StudyApplicationForm;
 import much.api.dto.request.StudyForm;
 import much.api.dto.request.StudySearch;
-import much.api.dto.response.Envelope;
-import much.api.dto.response.PagedResult;
-import much.api.dto.response.StudyDetail;
-import much.api.dto.response.StudySummary;
+import much.api.dto.response.*;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 @Tag(name = "스터디 관련 API")
 public interface StudyApiV1 {
@@ -63,6 +63,7 @@ public interface StudyApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 본인글이 아닌경우
+                    - 인원 수정이 올바르지 않을때
                     """)
     ResponseEntity<Envelope<Long>> modifyStudy(Long studyId,
                                                StudyForm request);
@@ -112,7 +113,7 @@ public interface StudyApiV1 {
                     # 검색기능에서 태그검색만 구현되어 있고, 검색어(search) 값 제목검색은 구현되어있지 않습니다.  
                     스터디를 다건 조회합니다.
                     - 페이지 결과를 얻습니다.
-                    - 요청예시 GET /v1/projects?search=제목&page=1&size=16&tags=Spring,JPA
+                    - 요청예시 GET /v1/studies?search=제목&page=1&size=16&tags=Spring,JPA
                     ### 정확도순 정렬시(byRecent=false) 우선순위
                     - 태그 일치 개수 순서이므로 요청값 'tags' 존재해야 의미있음.
                     ### 요청값
@@ -139,7 +140,7 @@ public interface StudyApiV1 {
                     - timesPerWeek : 주 모임주기 (Number)
                     - viewCount    : 조회수 (Number)
                     - deadlineDDay : 마감일 D-Day (Number)
-                    - pick         : 찜 여부 (Boolean)
+                    - pick         : 찜 여부 (Boolean) 비로그인은 ""
                     - imageUrl     : 대표 이미지 url (String)
                     - <b>recruit   : 모집정보 (Object)</b>
                     ##### Object: recruit
@@ -148,4 +149,102 @@ public interface StudyApiV1 {
                     - recruited    : 모집된 전체 인원 (Number)
                     """)
     ResponseEntity<Envelope<PagedResult<StudySummary>>> getStudies(StudySearch searchCondition);
+
+
+    @Operation(
+            summary = "스터디 삭제 API",
+            description = """
+                    스터디 글을 삭제합니다.
+                    - 로그인 사용자와 등록자가 같아야합니다.
+                    - 스터디와 연관된 신청, 가입정보 모두 삭제됩니다.
+                    - 요청예시 DELETE /v1/studies/1
+                    ### 응답값
+                    - code 200
+                    - 삭제 성공
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 본인글이 아닌경우
+                    """)
+    ResponseEntity<Envelope<Void>> deleteStudy(Long studyId);
+
+
+    @Operation(
+            summary = "스터디 신청 API",
+            description = """
+                    스터디의 특정 포지션을 신청합니다.
+                    - 로그인이 되어있어야 합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 스터디 고유 ID
+                    - positionId (Number)  : 스터디 포지션 ID (스터디 상세조회의 positionStatus.id) - 필수
+                    - memo (String)        : 신청자의 메모
+                    ### 응답값
+                    - code 200
+                    - 신청 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 스터디를 찾을 수 없는경우
+                    - 이미 가입된 스터디인 경우
+                    - 이미 신청한 스터디인 경우
+                    - 이미 모집이 완료된 경우
+                    """)
+    ResponseEntity<Envelope<Void>> createStudyApplication(Long studyId, StudyApplicationForm request);
+
+
+    @Operation(
+            summary = "스터디 신청서 삭제(취소) API",
+            description = """
+                    신청한 스터디 신청서를 삭제합니다.
+                    - 로그인이 되어있어야 합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 신청서를 삭제할 스터디 고유 ID
+                    ### 응답값
+                    - code 200
+                    - 삭제 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 스터디에 해당하는 신청서를 찾을 수 없는경우
+                    - 본인의 신청서가 아닌경우
+                    """)
+    ResponseEntity<Envelope<Void>> deleteStudyApplication(Long studyId);
+
+
+    @Operation(
+            summary = "스터디 신청서 목록 얻어오기 API",
+            description = """
+                    스터디에 신청한 신청서들을 요청합니다.
+                    ### 요청값
+                    - (경로변수) projectId : 스터디 고유 ID - 요청자가 생성한 스터디
+                    ### 응답값
+                    - code 200
+                    - result[].applicant    : 지원자 정보 (Object)
+                    - result[].id           : 신청서 고유 ID (Number)
+                    - result[].memo         : 신청시의 메모 (String)
+                    ##### Object: applicant
+                    - id       : 지원자 고유 ID
+                    - nickname : 지원자 닉네임
+                    - imageUrl : 지원자 이미지
+                    - code 2000
+                    - 스터디를 찾을 수 없는경우
+                    - 사용자를 찾을 수 없는경우
+                    - 스터디 생성자가 아닌경우
+                    """)
+    ResponseEntity<Envelope<List<StudyApplication>>> getStudyApplications(Long studyId);
+
+
+    @Operation(
+            summary = "스터디 신청 승인하기",
+            description = """
+                    스터디 신청서를 승인합니다.
+                    ### 요청값
+                    - (경로변수) applicationId : 신청서 고유 ID
+                    ### 응답값
+                    - code 200
+                    - 승인처리 완료
+                    - code 2000
+                    - 로그인 된 사용자를 찾을 수 없는경우
+                    - 신청서를 찾을 수 없는경우
+                    - 이미 모집 완료된 경우
+                    - 승인자와 스터디 생성자가 다른경우
+                    """)
+    ResponseEntity<Envelope<Void>> acceptStudyApplication(Long applicationId);
 }
