@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import much.api.common.exception.NoAuthority;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -54,6 +55,12 @@ public class ProjectApplication extends BaseTimeEntity {
     }
 
     public void accept() {
+
+        // 승인 권한 확인
+        boolean isWriter = project.isWriter();
+        if (!isWriter) {
+            throw new NoAuthority("프로젝트 신청서 승인");
+        }
 
         position.addPositionJoin(
                 ProjectJoin.builder()

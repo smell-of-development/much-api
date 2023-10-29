@@ -63,8 +63,8 @@ public class ProjectService {
         String meetingDays = requestMeetingDays.isEmpty() ? null :
                 String.join(",", requestMeetingDays);
 
-        final String requestIntroduction = projectForm.getIntroduction();
-        final Set<String> requestTags = projectForm.getTags();
+        String requestIntroduction = projectForm.getIntroduction();
+        Set<String> requestTags = projectForm.getTags();
 
         Project project = Project.builder()
                 .writer(user)
@@ -111,7 +111,6 @@ public class ProjectService {
 
         Set<String> tags = tagHelperService.getTags(PROJECT, projectId);
 
-        project.increaseViewCount();
         return ProjectDetail.ofEntity(project, tags);
     }
 
@@ -143,8 +142,8 @@ public class ProjectService {
 
 
     @Transactional
-    public ProjectDetail modifyProject(Long projectId,
-                                       @MuchValid ProjectForm request) {
+    public Long modifyProject(Long projectId,
+                              @MuchValid ProjectForm projectForm) {
 
         // 사용자 확인
         Long userId = ContextUtils.getUserId();
@@ -155,36 +154,36 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectNotFound(projectId));
 
         // 수정
-        List<String> requestMeetingDays = request.getMeetingDays();
+        List<String> requestMeetingDays = projectForm.getMeetingDays();
 
         String timesPerWeek = requestMeetingDays.isEmpty() ? null :
                 String.join(",", requestMeetingDays);
 
-        final String modifiedIntroduction = request.getIntroduction();
+        String modifiedIntroduction = projectForm.getIntroduction();
 
         project.modify(
-                request.getTitle(),
-                request.getImageUrl(),
-                request.getOnline(),
-                request.getAddress(),
-                request.getDeadline(),
-                request.getStartDate(),
-                request.getEndDate(),
+                projectForm.getTitle(),
+                projectForm.getImageUrl(),
+                projectForm.getOnline(),
+                projectForm.getAddress(),
+                projectForm.getDeadline(),
+                projectForm.getStartDate(),
+                projectForm.getEndDate(),
                 timesPerWeek,
                 modifiedIntroduction
         );
 
         // 포지션 정보 변경
-        handlePosition(project, request.getRecruit().getPositionStatus());
+        handlePosition(project, projectForm.getRecruit().getPositionStatus());
 
         // 태그정보 수정
-        final Set<String> tags = request.getTags();
+        Set<String> tags = projectForm.getTags();
         tagHelperService.handleTagRelation(PROJECT, projectId, tags);
 
         // 파일정보 수정
         fileService.handleEditorImage(PROJECT, projectId, modifiedIntroduction);
 
-        return ProjectDetail.ofEntity(project, tags);
+        return projectId;
     }
 
 
@@ -248,7 +247,7 @@ public class ProjectService {
                 .findAny()
                 .orElseThrow(() -> new ProjectPositionNotFound(positionId));
 
-        if (matchedPosition.isClosed()) {
+        if (matchedPosition.closed()) {
             throw new AlreadyRecruitedPosition(matchedPosition.getName());
         }
 
@@ -317,14 +316,8 @@ public class ProjectService {
         much.api.entity.ProjectApplication application = projectApplicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationFormNotFound::new);
 
-        // 승인자, 신청서 프로젝트의 생성자 일치 확인
+        // 프로젝트
         Project project = application.getProject();
-
-        User projectWriter = project.getWriter();
-        assert userId != null;
-        if (!userId.equals(projectWriter.getId())) {
-            throw new NoAuthority("신청서 승인");
-        }
 
         // 신청서의 포지션이 프로젝트에 존재하는지 확인
         ProjectPosition applicationPosition = application.getPosition();
@@ -338,7 +331,7 @@ public class ProjectService {
         }
 
         // 포지션 모집완료 확인
-        if (applicationPosition.isClosed()) {
+        if (applicationPosition.closed()) {
             throw new AlreadyRecruitedPosition(applicationPosition.getName());
         }
 

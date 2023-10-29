@@ -23,6 +23,7 @@ public enum Code {
     PHONE_NUMBER_NOT_FOUND(2000, "전화번호에 해당하는 사용자를 찾을 수 없어요.", false),
     POST_NOT_FOUND(2000, "게시글을 찾을 수 없어요.", false),
     PROJECT_NOT_FOUND(2000, "프로젝트 정보를 찾을 수 없어요.", false),
+    STUDY_NOT_FOUND(2000, "스터디 정보를 찾을 수 없어요.", false),
     PROJECT_POSITION_NOT_FOUND(2000, "포지션 정보를 찾을 수 없어요.", false),
     APPLICATION_FORM_NOT_FOUND(2000, "신청서 정보를 찾을 수 없어요.", false),
     FILE_NOT_FOUND(2000, "파일을 찾을 수 없어요.", false),
@@ -38,7 +39,8 @@ public enum Code {
     INVALID_DEADLINE(2000, "모집 마감일을 확인해주세요.", false),
     INVALID_PERIOD(2000, "일정 시작일이 종료일보다 같거나 빨라야해요.", false),
     INVALID_RECRUIT(2000, "모집 대상 포지션 정보는 필수에요.", false),
-    INVALID_RECRUIT_NEEDS(2000, "각 포지션별 모집인원은 1명 이상이어야 해요.", false),
+    INVALID_RECRUIT_REQUIRED_PEOPLE(2000, "각 포지션별 모집인원은 1명 이상이어야 해요.", false),
+    INVALID_REQUIRED_PEOPLE(2000, "모집인원은 1명 이상이어야 해요.", false),
     INVALID_MY_POSITION(2000, "나를 포함한 포지션은 1개 지정해야 해요.", false),
 
     NEEDS_LESS_THAN_RECRUITED(2000, "%s 포지션의 모집완료 인원 %s명보다 필요인원이 더 적어요.", true),

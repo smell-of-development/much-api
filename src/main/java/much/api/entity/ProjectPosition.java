@@ -71,7 +71,7 @@ public class ProjectPosition extends BaseTimeEntity {
     }
 
 
-    public boolean isClosed() {
+    public boolean closed() {
 
         return needs <= recruited;
     }

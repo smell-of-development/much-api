@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import much.api.common.exception.NoAuthority;
-import much.api.common.exception.PositionCanNotBeDeleted;
 import much.api.common.util.ContextUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -14,22 +13,19 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import static java.util.function.Predicate.not;
 
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "tb_project",
+        name = "tb_study",
         indexes = {
-                @Index(name = "tb_project_idx1", columnList = "id, deadline"),
+                @Index(name = "tb_study_idx1", columnList = "id, deadline"),
         }
 )
-public class Project extends BaseTimeEntity {
+public class Study extends BaseTimeEntity {
 
     @Getter
     @Id
@@ -69,6 +65,12 @@ public class Project extends BaseTimeEntity {
     private String meetingDays;
 
     @Getter
+    private Integer needs;
+
+    @Getter
+    private Integer recruited;
+
+    @Getter
     @Column(columnDefinition = "text")
     private String introduction;
 
@@ -80,29 +82,27 @@ public class Project extends BaseTimeEntity {
     private long viewCount;
 
     @Getter
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectPosition> positionStatus = new ArrayList<>();
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudyJoin> studyJoins = new ArrayList<>();
 
     @Getter
-    @OneToMany(mappedBy = "project")
-    private List<ProjectJoin> projectJoins = new ArrayList<>();
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudyApplication> applications = new ArrayList<>();
 
-    @Getter
-    @OneToMany(mappedBy = "project")
-    private List<ProjectApplication> applications = new ArrayList<>();
 
     @Builder
-    public Project(User writer,
-                   String title,
-                   String imageUrl,
-                   boolean online,
-                   String address,
-                   LocalDate deadline,
-                   LocalDate startDate,
-                   LocalDate endDate,
-                   String meetingDays,
-                   String introduction,
-                   String introductionWithoutHtmlTags) {
+    public Study(User writer,
+                 String title,
+                 String imageUrl,
+                 boolean online,
+                 String address,
+                 LocalDate deadline,
+                 LocalDate startDate,
+                 LocalDate endDate,
+                 String meetingDays,
+                 Integer needs,
+                 String introduction,
+                 String introductionWithoutHtmlTags) {
 
         this.writer = writer;
         this.title = title;
@@ -113,6 +113,7 @@ public class Project extends BaseTimeEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.meetingDays = meetingDays;
+        this.needs = needs;
         this.introduction = introduction;
         this.introductionWithoutHtmlTags = introductionWithoutHtmlTags;
     }
@@ -128,8 +129,8 @@ public class Project extends BaseTimeEntity {
     public boolean hasJoinedUser(Long userId) {
         if (userId == null) return false;
 
-        return projectJoins.stream()
-                .anyMatch(pj -> pj.getMember().getId().equals(userId));
+        return studyJoins.stream()
+                .anyMatch(sj -> sj.getMember().getId().equals(userId));
     }
 
 
@@ -144,6 +145,12 @@ public class Project extends BaseTimeEntity {
     public void increaseViewCount() {
 
         ++viewCount;
+    }
+
+
+    public boolean closed() {
+
+        return needs <= recruited;
     }
 
 
@@ -170,10 +177,11 @@ public class Project extends BaseTimeEntity {
                        LocalDate startDate,
                        LocalDate endDate,
                        String timesPerWeek,
+                       Integer needs,
                        String introduction) {
 
         if (!isWriter()) {
-            throw new NoAuthority("프로젝트 수정");
+            throw new NoAuthority("스터디 수정");
         }
 
         this.title = title;
@@ -184,43 +192,24 @@ public class Project extends BaseTimeEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.meetingDays = timesPerWeek;
+        this.needs = needs;
         this.introduction = introduction;
     }
 
 
-    public void addPosition(ProjectPosition position, boolean containsWriter) {
+    public void addMember(User user) {
 
         if (!isWriter()) {
-            throw new NoAuthority("프로젝트 포지션 추가");
+            throw new NoAuthority("스터디원 추가");
         }
 
-        positionStatus.add(position);
-
-        if (containsWriter) {
-            position.addPositionJoin(
-                    ProjectJoin.builder()
-                            .project(this)
-                            .position(position)
-                            .member(writer)
-                            .build());
-        }
-    }
-
-
-    public void deletePosition(Collection<ProjectPosition> positions) {
-
-        if (!isWriter()) {
-            throw new NoAuthority("프로젝트 포지션 삭제");
-        }
-
-        positions.stream()
-                .filter(not(ProjectPosition::isDeletable))
-                .findAny()
-                .ifPresent(pp -> {
-                    throw new PositionCanNotBeDeleted(pp.getName());
-                });
-
-        positionStatus.removeAll(positions);
+        studyJoins.add(
+                StudyJoin.builder()
+                        .study(this)
+                        .member(user)
+                        .build()
+        );
+        recruited = studyJoins.size();
     }
 
 }

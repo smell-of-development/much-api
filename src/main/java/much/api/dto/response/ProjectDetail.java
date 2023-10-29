@@ -8,7 +8,6 @@ import lombok.Getter;
 import much.api.common.enums.MuchState;
 import much.api.common.util.ContextUtils;
 import much.api.entity.Project;
-import much.api.entity.ProjectJoin;
 import much.api.entity.ProjectPosition;
 import much.api.entity.User;
 
@@ -89,6 +88,7 @@ public class ProjectDetail {
 
     public static ProjectDetail ofEntity(Project project, Set<String> tags) {
 
+        project.increaseViewCount();
         List<ProjectPosition> projectPositions = project.getPositionStatus();
 
         Long userId = ContextUtils.getUserId();
@@ -96,9 +96,9 @@ public class ProjectDetail {
         boolean isWriter = project.isWriter();
 
         Boolean alreadyJoined = isLoggedOut ? null
-                : isWriter || isJoined(userId, project.getProjectJoins());
+                : isWriter || project.hasJoinedUser(userId);
         Boolean alreadyApplied = isLoggedOut ? null
-                : !alreadyJoined && hasApplied(userId, project.getApplications());
+                : !alreadyJoined && project.hasAppliedUser(userId);
 
         return ProjectDetail.builder()
                 .writer(ofUser(project.getWriter()))
@@ -123,20 +123,6 @@ public class ProjectDetail {
                 .tags(tags)
                 .introduction(project.getIntroduction())
                 .build();
-    }
-
-    private static boolean hasApplied(Long userId, List<much.api.entity.ProjectApplication> applications) {
-        if (userId == null) return false;
-
-        return applications.stream()
-                .anyMatch(ap -> ap.getMember().getId().equals(userId));
-    }
-
-    private static boolean isJoined(Long userId, List<ProjectJoin> projectJoins) {
-        if (userId == null) return false;
-
-        return projectJoins.stream()
-                .anyMatch(pj -> pj.getMember().getId().equals(userId));
     }
 
 
@@ -214,7 +200,7 @@ public class ProjectDetail {
                 totalRecruited += recruited;
 
                 // 포지션 마감 확인
-                if (position.isClosed()) {
+                if (position.closed()) {
                     closedPositionCount++;
                 }
 
@@ -231,7 +217,7 @@ public class ProjectDetail {
 
                 positionStatusList.add(
                         PositionStatus.builder()
-                                .state(position.isClosed() ? ofState(DONE) : ofState(RECRUITING))
+                                .state(position.closed() ? ofState(DONE) : ofState(RECRUITING))
                                 .id(position.getId())
                                 .name(position.getName())
                                 .needs(needs)

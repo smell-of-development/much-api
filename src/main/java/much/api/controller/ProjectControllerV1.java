@@ -38,7 +38,7 @@ public class ProjectControllerV1 implements ProjectApiV1 {
                                                         @RequestBody ProjectForm request) {
 
         return ok(
-                Envelope.ok(projectService.modifyProject(projectId, request).getId())
+                Envelope.ok(projectService.modifyProject(projectId, request))
         );
     }
 
