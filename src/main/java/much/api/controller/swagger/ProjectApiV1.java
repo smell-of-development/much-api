@@ -191,8 +191,6 @@ public interface ProjectApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 본인글이 아닌경우
-                    - code 4001
-                    - 로그인이 되어있지 않은경우
                     """)
     ResponseEntity<Envelope<Void>> deleteProject(Long projectId);
 
@@ -215,8 +213,6 @@ public interface ProjectApiV1 {
                     - 이미 가입된 프로젝트인 경우
                     - 이미 신청한 프로젝트인 경우
                     - 프로젝트의 포지션을 찾을 수 없는경우
-                    - code 4001
-                    - 로그인이 되어있지 않은경우
                     """)
     ResponseEntity<Envelope<Void>> createProjectApplication(Long projectId, ProjectApplicationForm request);
 
@@ -234,8 +230,7 @@ public interface ProjectApiV1 {
                     - code 2000
                     - 로그인 된 사용자를 찾을 수 없는경우
                     - 프로젝트에 해당하는 신청서를 찾을 수 없는경우
-                    - code 4001
-                    - 로그인이 되어있지 않은경우
+                    - 본인의 신청서가 아닌경우
                     """)
     ResponseEntity<Envelope<Void>> deleteProjectApplication(Long projectId);
 
