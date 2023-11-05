@@ -2,6 +2,7 @@ package much.api.common.util;
 
 import much.api.common.enums.RunMode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,10 @@ public class ContextUtils {
     public static Long getUserId() {
 
         try {
-            return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null) return null;
+
+            return Long.valueOf(authentication.getName());
         } catch (NumberFormatException e) {
             return null;
         }

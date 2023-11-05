@@ -178,7 +178,7 @@ public class StudyDetail {
 
         public static Recruit ofEntity(Study study) {
 
-            return new Recruit(ofState(study.closed() ? DONE : RECRUITING), study.getNeeds(), study.getRecruited());
+            return new Recruit(ofState(study.isClosed() ? DONE : RECRUITING), study.getNeeds(), study.getRecruited());
         }
 
         @Getter

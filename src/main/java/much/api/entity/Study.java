@@ -66,10 +66,10 @@ public class Study extends BaseTimeEntity {
     private String meetingDays;
 
     @Getter
-    private Integer needs;
+    private int needs;
 
     @Getter
-    private Integer recruited;
+    private int recruited;
 
     @Getter
     @Column(columnDefinition = "text")
@@ -149,7 +149,7 @@ public class Study extends BaseTimeEntity {
     }
 
 
-    public boolean closed() {
+    public boolean isClosed() {
 
         return needs <= recruited;
     }

@@ -201,7 +201,7 @@ public class StudyService {
                 });
 
         // 스터디 모집완료 확인
-        if (study.closed()) {
+        if (study.isClosed()) {
             throw new AlreadyRecruited();
         }
 
@@ -267,7 +267,7 @@ public class StudyService {
         Study study = application.getStudy();
 
         // 스터디 모집완료 확인
-        if (study.closed()) {
+        if (study.isClosed()) {
             throw new AlreadyRecruited();
         }
 
