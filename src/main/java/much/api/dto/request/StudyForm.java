@@ -2,6 +2,7 @@ package much.api.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import much.api.common.aop.SelfCheck;
 import much.api.common.exception.*;
@@ -48,6 +49,31 @@ public class StudyForm {
 
     private String introduction;
 
+    @Builder
+    private StudyForm(String title,
+                     String imageUrl,
+                     Boolean online,
+                     String address,
+                     LocalDate deadline,
+                     LocalDate startDate,
+                     LocalDate endDate,
+                     List<String> meetingDays,
+                     int needs,
+                     Set<String> tags,
+                     String introduction) {
+
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.online = online;
+        this.address = address;
+        this.deadline = deadline;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.meetingDays = meetingDays;
+        this.needs = needs;
+        this.tags = tags;
+        this.introduction = introduction;
+    }
 
     private void checkValidation() {
 
@@ -64,17 +90,15 @@ public class StudyForm {
             throw new InvalidDeadLine();
         }
 
-        // 일정 협의
-        if (startDate == null && endDate == null) {
-            return;
-        }
+        // 일정 체크
+        boolean needToCheckSchedule = startDate != null || endDate != null;
 
-        if (startDate == null || endDate == null) {
+        if (needToCheckSchedule && (startDate == null || endDate == null)) {
             throw new InvalidPeriod();
         }
 
         // 일정 시작 ~ 종료일 확인
-        if (startDate.isAfter(endDate)) {
+        if (needToCheckSchedule && startDate.isAfter(endDate)) {
             throw new InvalidPeriod(startDate.toString(), endDate.toString());
         }
 
