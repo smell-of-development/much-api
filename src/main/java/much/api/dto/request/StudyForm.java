@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import much.api.common.aop.SelfCheck;
 import much.api.common.exception.*;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,7 @@ import java.util.Set;
 
 @Getter
 @SelfCheck("checkValidation")
+@NoArgsConstructor
 public class StudyForm {
 
     private static final int MAX_TITLE_LENGTH = 40;
