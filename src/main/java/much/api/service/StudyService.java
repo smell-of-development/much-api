@@ -56,7 +56,7 @@ public class StudyService {
         List<String> requestMeetingDays = studyForm.getMeetingDays();
 
         String meetingDays = requestMeetingDays.isEmpty() ? null :
-                String.join(", ", requestMeetingDays);
+                String.join(",", requestMeetingDays);
 
         String requestIntroduction = studyForm.getIntroduction();
         Set<String> requestTags = studyForm.getTags();
