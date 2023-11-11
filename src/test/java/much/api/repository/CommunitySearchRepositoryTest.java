@@ -33,10 +33,14 @@ class CommunitySearchRepositoryTest {
     CommunityRepository communityRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     TagRelationRepository tagRelationRepository;
 
     @BeforeEach
     void clean() {
+        userRepository.deleteAll();
         tagRelationRepository.deleteAll();
         communityRepository.deleteAll();
     }
