@@ -1,0 +1,142 @@
+##### 활성 프로파일 설정 #####
+spring:
+  profiles:
+    active:
+      - memoryDb
+      - devLog
+      - devValue
+  ##### 공통 START #####
+  security:
+    filter:
+      order: 1
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        default_batch_fetch_size: 100
+  sql:
+    init:
+      mode: never
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  error:
+    path: /
+    whitelabel:
+      enabled: false
+##### 공통 END #####
+
+--- ##### 로깅 프로파일 START #####
+spring:
+  config:
+    activate:
+      on-profile:
+        - devLog
+
+logging:
+  level:
+    much.api: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    reactor.netty.http.client.HttpClient: debug
+--- ##### 로깅 프로파일 END #####
+
+--- ##### DB 프로파일 START #####
+spring:
+  config:
+    activate:
+      on-profile:
+        - memoryDb
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:much;MODE=MySQL
+    username: sa
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  sql:
+    init:
+      mode: always
+--- ##### DB 프로파일 END #####
+
+--- ##### VALUE 프로파일 #####
+spring:
+  config:
+    activate:
+      on-profile:
+        - devValue
+context:
+  host: http://localhost:8080
+  runMode: DEV
+oauth2:
+  providers:
+    - name: google
+      clientId:
+      clientSecret:
+      responseType:
+      authorizationGrantType:
+      authorizationUri:
+      redirectUri:
+      tokenUri:
+      userInfoUri:
+      revokeUri:
+      scope:
+    - name: kakao
+      clientId:
+      clientSecret:
+      responseType:
+      authorizationGrantType:
+      authorizationUri:
+      redirectUri:
+      tokenUri:
+      userInfoUri:
+      revokeUri:
+      scope:
+sms:
+  expirationTimeInMinutes: 5
+  maxSendingCountPerDay: 5
+  certificationMessageFormat: "[MUCH] 인증번호는 [%s] 입니다."
+  from:
+  host:
+  url:
+  pathVariableName:
+  serviceId:
+  accessKey:
+  secretKey:
+  accessKeyHeader:
+  timeStampHeader:
+  signatureHeader:
+jwt:
+  header: Authorization
+  type: "Bearer "
+  secret: hello world
+  accessTokenExpirationTime: 86400000 # 300000 - 5분, 86400000 - 1일
+  refreshTokenExpirationTime: 604800000 # 86400000 - 1일, 604800000 - 7일
+---
