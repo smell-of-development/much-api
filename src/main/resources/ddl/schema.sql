@@ -192,10 +192,9 @@ create table tb_user_pick
 alter table tb_community add constraint tb_community_idx1 unique (id, category);
 
 alter table tb_user add constraint tb_user_idx1 unique (login_id);
-
 alter table tb_user add constraint tb_user_idx2 unique (kakao_id);
-
 alter table tb_user add constraint tb_user_idx3 unique (google_id);
+alter table tb_user add constraint tb_user_idx4 unique (phone_number);
 
 alter table tb_project_position
     add constraint tb_project_position_fk1 foreign key (project_id) references tb_project(id);

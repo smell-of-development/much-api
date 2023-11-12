@@ -18,6 +18,7 @@ import org.hibernate.annotations.DynamicUpdate;
                 @Index(name = "tb_user_idx1", columnList = "loginId", unique = true),
                 @Index(name = "tb_user_idx2", columnList = "kakaoId", unique = true),
                 @Index(name = "tb_user_idx3", columnList = "googleId", unique = true),
+                @Index(name = "tb_user_idx4", columnList = "phoneNumber", unique = true),
         }
 )
 public class User extends BaseTimeEntity {
