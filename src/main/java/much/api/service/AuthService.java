@@ -60,10 +60,10 @@ public class AuthService {
         final String requestPassword = loginRequest.getPassword();
 
         User user = userRepository.findByLoginId(requestId)
-                .orElseThrow(() -> new IncorrectLoginInfo(Long.valueOf(requestId)));
+                .orElseThrow(() -> new IncorrectLoginInfo(requestId));
 
         if (!passwordEncoder.matches(requestPassword, user.getPassword())) {
-            throw new IncorrectLoginInfo(Long.valueOf(requestId));
+            throw new IncorrectLoginInfo(requestId);
         }
 
         return WebToken.ofJwt(
