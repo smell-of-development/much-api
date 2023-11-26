@@ -189,7 +189,7 @@ public class AuthService {
      * @param verificationNumber 입력 인증번호
      */
     @Transactional
-    public void verifyVerificationNumber(String phoneNumber, String verificationNumber) {
+    public void validateVerificationNumber(String phoneNumber, String verificationNumber) {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);

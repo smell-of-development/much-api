@@ -124,7 +124,7 @@ public class AuthControllerV1 implements AuthApiV1 {
         final String phoneNumber = request.getPhoneNumber();
         final String verificationNumber = request.getVerificationNumber();
 
-        authService.verifyVerificationNumber(phoneNumber, verificationNumber);
+        authService.validateVerificationNumber(phoneNumber, verificationNumber);
         return ok(
                 Envelope.empty()
         );
