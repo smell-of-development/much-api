@@ -4,11 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import much.api.dto.request.SmsValidation;
 import much.api.dto.response.WebToken;
 import much.api.dto.request.Login;
-import much.api.dto.request.SmsVerification;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.SmsCertification;
+import much.api.dto.response.SmsVerification;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "인증 API", description = "인증 관련 API")
@@ -107,7 +107,7 @@ public interface AuthApiV1 {
             parameters = {
                     @Parameter(name = "phoneNumber", description = "휴대폰번호")
             })
-    ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(String phoneNumber);
+    ResponseEntity<Envelope<SmsVerification>> sendJoinVerificationNumber(String phoneNumber);
 
 
     @Operation(summary = "가입 SMS 인증번호 확인",
@@ -115,9 +115,8 @@ public interface AuthApiV1 {
                     발송된 인증번호를 확인하고, 휴대폰번호를 설정합니다.
                     - 개발환경 + DB 개발 파라미터 설정시 모든 인증번호에 대해 성공을 응답합니다.
                     ### 요청값
-                    - id                  : 사용자 id
                     - phoneNumber         : 인증번호를 받은 휴대폰번호. 010####@@@@ 형식
-                    - certificationNumber : 전송받은 인증번호
+                    - verificationNumber : 전송받은 인증번호
                     ### 응답값
                     - code 200  : 인증성공
                     - code 2000
@@ -126,6 +125,6 @@ public interface AuthApiV1 {
                     - 발송기록을 찾을 수 없음
                     """,
             requestBody = @RequestBody(required = true, description = "사용자 id, 휴대폰번호, 인증번호"))
-    ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(SmsVerification request);
+    ResponseEntity<Envelope<Void>> validateJoinVerificationNumber(SmsValidation request);
 
 }

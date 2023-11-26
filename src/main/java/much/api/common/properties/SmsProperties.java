@@ -13,7 +13,7 @@ public class SmsProperties {
 
     private final int maxSendingCountPerDay;
 
-    private final String certificationMessageFormat;
+    private final String verificationMessageFormat;
 
     private final String from;
 

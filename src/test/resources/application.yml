@@ -122,7 +122,7 @@ oauth2:
 sms:
   expirationTimeInMinutes: 5
   maxSendingCountPerDay: 5
-  certificationMessageFormat: "[MUCH] 인증번호는 [%s] 입니다."
+  verificationMessageFormat: "[MUCH] 인증번호는 [%s] 입니다."
   from:
   host:
   url:

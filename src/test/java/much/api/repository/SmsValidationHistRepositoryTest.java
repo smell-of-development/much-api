@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
-import much.api.entity.SmsCertificationHist;
+import much.api.entity.SmsVerificationHist;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-class SmsCertificationHistRepositoryTest {
+class SmsValidationHistRepositoryTest {
 
     @Autowired
-    SmsCertificationHistRepository smsCertificationHistRepository;
+    SmsVerificationHistRepository smsVerificationHistRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -37,16 +37,16 @@ class SmsCertificationHistRepositoryTest {
         String phoneNumber = "01012345678";
 
         IntStream.range(0, 4)
-                .forEach(i -> smsCertificationHistRepository.save(SmsCertificationHist.builder()
+                .forEach(i -> smsVerificationHistRepository.save(SmsVerificationHist.builder()
                         .number("123456")
                         .phoneNumber(phoneNumber)
                         .build()));
 
         // when
-        boolean result = smsCertificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
+        boolean result = smsVerificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
 
         // then
-        assertEquals(4L, smsCertificationHistRepository.count());
+        assertEquals(4L, smsVerificationHistRepository.count());
         assertFalse(result);
     }
 
@@ -58,16 +58,16 @@ class SmsCertificationHistRepositoryTest {
         String phoneNumber = "01012345678";
 
         IntStream.range(0, 5)
-                .forEach(i -> smsCertificationHistRepository.save(SmsCertificationHist.builder()
+                .forEach(i -> smsVerificationHistRepository.save(SmsVerificationHist.builder()
                         .number("123456")
                         .phoneNumber(phoneNumber)
                         .build()));
 
         // when
-        boolean result = smsCertificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
+        boolean result = smsVerificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
 
         // then
-        assertEquals(5L, smsCertificationHistRepository.count());
+        assertEquals(5L, smsVerificationHistRepository.count());
         assertTrue(result);
     }
 
@@ -81,16 +81,16 @@ class SmsCertificationHistRepositoryTest {
 
         IntStream.range(0, 5)
                 .forEach(i -> {
-                    SmsCertificationHist hist = SmsCertificationHist.builder()
+                    SmsVerificationHist hist = SmsVerificationHist.builder()
                             .number("123456")
                             .phoneNumber(phoneNumber)
                             .build();
 
 
-                    smsCertificationHistRepository.save(hist);
+                    smsVerificationHistRepository.save(hist);
                 });
 
-        Query query = entityManager.createQuery("UPDATE SmsCertificationHist sch SET sch.createdAt = :createdAt");
+        Query query = entityManager.createQuery("UPDATE SmsVerificationHist sch SET sch.createdAt = :createdAt");
 
         LocalDateTime minusDays = now().minusHours(23).minusMinutes(59);
         log.info(minusDays.toString());
@@ -100,10 +100,10 @@ class SmsCertificationHistRepositoryTest {
         entityManager.clear();
 
         // when
-        boolean result = smsCertificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
+        boolean result = smsVerificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
 
         // then
-        assertEquals(5L, smsCertificationHistRepository.count());
+        assertEquals(5L, smsVerificationHistRepository.count());
         assertTrue(result);
     }
 
@@ -117,16 +117,16 @@ class SmsCertificationHistRepositoryTest {
 
         IntStream.range(0, 5)
                 .forEach(i -> {
-                    SmsCertificationHist hist = SmsCertificationHist.builder()
+                    SmsVerificationHist hist = SmsVerificationHist.builder()
                             .number("123456")
                             .phoneNumber(phoneNumber)
                             .build();
 
 
-                    smsCertificationHistRepository.save(hist);
+                    smsVerificationHistRepository.save(hist);
                 });
 
-        Query query = entityManager.createQuery("UPDATE SmsCertificationHist sch SET sch.createdAt = :createdAt");
+        Query query = entityManager.createQuery("UPDATE SmsVerificationHist sch SET sch.createdAt = :createdAt");
 
         LocalDateTime minusDays = now().minusDays(1L);
         log.info(minusDays.toString());
@@ -136,10 +136,10 @@ class SmsCertificationHistRepositoryTest {
         entityManager.clear();
 
         // when
-        boolean result = smsCertificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
+        boolean result = smsVerificationHistRepository.existsHistMoreThanN(phoneNumber, now().minusDays(1L), 5);
 
         // then
-        assertEquals(5L, smsCertificationHistRepository.count());
+        assertEquals(5L, smsVerificationHistRepository.count());
         assertFalse(result);
     }
 

@@ -57,10 +57,10 @@ public enum Code {
     DUPLICATED_PHONE_NUMBER(2000, "중복된 휴대폰번호에요.", false),
 
     MESSAGE_SENDING_FAIL(2000, "메세지 발송에 실패했어요.", false),
-    CERTIFICATION_MESSAGE_SENDING_COUNT_EXCEEDED(2000, "하루 최대 전송횟수를 초과했어요.", false),
-    CERTIFICATION_NUMBER_NOT_MATCHED(2000, "인증번호가 일치하지 않아요.", false),
-    CERTIFICATION_NUMBER_SENDING_NEEDED(2000, "인증번호 전송이 필요해요.", false),
-    CERTIFICATION_NEEDED(2000, "SMS 인증이 필요해요.", false),
+    VERIFICATION_MESSAGE_SENDING_COUNT_EXCEEDED(2000, "하루 최대 전송횟수를 초과했어요.", false),
+    VERIFICATION_NUMBER_NOT_MATCHED(2000, "인증번호가 일치하지 않아요.", false),
+    VERIFICATION_NUMBER_SENDING_NEEDED(2000, "인증번호 전송이 필요해요.", false),
+    VERIFICATION_NEEDED(2000, "SMS 인증이 필요해요.", false),
 
     NOT_IMAGE_FILE(2000, "이미지 파일이 아니에요.", false),
 

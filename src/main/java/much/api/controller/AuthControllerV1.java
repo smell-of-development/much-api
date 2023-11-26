@@ -8,9 +8,9 @@ import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
 import much.api.controller.swagger.AuthApiV1;
 import much.api.dto.request.Login;
-import much.api.dto.request.SmsVerification;
+import much.api.dto.request.SmsValidation;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.SmsCertification;
+import much.api.dto.response.SmsVerification;
 import much.api.dto.response.WebToken;
 import much.api.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -108,8 +108,8 @@ public class AuthControllerV1 implements AuthApiV1 {
 
 
     @Override
-    @PostMapping("/sms/certification")
-    public ResponseEntity<Envelope<SmsCertification>> sendJoinCertificationNumber(@RequestParam String phoneNumber) {
+    @PostMapping("/sms/verification-number-sending")
+    public ResponseEntity<Envelope<SmsVerification>> sendJoinVerificationNumber(@RequestParam String phoneNumber) {
 
         return ok(
                 Envelope.ok(authService.sendCertificationNumber(phoneNumber))
@@ -118,13 +118,13 @@ public class AuthControllerV1 implements AuthApiV1 {
 
 
     @Override
-    @PostMapping("/sms/verification")
-    public ResponseEntity<Envelope<Void>> verifyJoinCertificationNumber(@RequestBody @Valid SmsVerification request) {
+    @PostMapping("/sms/validation")
+    public ResponseEntity<Envelope<Void>> validateJoinVerificationNumber(@RequestBody @Valid SmsValidation request) {
 
         final String phoneNumber = request.getPhoneNumber();
-        final String certificationNumber = request.getCertificationNumber();
+        final String verificationNumber = request.getVerificationNumber();
 
-        authService.verifyCertificationNumber(phoneNumber, certificationNumber);
+        authService.verifyVerificationNumber(phoneNumber, verificationNumber);
         return ok(
                 Envelope.empty()
         );

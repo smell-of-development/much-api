@@ -2,8 +2,8 @@ package much.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import much.api.dto.request.UserCreation;
-import much.api.entity.SmsCertificationHist;
-import much.api.repository.SmsCertificationHistRepository;
+import much.api.entity.SmsVerificationHist;
+import much.api.repository.SmsVerificationHistRepository;
 import much.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +40,7 @@ class UserControllerV1Test {
     UserRepository userRepository;
 
     @Autowired
-    SmsCertificationHistRepository smsCertificationHistRepository;
+    SmsVerificationHistRepository smsVerificationHistRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -48,7 +48,7 @@ class UserControllerV1Test {
 
     @BeforeEach
     void clean() {
-        smsCertificationHistRepository.deleteAll();
+        smsVerificationHistRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -75,10 +75,10 @@ class UserControllerV1Test {
     void user_join_test1(@AggregateWith(UserCreationAggregator.class) UserCreation information) throws Exception {
         // given
         String request = objectMapper.writeValueAsString(information);
-        smsCertificationHistRepository.save(
-                SmsCertificationHist.builder()
+        smsVerificationHistRepository.save(
+                SmsVerificationHist.builder()
                         .phoneNumber(information.getPhoneNumber())
-                        .certified(true)
+                        .verified(true)
                         .build());
 
         // expected

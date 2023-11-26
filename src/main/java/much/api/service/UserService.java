@@ -3,15 +3,15 @@ package much.api.service;
 import lombok.RequiredArgsConstructor;
 import much.api.common.aop.MuchValid;
 import much.api.common.enums.Role;
-import much.api.common.exception.CertificationNeeded;
+import much.api.common.exception.VerificationNeeded;
 import much.api.common.exception.InvalidPhoneNumber;
 import much.api.common.util.PhoneNumberUtils;
 import much.api.common.util.TokenProvider;
 import much.api.dto.request.UserCreation;
 import much.api.dto.response.WebToken;
-import much.api.entity.SmsCertificationHist;
+import much.api.entity.SmsVerificationHist;
 import much.api.entity.User;
-import much.api.repository.SmsCertificationHistRepository;
+import much.api.repository.SmsVerificationHistRepository;
 import much.api.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final SmsCertificationHistRepository smsCertificationHistRepository;
+    private final SmsVerificationHistRepository smsVerificationHistRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -50,22 +50,22 @@ public class UserService {
 
         // 휴대폰인증 SELECT - 1시간 이내
         LocalDateTime after = LocalDateTime.now().minusHours(1L);
-        Optional<SmsCertificationHist> histOptional = smsCertificationHistRepository.findLatestSent(phoneNumber, after);
+        Optional<SmsVerificationHist> histOptional = smsVerificationHistRepository.findLatestSent(phoneNumber, after);
 
         // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
-        boolean certificationCompleted = commonService.isSmsPass();
+        boolean verificationCompleted = commonService.isSmsPass();
 
         // 인증이 완료된 번호인지 확인
-        if (!certificationCompleted && histOptional.isPresent()) {
+        if (!verificationCompleted && histOptional.isPresent()) {
 
-            SmsCertificationHist hist = histOptional.get();
-            if (hist.isCertified()) {
-                certificationCompleted = true;
+            SmsVerificationHist hist = histOptional.get();
+            if (hist.isVerified()) {
+                verificationCompleted = true;
             }
         }
 
-        if (!certificationCompleted) {
-            throw new CertificationNeeded(phoneNumber);
+        if (!verificationCompleted) {
+            throw new VerificationNeeded(phoneNumber);
         }
 
         // 유저 등록

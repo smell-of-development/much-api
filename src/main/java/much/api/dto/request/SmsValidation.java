@@ -8,19 +8,19 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SmsVerification {
+public class SmsValidation {
 
     @NotNull
     private String phoneNumber;
 
     @NotNull
-    private String certificationNumber;
+    private String verificationNumber;
 
     @Builder
-    private SmsVerification(String phoneNumber,
-                            String certificationNumber) {
+    private SmsValidation(String phoneNumber,
+                          String verificationNumber) {
 
         this.phoneNumber = phoneNumber;
-        this.certificationNumber = certificationNumber;
+        this.verificationNumber = verificationNumber;
     }
 }

@@ -2,11 +2,11 @@ package much.api.service;
 
 import much.api.dto.request.UserCreation;
 import much.api.dto.response.WebToken;
-import much.api.entity.SmsCertificationHist;
+import much.api.entity.SmsVerificationHist;
 import much.api.entity.User;
-import much.api.common.exception.CertificationNeeded;
+import much.api.common.exception.VerificationNeeded;
 import much.api.common.exception.MuchException;
-import much.api.repository.SmsCertificationHistRepository;
+import much.api.repository.SmsVerificationHistRepository;
 import much.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ class UserServiceTest {
     UserService userService;
 
     @Autowired
-    SmsCertificationHistRepository smsCertificationHistRepository;
+    SmsVerificationHistRepository smsVerificationHistRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -41,7 +41,7 @@ class UserServiceTest {
 
     @BeforeEach
     void clean() {
-        smsCertificationHistRepository.deleteAll();
+        smsVerificationHistRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -67,10 +67,10 @@ class UserServiceTest {
     })
     void user_join_test1(@AggregateWith(UserCreationAggregator.class) UserCreation userCreation) {
         // given
-        smsCertificationHistRepository.save(
-                SmsCertificationHist.builder()
+        smsVerificationHistRepository.save(
+                SmsVerificationHist.builder()
                         .phoneNumber(userCreation.getPhoneNumber())
-                        .certified(true)
+                        .verified(true)
                         .build());
 
         // when
@@ -117,6 +117,6 @@ class UserServiceTest {
     })
     void user_join_test3(@AggregateWith(UserCreationAggregator.class) UserCreation userCreation) {
         // expected
-        assertThrows(CertificationNeeded.class, () -> userService.createUser(userCreation));
+        assertThrows(VerificationNeeded.class, () -> userService.createUser(userCreation));
     }
 }

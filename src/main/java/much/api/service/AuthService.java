@@ -11,11 +11,11 @@ import much.api.common.util.SmsSender;
 import much.api.common.util.TokenProvider;
 import much.api.dto.request.Login;
 import much.api.dto.response.Envelope;
-import much.api.dto.response.SmsCertification;
+import much.api.dto.response.SmsVerification;
 import much.api.dto.response.WebToken;
-import much.api.entity.SmsCertificationHist;
+import much.api.entity.SmsVerificationHist;
 import much.api.entity.User;
-import much.api.repository.SmsCertificationHistRepository;
+import much.api.repository.SmsVerificationHistRepository;
 import much.api.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,7 +43,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
-    private final SmsCertificationHistRepository smsCertificationHistRepository;
+    private final SmsVerificationHistRepository smsVerificationHistRepository;
 
     private final TokenProvider tokenProvider;
 
@@ -126,7 +126,7 @@ public class AuthService {
      * @return 성공시, 응답객체
      */
     @Transactional
-    public SmsCertification sendCertificationNumber(String phoneNumber) {
+    public SmsVerification sendCertificationNumber(String phoneNumber) {
 
         final int expirationTimeInMinutes = smsProperties.getExpirationTimeInMinutes();
 
@@ -137,7 +137,7 @@ public class AuthService {
         // 개발환경 + DB 개발 파라미터 확인하여 인증 건너뛰기
         if (commonService.isSmsPass()) {
 
-            return SmsCertification.builder()
+            return SmsVerification.builder()
                     .phoneNumber(phoneNumber)
                     .remainTimeInMinutes(expirationTimeInMinutes)
                     .build();
@@ -145,19 +145,19 @@ public class AuthService {
 
         // 하루 최대 전송횟수 초과 검사
         LocalDateTime previousDateTime = now().minusDays(1L);
-        if (smsCertificationHistRepository
+        if (smsVerificationHistRepository
                 .existsHistMoreThanN(
                         phoneNumber,
                         previousDateTime,
                         smsProperties.getMaxSendingCountPerDay())) {
 
-            throw new CertificationMessageSendingCountExceeded(phoneNumber);
+            throw new VerificationMessageSendingCountExceeded(phoneNumber);
         }
 
         // 랜덤번호 채번
         int random = ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
         String randomToString = String.valueOf(random);
-        String content = String.format(smsProperties.getCertificationMessageFormat(), randomToString);
+        String content = String.format(smsProperties.getVerificationMessageFormat(), randomToString);
 
         // 문자발송
         boolean success = smsSender.sendSms(phoneNumber, content);
@@ -165,14 +165,14 @@ public class AuthService {
         // DB 저장후 응답
         if (success) {
 
-            SmsCertificationHist hist = SmsCertificationHist.builder()
+            SmsVerificationHist hist = SmsVerificationHist.builder()
                     .phoneNumber(phoneNumber)
                     .number(randomToString)
                     .build();
 
-            smsCertificationHistRepository.save(hist);
+            smsVerificationHistRepository.save(hist);
 
-            return SmsCertification.builder()
+            return SmsVerification.builder()
                     .phoneNumber(phoneNumber)
                     .remainTimeInMinutes(expirationTimeInMinutes)
                     .build();
@@ -185,11 +185,11 @@ public class AuthService {
     /**
      * 전송된 인증번호를 확인
      *
-     * @param phoneNumber         휴대폰 번호
-     * @param certificationNumber 인증번호
+     * @param phoneNumber        휴대폰 번호
+     * @param verificationNumber 입력 인증번호
      */
     @Transactional
-    public void verifyCertificationNumber(String phoneNumber, String certificationNumber) {
+    public void verifyVerificationNumber(String phoneNumber, String verificationNumber) {
 
         if (!PhoneNumberUtils.isOnlyDigitsPattern(phoneNumber)) {
             throw new InvalidPhoneNumber(phoneNumber);
@@ -202,20 +202,15 @@ public class AuthService {
         // 유효시간 내 전송기록 찾기
         LocalDateTime after = now().minusMinutes(smsProperties.getExpirationTimeInMinutes());
 
-        SmsCertificationHist hist = smsCertificationHistRepository.findLatestSent(phoneNumber, after)
-                .orElseThrow(() -> new CertificationNumberSendingNeeded(phoneNumber));
+        SmsVerificationHist hist = smsVerificationHistRepository.findLatestSent(phoneNumber, after)
+                .orElseThrow(() -> new VerificationNumberSendingNeeded(phoneNumber));
 
-        String savedCertificationNumber = hist.getNumber();
+        String savedVerificationNumber = hist.getNumber();
 
-        log.info("휴대폰번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedCertificationNumber, certificationNumber);
+        log.info("휴대폰번호: {}, 인증번호: {}, 입력 인증번호: {}", phoneNumber, savedVerificationNumber, verificationNumber);
 
-        // 인증번호 일치
-        if (!savedCertificationNumber.equals(certificationNumber)) {
-            throw new CertificationNumberNotMatched(certificationNumber);
-        }
-
-        // 완료
-        hist.certify();
+        // 인증번호 일치 확인
+        hist.verify(verificationNumber);
     }
 
 

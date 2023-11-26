@@ -2,7 +2,7 @@ create table dev_parameter
 (
     id     bigint auto_increment,
     name   varchar(255),
-    use_yn boolean default 0 not null,
+    used   boolean default 0 not null,
     constraint dev_parameter_pk primary key (id)
 );
 
@@ -37,15 +37,15 @@ create table tb_file
     constraint tb_file_pk primary key (id)
 );
 
-create table tb_sms_certification_hist
+create table tb_sms_verification_hist
 (
     id           bigint auto_increment,
     phone_number varchar(20),
     number       varchar(6),
-    certified    boolean default 0 not null,
+    verified     boolean default 0 not null,
     created_at   timestamp(6)      not null,
     updated_at   timestamp(6)      not null,
-    constraint tb_sms_certification_hist_pk primary key (id)
+    constraint tb_sms_verification_hist_pk primary key (id)
 );
 
 create table tb_tag_relation
@@ -179,13 +179,23 @@ create table tb_study_application
 create table tb_user_pick
 (
     id          bigint auto_increment,
-    created_at  timestamp(6),
-    updated_at  timestamp(6),
     available   boolean not null,
     target_id   bigint,
     target_type varchar(50),
     user_id     bigint,
+    created_at  timestamp(6),
+    updated_at  timestamp(6),
     constraint tb_user_pick_pk primary key (id)
+);
+
+create table tb_account_finding
+(
+    id               bigint auto_increment,
+    verification_key varchar(36),
+    sms_id           bigint,
+    user_id          bigint,
+    used             boolean default 0 not null,
+    constraint tb_account_finding primary key (id)
 );
 
 
@@ -234,8 +244,10 @@ create index tb_study_join_idx2 on tb_study_join (member_id);
 create index tb_study_application_idx1 on tb_study_application (study_id, member_id);
 create index tb_study_application_idx2 on tb_study_application (member_id);
 
-create index tb_sms_certification_hist_idx1 on tb_sms_certification_hist (phone_number);
+create index tb_sms_verification_hist_idx1 on tb_sms_verification_hist (phone_number);
 
 create index tb_tag_relation_idx1 on tb_tag_relation (relation_type, relation_id);
 
 create index tb_user_pick_idx1 on tb_user_pick (user_id, target_type, target_id);
+
+create unique index tb_account_finding_idx1 on tb_account_finding (verification_key);
