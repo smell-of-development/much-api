@@ -126,7 +126,7 @@ public class AuthService {
      * @return 성공시, 응답객체
      */
     @Transactional
-    public SmsVerification sendCertificationNumber(String phoneNumber) {
+    public SmsVerification sendVerificationNumber(String phoneNumber) {
 
         final int expirationTimeInMinutes = smsProperties.getExpirationTimeInMinutes();
 

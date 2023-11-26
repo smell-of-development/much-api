@@ -112,7 +112,7 @@ public class AuthControllerV1 implements AuthApiV1 {
     public ResponseEntity<Envelope<SmsVerification>> sendJoinVerificationNumber(@RequestParam String phoneNumber) {
 
         return ok(
-                Envelope.ok(authService.sendCertificationNumber(phoneNumber))
+                Envelope.ok(authService.sendVerificationNumber(phoneNumber))
         );
     }
 
