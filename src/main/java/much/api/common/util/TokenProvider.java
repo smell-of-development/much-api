@@ -34,7 +34,7 @@ public class TokenProvider {
 
     public static final String CLAIM_ROLE = "role";
 
-    private static final String CLAIM_PAIR_ID = "pair_id";
+    private static final String CLAIM_PAIR_KEY = "pair_key";
 
     private final JwtProperties properties;
 
@@ -102,9 +102,9 @@ public class TokenProvider {
         Long userIdAtRefreshToken = extractSubject(refreshToken);
 
         // 액세스 토큰의 UUID 추출
-        String uuidAtAccessToken = extractClaim(accessToken, CLAIM_PAIR_ID);
+        String uuidAtAccessToken = extractClaim(accessToken, CLAIM_PAIR_KEY);
         // 리프레시 토큰의 UUID 추출
-        String uuidAtRefreshToken = extractClaim(refreshToken, CLAIM_PAIR_ID);
+        String uuidAtRefreshToken = extractClaim(refreshToken, CLAIM_PAIR_KEY);
 
         // 같은 유저에 대한 토큰이 아니거나, 짝이 안맞으면 리프레시 불가
         if (!userIdAtAccessToken.equals(userIdAtRefreshToken) || !uuidAtAccessToken.equals(uuidAtRefreshToken)) {
@@ -188,7 +188,7 @@ public class TokenProvider {
 
         return JWT.create()
                 .withSubject(String.valueOf(id))
-                .withClaim(CLAIM_PAIR_ID, uuid)
+                .withClaim(CLAIM_PAIR_KEY, uuid)
                 .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()));
     }
 

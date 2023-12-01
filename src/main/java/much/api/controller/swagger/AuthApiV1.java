@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import much.api.dto.request.SmsValidation;
+import much.api.dto.response.LoginCheck;
 import much.api.dto.response.WebToken;
 import much.api.dto.request.Login;
 import much.api.dto.response.Envelope;
@@ -72,7 +73,8 @@ public interface AuthApiV1 {
                     - accessToken  : 만료되었거나 정상인 액세스토큰(필수)
                     - refreshToken : 액세스 토큰에 해당하는 정상 리프레시토큰(필수)
                     ### 응답값
-                    - result{}: accessToken - 리프레시 된 액세스 토큰
+                    - result.id          - 로그인 사용자의 ID Sequence
+                    - result.accessToken - 리프레시 된 액세스 토큰
                     """,
             requestBody = @RequestBody(required = true))
     ResponseEntity<Envelope<WebToken>> refreshAccessToken(WebToken request);
@@ -80,14 +82,21 @@ public interface AuthApiV1 {
 
     @Operation(summary = "로그인 체크",
             description = """
-                    액세스 토큰을 검사하여 로그인 여부를 체크합니다.
+                    액세스 토큰을 검사하여 로그인 여부와 정보를 체크합니다.
                     Authorization 헤더에 액세스 토큰이 필요합니다.
                     ### 요청값
                     - (Header) Authorization : Bearer {accessToken}
                     ### 응답값
-                    - ex) result(number): 1 (로그인 사용자의 id)
+                    - 200
+                    - result.id       - 로그인 사용자의 ID Sequence
+                    - result.nickname - 로그인 사용자의 닉네임
+                    - result.imageUrl - 로그인 사용자의 프로필 사진 URL
+                    - 4001
+                    - 정상적인 로그인 정보가 없음
+                    - 2000
+                    - 토큰은 정상이나, 토큰에 해당하는 사용자를 DB에서 찾을 수 없는경우 -> 로그아웃이 되어야 한다.
                     """)
-    ResponseEntity<Envelope<Long>> checkToken();
+    ResponseEntity<Envelope<LoginCheck>> checkToken();
 
 
     @Operation(summary = "가입 SMS 인증번호 발송",

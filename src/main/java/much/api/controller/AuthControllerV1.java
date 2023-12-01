@@ -4,15 +4,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import much.api.common.enums.Role;
+import much.api.common.exception.UserNotFound;
 import much.api.common.util.ContextUtils;
 import much.api.common.util.TokenProvider;
 import much.api.controller.swagger.AuthApiV1;
 import much.api.dto.request.Login;
 import much.api.dto.request.SmsValidation;
 import much.api.dto.response.Envelope;
+import much.api.dto.response.LoginCheck;
 import much.api.dto.response.SmsVerification;
 import much.api.dto.response.WebToken;
+import much.api.entity.User;
 import much.api.service.AuthService;
+import much.api.service.CommonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +33,8 @@ import static org.springframework.http.ResponseEntity.ok;
 public class AuthControllerV1 implements AuthApiV1 {
 
     private final AuthService authService;
+
+    private final CommonService commonService;
 
     private final TokenProvider tokenProvider;
 
@@ -98,11 +104,20 @@ public class AuthControllerV1 implements AuthApiV1 {
 
     @Override
     @GetMapping("/check")
-    public ResponseEntity<Envelope<Long>> checkToken() {
+    public ResponseEntity<Envelope<LoginCheck>> checkToken() {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.parseLong(principal.getUsername());
+
+        User user = commonService.getUser(userId)
+                .orElseThrow(() -> new UserNotFound(userId));
+
         return ok(
-                Envelope.ok(Long.parseLong(principal.getUsername()))
+                Envelope.ok(LoginCheck.builder()
+                        .id(userId)
+                        .nickname(user.getNickname())
+                        .imageUrl(user.getImageUrl())
+                        .build())
         );
     }
 
