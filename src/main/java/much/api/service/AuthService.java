@@ -143,7 +143,7 @@ public class AuthService {
                     .build();
         }
 
-        // 하루 최대 전송횟수 초과 검사
+        // 하루 최대 전송수 초과 검사
         LocalDateTime previousDateTime = now().minusDays(1L);
         if (smsVerificationHistRepository
                 .existsHistMoreThanN(
