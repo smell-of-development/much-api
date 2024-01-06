@@ -54,11 +54,7 @@ public class CommunitySearchRepository extends QuerydslRepositorySupport {
                                     community.contentWithoutHtmlTags,
                                     community.createdAt,
                                     Expressions.asNumber(0L),
-                                    JPAExpressions
-                                            .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
-                                            .from(tagRelation)
-                                            .where(tagRelation.relationType.eq(COMMUNITY),
-                                                    tagRelation.relationId.eq(community.id)),
+                                    Expressions.asString(""),
                                     community.viewCount
                             )
                     )

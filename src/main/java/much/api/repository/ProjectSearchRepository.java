@@ -51,11 +51,7 @@ public class ProjectSearchRepository extends QuerydslRepositorySupport {
                                     project.address,
                                     project.deadline,
                                     project.meetingDays,
-                                    JPAExpressions
-                                            .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
-                                            .from(tagRelation)
-                                            .where(tagRelation.relationType.eq(PROJECT),
-                                                    tagRelation.relationId.eq(project.id)),
+                                    Expressions.asString(""),
                                     project.viewCount,
                                     JPAExpressions.select(userPick.available)
                                             .from(userPick)

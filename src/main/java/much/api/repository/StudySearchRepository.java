@@ -53,11 +53,7 @@ public class StudySearchRepository extends QuerydslRepositorySupport {
                                     study.meetingDays,
                                     study.needs,
                                     study.recruited,
-                                    JPAExpressions
-                                            .select(stringTemplate("GROUP_CONCAT({0})", tagRelation.tagName))
-                                            .from(tagRelation)
-                                            .where(tagRelation.relationType.eq(STUDY),
-                                                    tagRelation.relationId.eq(study.id)),
+                                    Expressions.asString(""),
                                     study.viewCount,
                                     JPAExpressions.select(userPick.available)
                                             .from(userPick)
