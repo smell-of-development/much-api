@@ -28,7 +28,7 @@ public class ValidationAspect {
                 SelfCheck selfCheck = object.getClass().getAnnotation(SelfCheck.class);
                 if (selfCheck != null) {
                     checkMyself(object, selfCheck);
-                    break;
+                    continue;
                 }
 
                 Field[] fields = object.getClass().getDeclaredFields();
