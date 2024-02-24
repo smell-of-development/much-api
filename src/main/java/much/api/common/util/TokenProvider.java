@@ -117,7 +117,7 @@ public class TokenProvider {
 
     private String createAccessToken(Long id, Role role, String uuid) {
 
-        return getJwtCommonBuilder(id, uuid)
+        return getJwtCommonBuilder(id, uuid, properties.getAccessTokenExpirationTime())
                 .withClaim(CLAIM_ROLE, role.name())
                 .sign(Algorithm.HMAC512(properties.getSecret()));
     }
@@ -125,7 +125,7 @@ public class TokenProvider {
 
     private String createRefreshToken(Long id, String uuid) {
 
-        return getJwtCommonBuilder(id, uuid)
+        return getJwtCommonBuilder(id, uuid, properties.getRefreshTokenExpirationTime())
                 .sign(Algorithm.HMAC512(properties.getSecret()));
     }
 
@@ -184,12 +184,12 @@ public class TokenProvider {
     }
 
 
-    private JWTCreator.Builder getJwtCommonBuilder(Long id, String uuid) {
+    private JWTCreator.Builder getJwtCommonBuilder(Long id, String uuid, long expirationTimes) {
 
         return JWT.create()
                 .withSubject(String.valueOf(id))
                 .withClaim(CLAIM_PAIR_KEY, uuid)
-                .withExpiresAt(new Date(System.currentTimeMillis() + properties.getRefreshTokenExpirationTime()));
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTimes));
     }
 
 
